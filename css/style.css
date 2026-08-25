@@ -3,7 +3,7 @@
    botones tactiles. Sin dependencias externas ni fuentes remotas. */
 
 :root {
-  --fondo: #05070f;
+  --fondo: #070a14;   /* igual que el fondo del lienzo */
   --fondo-panel: rgba(5, 7, 15, 0.88);
   --tinta: #e8f1ff;
   --tinta-tenue: #8b98bd;
@@ -27,6 +27,7 @@ body {
   color: var(--tinta);
   font-family: var(--fuente);
   overscroll-behavior: none;
+  overflow-x: hidden;
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -35,7 +36,12 @@ body {
   flex-direction: column;
   height: 100%;
   min-height: 100%;
-  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  /* CUIDADO: los margenes de seguridad (notch, bordes curvos, barra de
+     gestos) van SOLO arriba y abajo. Si se aplican tambien a los lados, todo
+     el juego se corre hacia un costado y deja una franja vacia al otro.
+     Los laterales se aplican mas abajo, solo a las barras. */
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
 /* ---------- Cabecera ---------- */
@@ -46,7 +52,7 @@ body {
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  padding: 6px 12px;
+  padding: 6px calc(12px + env(safe-area-inset-right)) 6px calc(12px + env(safe-area-inset-left));
   border-bottom: 1px solid var(--borde);
 }
 
@@ -242,7 +248,7 @@ body {
   display: none;
   flex: 0 0 auto;
   gap: 8px;
-  padding: 8px 10px 10px;
+  padding: 8px calc(10px + env(safe-area-inset-right)) 10px calc(10px + env(safe-area-inset-left));
 }
 
 body.tactil #botonera { display: flex; }
@@ -282,7 +288,7 @@ body.tactil #botonera { display: flex; }
   justify-content: center;
   gap: 14px;
   flex-wrap: wrap;
-  padding: 6px 12px 10px;
+  padding: 6px calc(12px + env(safe-area-inset-right)) 10px calc(12px + env(safe-area-inset-left));
   font-size: 11px;
   color: var(--tinta-tenue);
   border-top: 1px solid var(--borde);
@@ -387,18 +393,18 @@ body.tactil #botonera { display: flex; }
     pointer-events: auto;
   }
 
-  body.tactil #botonera [data-accion="izquierda"] { left: 12px; }
-  body.tactil #botonera [data-accion="derecha"] { left: 102px; }
+  body.tactil #botonera [data-accion="izquierda"] { left: calc(12px + env(safe-area-inset-left)); }
+  body.tactil #botonera [data-accion="derecha"] { left: calc(102px + env(safe-area-inset-left)); }
 
   body.tactil #botonera [data-accion="disparo"] {
-    right: 12px;
+    right: calc(12px + env(safe-area-inset-right));
     width: 100px;
     height: 100px;
     font-size: 13px;
   }
 
   body.tactil #botonera [data-accion="pausa"] {
-    right: 16px;
+    right: calc(16px + env(safe-area-inset-right));
     top: 10px;
     bottom: auto;
     width: 52px;
