@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 30" width="36" height="30" shape-rendering="geometricPrecision">
+  <!-- ENEMIGO 03 "JEFE CHUNCHO" - fotograma B (pupila girada, patas alternadas) -->
+  <g stroke="#6b1f14" stroke-width="2" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M18,2 L24,7 L30,4 L28,10 L33,13 L27,15 L18,15 L9,15 L3,13 L8,10 L6,4 L12,7 Z" fill="#ff9b6e"/>
+    <ellipse cx="18" cy="18" rx="13" ry="9.6" fill="#ff7b5e"/>
+    <path d="M8,27 L9,30 M14,27 L16,30 M22,27 L20,30 M28,27 L27,30" stroke="#e0553a" stroke-width="3"/>
+  </g>
+  <ellipse cx="18" cy="17" rx="7" ry="6.5" fill="#fffdf7" stroke="#6b1f14" stroke-width="1.8"/>
+  <circle cx="16.4" cy="18.4" r="3.4" fill="#1b2b3d"/>
+  <circle cx="15" cy="17" r="1.2" fill="#ffffff"/>
+  <path d="M11,25 Q18,21 25,25" fill="none" stroke="#6b1f14" stroke-width="2" stroke-linecap="round"/>
+</svg>

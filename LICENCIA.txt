@@ -1,0 +1,21 @@
+TIO RENE INVADERS
+Copyright (c) 2026 Eduardo Perez
+
+Todo el contenido de esta carpeta es original de este proyecto:
+
+  - el codigo JavaScript, HTML y CSS;
+  - los sprites SVG de assets/sprites y assets/ui;
+  - el arte de reserva generado por codigo (js/fallback-art.js);
+  - los sonidos, que se sintetizan en tiempo real con la Web Audio API.
+
+No se han utilizado sprites, sonidos, musica, ROMs, codigo ni recursos
+extraidos de Space Invaders ni de ningun otro videojuego existente. La
+inspiracion es mecanica (formacion que desciende, barreras, nave de bonus),
+que no es objeto de proteccion; la ejecucion grafica y sonora es propia.
+
+No se incluye ninguna dependencia de terceros, por lo que no hay licencias
+ajenas que respetar.
+
+Todos los derechos reservados. Si mas adelante quieres publicarlo como
+software libre, basta con reemplazar este archivo por la licencia elegida
+(por ejemplo MIT) y anadir su texto completo.

@@ -1,0 +1,37 @@
+CARPETA DE AUDIO
+================
+
+Esta carpeta esta vacia a proposito.
+
+Todos los efectos del juego se generan en tiempo real con la Web Audio API
+(ver js/audio.js). No hay ningun archivo de sonido ajeno en el proyecto y el
+juego suena igual sin descargar nada.
+
+SI QUIERES PONER TUS PROPIOS SONIDOS (por ejemplo voces del Tio Rene):
+
+1. Deja aqui los .wav con estos nombres exactos:
+
+     tio-rene-shoot.wav     disparo
+     enemy-hit.wav          muere un enemigo
+     tio-rene-hit.wav       al Tio Rene le dan
+     tio-rene-death.wav     ultima vida
+     barrier-hit.wav        impacto en una barrera
+     enemy-drop.wav         la formacion baja un escalon
+     ufo.wav                zumbido del Platillo Completo
+     ufo-hit.wav            cae el Platillo Completo
+     level-start.wav        empieza un nivel
+     level-complete.wav     nivel superado
+     game-over.wav          fin de la partida
+     victory.wav            victoria
+     menu-select.wav        pulsar un boton
+     extra-life.wav         vida extra
+
+2. En js/config.js cambia  USAR_ARCHIVOS: false  por  USAR_ARCHIVOS: true
+
+3. Abre el juego con un servidor local (node tools/servidor-local.mjs).
+   Con file:// el navegador bloquea la lectura de archivos y no se cargarian.
+
+Si falta alguno, ese efecto vuelve solo al sonido sintetizado. La logica del
+juego no cambia nunca: siempre llama a Audio.reproducir('disparo').
+
+Usa solo audio del que tengas los derechos.

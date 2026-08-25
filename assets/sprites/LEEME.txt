@@ -1,0 +1,53 @@
+SPRITES
+=======
+
+Cada pieza es un archivo suelto. Para cambiar el aspecto del juego basta con
+reemplazar el archivo: no hay que tocar codigo.
+
+EL TIO RENE (recortes de una foto)
+
+  player-head.png    360 x 249   cara hasta el corte, con los dientes de arriba
+  player-jaw.png     360 x 147   MANDIBULA INFERIOR (pieza independiente)
+  player-mouth.png   360 x   2   tira que rellena el hueco al abrir la boca
+  player-body.svg     56 x  34   cuerpo pequeno
+
+RESTO DEL JUEGO (dibujos SVG propios)
+
+  enemy-01-a.svg      36 x 30   enemigo verde, fotograma A
+  enemy-01-b.svg      36 x 30   enemigo verde, fotograma B
+  enemy-02-a.svg      36 x 30   enemigo morado, fotograma A
+  enemy-02-b.svg      36 x 30   enemigo morado, fotograma B
+  enemy-03-a.svg      36 x 30   enemigo ciclope, fotograma A
+  enemy-03-b.svg      36 x 30   enemigo ciclope, fotograma B
+  enemy-special.svg   64 x 28   El Platillo Completo (bonus)
+  projectile-player.svg 12 x 22 la muela laser
+  projectile-enemy.svg  12 x 22 rayo enemigo
+  barrier-block.svg    8 x  8   un ladrillo de barrera
+  explosion.svg       32 x 32   destello
+
+EL CORTE DE LA CABEZA
+
+  player-head.png termina justo en el hueco oscuro que hay entre los dientes de
+  arriba y los de abajo. Por eso los dientes de arriba se quedan con la cabeza
+  y los de abajo bajan con la mandibula.
+
+  Las dos piezas salen del MISMO recorte, asi que tienen el mismo ancho y
+  encajan al pixel. Al abrirse queda un hueco que se rellena estirando
+  player-mouth.png: boca oscura al centro, piel a los lados.
+
+CAMBIAR LA CARA POR OTRA FOTO
+
+  python tools/cortar-cara.py mi-foto.png
+
+  Necesita un PNG con el fondo ya recortado. Detecta solo la fila del corte,
+  genera las tres piezas y te dice que medidas actualizar si cambian las
+  proporciones. Para elegir la fila a mano:
+
+  python tools/cortar-cara.py mi-foto.png --regla    (genera regla.png numerada)
+  python tools/cortar-cara.py mi-foto.png 825        (corta en esa fila)
+
+RESPALDOS
+
+  Cada pieza del Tio Rene tiene un .svg del mismo nombre. Solo se usa si el
+  .png falta. Y si tampoco esta el .svg, el juego dibuja una version de
+  emergencia por codigo (js/fallback-art.js) y sigue siendo jugable.

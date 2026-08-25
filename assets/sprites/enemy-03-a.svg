@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 30" width="36" height="30" shape-rendering="geometricPrecision">
+  <!-- ENEMIGO 03 "JEFE CHUNCHO" - fotograma A (ciclope con cresta) -->
+  <g stroke="#6b1f14" stroke-width="2" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M18,1 L23,6 L29,3 L28,9 L33,12 L27,15 L18,15 L9,15 L3,12 L8,9 L7,3 L13,6 Z" fill="#ff9b6e"/>
+    <ellipse cx="18" cy="18" rx="13" ry="9" fill="#ff7b5e"/>
+    <path d="M8,26 L6,29 M14,27 L13,30 M22,27 L23,30 M28,26 L30,29" stroke="#e0553a" stroke-width="3"/>
+  </g>
+  <ellipse cx="18" cy="17" rx="7" ry="6.5" fill="#fffdf7" stroke="#6b1f14" stroke-width="1.8"/>
+  <circle cx="18" cy="17.5" r="3.4" fill="#1b2b3d"/>
+  <circle cx="19.6" cy="15.8" r="1.2" fill="#ffffff"/>
+  <path d="M11,24 Q18,27 25,24" fill="none" stroke="#6b1f14" stroke-width="2" stroke-linecap="round"/>
+</svg>

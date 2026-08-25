@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 4" width="96" height="4" preserveAspectRatio="none">
+  <!-- Respaldo del relleno del corte, por si falta player-mouth.png.
+       Se estira a lo ancho de la cabeza: piel a los lados, boca al centro. -->
+  <rect x="0" y="0" width="96" height="4" fill="#c98d6d"/>
+  <rect x="26" y="0" width="44" height="4" fill="#2e1013"/>
+</svg>

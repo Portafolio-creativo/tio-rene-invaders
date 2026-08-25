@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' file:; style-src 'self' file:; img-src 'self' file: data:; media-src 'self' file: data:; connect-src 'self' file:; font-src 'self' file:; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta name="referrer" content="no-referrer">
+<meta name="color-scheme" content="dark">
+<meta name="description" content="Tio Rene Invaders: arcade chileno de naves donde el Tio Rene dispara desde la mandibula.">
+<title>TÍO RENÉ INVADERS</title>
+<link rel="icon" href="assets/ui/favicon.png" type="image/png">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div id="app">
+
+  <header id="cabecera">
+    <p id="marca">TÍO RENÉ <span>INVADERS</span></p>
+    <div id="controles-audio">
+      <button type="button" id="btn-sonido" aria-pressed="true">SONIDO: SI</button>
+      <label id="etiqueta-volumen" for="control-volumen">VOL</label>
+      <input type="range" id="control-volumen" min="0" max="100" step="5" value="70" aria-label="Volumen">
+    </div>
+  </header>
+
+  <main id="escenario">
+    <div id="marco">
+      <canvas id="lienzo" width="600" height="800" aria-label="Zona de juego de Tío René Invaders" role="img"></canvas>
+
+      <!-- CARGA -->
+      <section class="capa" id="capa-carga" hidden>
+        <h2 class="titulo-capa">CARGANDO</h2>
+        <div id="pista-progreso"><div id="barra-progreso"></div></div>
+        <p id="texto-carga" class="tenue">CARGANDO</p>
+      </section>
+
+      <!-- MENÚ -->
+      <section class="capa" id="capa-menu" hidden>
+        <img id="emblema" src="assets/ui/logo.png" width="320" height="320" alt="">
+        <h1 class="titulo-juego">TÍO RENÉ<br><span>INVADERS</span></h1>
+        <p class="lema">La cabezota que defiende el barrio</p>
+        <p class="marcador-menu">RÉCORD <strong id="record-menu">00000</strong></p>
+        <button type="button" id="btn-jugar" class="boton principal">JUGAR</button>
+        <ul class="controles">
+          <li><b>← →</b> mover</li>
+          <li><b>ESPACIO</b> disparar</li>
+          <li><b>P</b> pausa</li>
+          <li><b>ENTER</b> empezar</li>
+          <li><b>M</b> silenciar</li>
+        </ul>
+        <p class="tenue">En el teléfono usa los botones de abajo.</p>
+      </section>
+
+      <!-- PAUSA -->
+      <section class="capa" id="capa-pausa" hidden>
+        <h2 class="titulo-capa">PAUSA</h2>
+        <button type="button" id="btn-reanudar" class="boton principal">SEGUIR</button>
+        <button type="button" id="btn-menu-pausa" class="boton">MENÚ</button>
+      </section>
+
+      <!-- GAME OVER -->
+      <section class="capa" id="capa-game-over" hidden>
+        <h2 class="titulo-capa peligro">GAME OVER</h2>
+        <p id="mensaje-final" class="lema"></p>
+        <p class="marcador-menu">PUNTOS <strong id="puntos-final">00000</strong></p>
+        <p class="marcador-menu">RÉCORD <strong id="record-final">00000</strong></p>
+        <button type="button" id="btn-reintentar" class="boton principal">OTRA VEZ</button>
+        <button type="button" id="btn-menu-final" class="boton">MENÚ</button>
+      </section>
+
+      <!-- VICTORIA -->
+      <section class="capa" id="capa-victoria" hidden>
+        <h2 class="titulo-capa exito">¡VICTORIA!</h2>
+        <p class="lema">El barrio quedó a salvo. Por ahora.</p>
+        <p class="marcador-menu">PUNTOS <strong id="puntos-victoria">00000</strong></p>
+        <button type="button" id="btn-seguir" class="boton principal">SEGUIR JUGANDO</button>
+        <button type="button" id="btn-menu-victoria" class="boton">MENÚ</button>
+      </section>
+    </div>
+  </main>
+
+  <div id="botonera" aria-label="Controles táctiles">
+    <button type="button" class="tacto" data-accion="izquierda" aria-label="Mover a la izquierda">◀</button>
+    <button type="button" class="tacto" data-accion="derecha" aria-label="Mover a la derecha">▶</button>
+    <button type="button" class="tacto disparo" data-accion="disparo" aria-label="Disparar">DISPARO</button>
+    <button type="button" class="tacto" data-accion="pausa" aria-label="Pausa">II</button>
+  </div>
+
+  <p id="aviso-almacenamiento" class="aviso" hidden></p>
+
+  <footer id="pie">
+    <span>Un juego de <b>Eduardo Pérez</b></span>
+    <a href="https://maladifusion.github.io/apoyo/" target="_blank" rel="noopener noreferrer">💛 Apoya mi trabajo</a>
+  </footer>
+
+</div>
+
+<p id="estado-accesible" class="oculto-visual" aria-live="polite"></p>
+
+<script src="js/config.js"></script>
+<script src="js/util.js"></script>
+<script src="js/storage.js"></script>
+<script src="js/fallback-art.js"></script>
+<script src="js/assets.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/input.js"></script>
+<script src="js/entities/player.js"></script>
+<script src="js/entities/enemy.js"></script>
+<script src="js/entities/projectile.js"></script>
+<script src="js/entities/barrier.js"></script>
+<script src="js/entities/ufo.js"></script>
+<script src="js/entities/particles.js"></script>
+<script src="js/systems/collisions.js"></script>
+<script src="js/systems/score.js"></script>
+<script src="js/systems/levels.js"></script>
+<script src="js/renderer.js"></script>
+<script src="js/game.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>

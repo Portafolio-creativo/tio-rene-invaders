@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 56 34" width="56" height="34" shape-rendering="geometricPrecision">
+  <!-- TIO RENE - CUERPO PEQUENO (chaleco de lana, brazos y zapatos) -->
+  <g stroke="#21140d" stroke-width="2.5" stroke-linejoin="round">
+    <rect x="24" y="0" width="8" height="6" fill="#e8b489"/>            <!-- cuello -->
+    <path d="M14,6 L42,6 L44,26 L12,26 Z" fill="#2e6fb7"/>               <!-- chaleco -->
+    <path d="M24,6 L32,6 L30,14 L26,14 Z" fill="#e8e4dc"/>               <!-- camisa -->
+    <rect x="4" y="8" width="9" height="16" rx="4" fill="#2e6fb7"/>      <!-- brazo izq -->
+    <rect x="43" y="8" width="9" height="16" rx="4" fill="#2e6fb7"/>     <!-- brazo der -->
+    <circle cx="8.5" cy="25" r="4" fill="#e8b489"/>
+    <circle cx="47.5" cy="25" r="4" fill="#e8b489"/>
+    <rect x="14" y="26" width="12" height="8" rx="3" fill="#3a2a1e"/>    <!-- zapatos -->
+    <rect x="30" y="26" width="12" height="8" rx="3" fill="#3a2a1e"/>
+  </g>
+  <g fill="#1d4f86">
+    <rect x="16" y="12" width="24" height="2.5" rx="1"/>
+    <rect x="16" y="18" width="24" height="2.5" rx="1"/>
+  </g>
+</svg>

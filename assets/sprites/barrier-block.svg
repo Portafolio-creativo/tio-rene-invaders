@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 8 8" width="8" height="8" shape-rendering="crispEdges">
+  <!-- BLOQUE DE BARRERA: se dibuja una vez por celda viva -->
+  <rect x="0" y="0" width="8" height="8" fill="#46d16a"/>
+  <rect x="0" y="0" width="8" height="2" fill="#7cf29a"/>
+  <rect x="0" y="6" width="8" height="2" fill="#238a44"/>
+</svg>

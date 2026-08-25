@@ -1,0 +1,250 @@
+/* Arte de emergencia dibujado por codigo.
+ * Solo se usa si un archivo de assets/ no carga (borrado, renombrado, ruta
+ * equivocada, bloqueo del navegador). Asi el juego NUNCA se queda en negro.
+ * Mantiene la misma silueta: cabezota, corte horizontal y mandibula aparte.
+ */
+(function (global) {
+  'use strict';
+
+  function lienzo(w, h) {
+    var c = document.createElement('canvas');
+    c.width = w; c.height = h;
+    return c;
+  }
+
+  function redondeado(ctx, x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+  }
+
+  /* Ultimo recurso: solo si no cargan ni el .png ni el .svg de la cabeza.
+     No pretende parecerse a nadie: solo mantiene el juego jugable, con la
+     cabezota, el corte horizontal y la mandibula aparte. */
+  function cabeza() {
+    var c = lienzo(96, 60), ctx = c.getContext('2d');
+    ctx.fillStyle = '#e8a882';
+    ctx.strokeStyle = '#21140d';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(13, 60); ctx.lineTo(11, 30);
+    ctx.quadraticCurveTo(11, 6, 48, 6);
+    ctx.quadraticCurveTo(85, 6, 85, 30);
+    ctx.lineTo(83, 60); ctx.closePath();
+    ctx.fill(); ctx.stroke();
+
+    // ojos entornados
+    ctx.lineWidth = 3; ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(23, 36); ctx.quadraticCurveTo(31, 31, 40, 35);
+    ctx.moveTo(73, 36); ctx.quadraticCurveTo(65, 31, 56, 35);
+    ctx.stroke();
+
+    // cejas gruesas
+    ctx.fillStyle = '#3a332b';
+    ctx.beginPath();
+    ctx.moveTo(18, 23); ctx.quadraticCurveTo(30, 18, 44, 27);
+    ctx.lineTo(44, 33); ctx.quadraticCurveTo(30, 25, 18, 30);
+    ctx.closePath(); ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(78, 23); ctx.quadraticCurveTo(66, 18, 52, 27);
+    ctx.lineTo(52, 33); ctx.quadraticCurveTo(66, 25, 78, 30);
+    ctx.closePath(); ctx.fill();
+
+    // nariz ancha
+    ctx.beginPath(); ctx.ellipse(48, 46, 12, 8, 0, 0, Math.PI * 2);
+    ctx.fillStyle = '#e08a6e'; ctx.fill();
+    ctx.strokeStyle = '#21140d'; ctx.lineWidth = 2.4; ctx.stroke();
+
+    // barba de tres dias
+    ctx.fillStyle = 'rgba(93,95,114,0.34)';
+    ctx.fillRect(14, 52, 68, 8);
+
+    // CORTE HORIZONTAL: dientes de arriba colgando del borde
+    ctx.fillStyle = '#b8695e'; ctx.fillRect(28, 52, 40, 2);
+    ctx.fillStyle = '#3a1c1a'; ctx.fillRect(13, 54, 70, 6);
+    ctx.fillStyle = '#ede4d0';
+    for (var i = 0; i < 6; i++) { ctx.fillRect(29 + i * 6.6, 54, 6, 6); }
+    return c;
+  }
+
+  function mandibula() {
+    var c = lienzo(76, 30), ctx = c.getContext('2d');
+    ctx.fillStyle = '#f4c99f'; ctx.strokeStyle = '#21140d'; ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(2, 2); ctx.lineTo(74, 2); ctx.lineTo(74, 12);
+    ctx.quadraticCurveTo(74, 28, 38, 28);
+    ctx.quadraticCurveTo(2, 28, 2, 12); ctx.closePath();
+    ctx.fill(); ctx.stroke();
+    ctx.fillStyle = '#fffdf7';
+    [24, 34, 44].forEach(function (x) { ctx.fillRect(x, 2, 8, 7); });
+    ctx.fillStyle = '#c96a6a';
+    ctx.beginPath(); ctx.ellipse(38, 12, 16, 4, 0, 0, Math.PI); ctx.fill();
+    ctx.fillStyle = '#21140d'; ctx.fillRect(2, 0, 72, 3);
+    return c;
+  }
+
+  function boca() {
+    var c = lienzo(64, 30), ctx = c.getContext('2d');
+    ctx.fillStyle = '#3a0f14'; ctx.fillRect(0, 0, 64, 30);
+    ctx.fillStyle = '#1a0508'; ctx.fillRect(0, 0, 64, 4);
+    ctx.fillStyle = '#d8506a';
+    ctx.beginPath(); ctx.ellipse(32, 26, 20, 9, 0, 0, Math.PI * 2); ctx.fill();
+    return c;
+  }
+
+  function cuerpo() {
+    var c = lienzo(56, 34), ctx = c.getContext('2d');
+    ctx.strokeStyle = '#21140d'; ctx.lineWidth = 2.5;
+    ctx.fillStyle = '#e8b489'; ctx.fillRect(24, 0, 8, 6); ctx.strokeRect(24, 0, 8, 6);
+    ctx.fillStyle = '#2e6fb7';
+    ctx.beginPath(); ctx.moveTo(14, 6); ctx.lineTo(42, 6); ctx.lineTo(44, 26); ctx.lineTo(12, 26);
+    ctx.closePath(); ctx.fill(); ctx.stroke();
+    redondeado(ctx, 4, 8, 9, 16, 4); ctx.fill(); ctx.stroke();
+    redondeado(ctx, 43, 8, 9, 16, 4); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = '#3a2a1e';
+    redondeado(ctx, 14, 26, 12, 8, 3); ctx.fill(); ctx.stroke();
+    redondeado(ctx, 30, 26, 12, 8, 3); ctx.fill(); ctx.stroke();
+    return c;
+  }
+
+  var PALETA_ENEMIGOS = {
+    'enemy-01': { cuerpo: '#6ee07a', borde: '#0d3b16', ojo: '#fffdf7', pupila: '#12202a' },
+    'enemy-02': { cuerpo: '#b980ff', borde: '#3d1a63', ojo: '#ffe36b', pupila: '#2a0f47' },
+    'enemy-03': { cuerpo: '#ff7b5e', borde: '#6b1f14', ojo: '#fffdf7', pupila: '#1b2b3d' }
+  };
+
+  function enemigo(tipo, alterno) {
+    var p = PALETA_ENEMIGOS[tipo] || PALETA_ENEMIGOS['enemy-01'];
+    var c = lienzo(36, 30), ctx = c.getContext('2d');
+    var d = alterno ? 2 : -2;
+    ctx.fillStyle = p.cuerpo; ctx.strokeStyle = p.borde; ctx.lineWidth = 2;
+    redondeado(ctx, 4, 5, 28, 18, 8); ctx.fill(); ctx.stroke();
+    ctx.lineWidth = 3; ctx.beginPath();
+    ctx.moveTo(9, 22); ctx.lineTo(7, 29 - d);
+    ctx.moveTo(18, 22); ctx.lineTo(18, 29 + d);
+    ctx.moveTo(27, 22); ctx.lineTo(29, 29 - d);
+    ctx.moveTo(10, 5); ctx.lineTo(6 - d, 0);
+    ctx.moveTo(26, 5); ctx.lineTo(30 + d, 0);
+    ctx.stroke();
+    if (tipo === 'enemy-03') {
+      ctx.fillStyle = p.ojo;
+      ctx.beginPath(); ctx.ellipse(18, 14, 7, 6, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.lineWidth = 2; ctx.stroke();
+      ctx.fillStyle = p.pupila;
+      ctx.beginPath(); ctx.arc(18 + d, 14, 3.2, 0, Math.PI * 2); ctx.fill();
+    } else {
+      [12, 24].forEach(function (cx) {
+        ctx.fillStyle = p.ojo;
+        ctx.beginPath(); ctx.ellipse(cx, 14, 4.5, 4.5, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.lineWidth = 2; ctx.stroke();
+        ctx.fillStyle = p.pupila;
+        ctx.beginPath(); ctx.arc(cx + d * 0.5, 14, 2, 0, Math.PI * 2); ctx.fill();
+      });
+    }
+    return c;
+  }
+
+  function ovni() {
+    var c = lienzo(64, 28), ctx = c.getContext('2d');
+    ctx.strokeStyle = '#5c3a12'; ctx.lineWidth = 2;
+    ctx.fillStyle = '#e8b36a';
+    ctx.beginPath(); ctx.ellipse(32, 19, 30, 7, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = '#f0c684';
+    ctx.beginPath(); ctx.moveTo(6, 15); ctx.quadraticCurveTo(32, -2, 58, 15);
+    ctx.quadraticCurveTo(32, 22, 6, 15); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = '#d1543f'; redondeado(ctx, 12, 11, 40, 7, 3.5); ctx.fill(); ctx.stroke();
+    ctx.strokeStyle = '#7bbf5a'; ctx.lineWidth = 3.5;
+    ctx.beginPath(); ctx.moveTo(13, 11);
+    ctx.quadraticCurveTo(24, 6, 32, 12); ctx.quadraticCurveTo(42, 17, 52, 11); ctx.stroke();
+    ctx.fillStyle = '#9fe8ff'; ctx.strokeStyle = '#5c3a12'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.ellipse(32, 6, 7, 4, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    return c;
+  }
+
+  function proyectil(esJugador) {
+    var c = lienzo(12, 22), ctx = c.getContext('2d');
+    if (esJugador) {
+      ctx.fillStyle = 'rgba(255,227,107,0.35)';
+      ctx.beginPath(); ctx.ellipse(6, 11, 5.5, 10.5, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#fffdf2'; ctx.strokeStyle = '#c9a227'; ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      ctx.moveTo(2, 5); ctx.quadraticCurveTo(6, 0, 10, 5);
+      ctx.lineTo(10, 13); ctx.lineTo(8, 20); ctx.lineTo(6, 15); ctx.lineTo(4, 20); ctx.lineTo(2, 13);
+      ctx.closePath(); ctx.fill(); ctx.stroke();
+    } else {
+      ctx.fillStyle = 'rgba(255,91,208,0.28)';
+      ctx.beginPath(); ctx.ellipse(6, 11, 5, 10, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#ff8ae0'; ctx.strokeStyle = '#7a1f66'; ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      ctx.moveTo(7, 1); ctx.lineTo(3, 9); ctx.lineTo(6, 9); ctx.lineTo(2, 21);
+      ctx.lineTo(10, 10); ctx.lineTo(6.5, 10); ctx.lineTo(10, 1);
+      ctx.closePath(); ctx.fill(); ctx.stroke();
+    }
+    return c;
+  }
+
+  function bloqueBarrera() {
+    var c = lienzo(8, 8), ctx = c.getContext('2d');
+    ctx.fillStyle = '#46d16a'; ctx.fillRect(0, 0, 8, 8);
+    ctx.fillStyle = '#7cf29a'; ctx.fillRect(0, 0, 8, 2);
+    ctx.fillStyle = '#238a44'; ctx.fillRect(0, 6, 8, 2);
+    return c;
+  }
+
+  function explosion() {
+    var c = lienzo(32, 32), ctx = c.getContext('2d');
+    ctx.fillStyle = '#ffe36b';
+    ctx.beginPath();
+    for (var i = 0; i < 12; i++) {
+      var ang = (Math.PI * 2 * i) / 12;
+      var r = i % 2 === 0 ? 16 : 8;
+      var x = 16 + Math.cos(ang) * r, y = 16 + Math.sin(ang) * r;
+      if (i === 0) { ctx.moveTo(x, y); } else { ctx.lineTo(x, y); }
+    }
+    ctx.closePath(); ctx.fill();
+    ctx.fillStyle = '#fff6d0';
+    ctx.beginPath(); ctx.arc(16, 16, 7, 0, Math.PI * 2); ctx.fill();
+    return c;
+  }
+
+  function logo() {
+    var c = lienzo(160, 160), ctx = c.getContext('2d');
+    ctx.fillStyle = '#141c33'; ctx.strokeStyle = '#46d16a'; ctx.lineWidth = 4;
+    ctx.beginPath(); ctx.arc(80, 80, 52, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    ctx.drawImage(cabeza(), 54, 44, 53, 33);
+    ctx.drawImage(mandibula(), 60, 78, 42, 17);
+    return c;
+  }
+
+  var GENERADORES = {
+    'player-head': cabeza,
+    'player-jaw': mandibula,
+    'player-mouth': boca,
+    'player-body': cuerpo,
+    'enemy-01-a': function () { return enemigo('enemy-01', false); },
+    'enemy-01-b': function () { return enemigo('enemy-01', true); },
+    'enemy-02-a': function () { return enemigo('enemy-02', false); },
+    'enemy-02-b': function () { return enemigo('enemy-02', true); },
+    'enemy-03-a': function () { return enemigo('enemy-03', false); },
+    'enemy-03-b': function () { return enemigo('enemy-03', true); },
+    'enemy-special': ovni,
+    'projectile-player': function () { return proyectil(true); },
+    'projectile-enemy': function () { return proyectil(false); },
+    'barrier-block': bloqueBarrera,
+    'explosion': explosion,
+    'logo': logo
+  };
+
+  global.TRI = global.TRI || {};
+  global.TRI.FallbackArt = {
+    generar: function (nombre) {
+      var gen = GENERADORES[nombre];
+      return gen ? gen() : lienzo(8, 8);
+    }
+  };
+})(window);

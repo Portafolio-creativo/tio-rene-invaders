@@ -1,0 +1,12 @@
+# Cabeceras de seguridad para hosting estatico (Netlify, Cloudflare Pages).
+# GitHub Pages no admite cabeceras propias: ahi vale la CSP del <meta> de
+# index.html, que ya cubre lo importante (frame-ancestors no se puede aplicar
+# desde <meta>, es la unica diferencia).
+
+/*
+  Content-Security-Policy: default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; media-src 'self' data:; connect-src 'self'; font-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; object-src 'none'
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: no-referrer
+  Permissions-Policy: geolocation=(), camera=(), microphone=(), payment=(), usb=(), interest-cohort=()
+  Cross-Origin-Opener-Policy: same-origin

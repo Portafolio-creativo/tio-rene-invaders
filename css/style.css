@@ -1,0 +1,419 @@
+/* TIO RENE INVADERS - estilos de la pagina que envuelve al canvas.
+   El juego se dibuja en el canvas; aqui solo esta el marco, los menus y los
+   botones tactiles. Sin dependencias externas ni fuentes remotas. */
+
+:root {
+  --fondo: #05070f;
+  --fondo-panel: rgba(5, 7, 15, 0.88);
+  --tinta: #e8f1ff;
+  --tinta-tenue: #8b98bd;
+  --acento: #ffe36b;
+  --verde: #46d16a;
+  --peligro: #ff6b6b;
+  --borde: #1e2a4a;
+  --fuente: "Courier New", "DejaVu Sans Mono", monospace;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--fondo);
+  color: var(--tinta);
+  font-family: var(--fuente);
+  overscroll-behavior: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+#app {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 100%;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+/* ---------- Cabecera ---------- */
+
+#cabecera {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 6px 12px;
+  border-bottom: 1px solid var(--borde);
+}
+
+#marca {
+  margin: 0;
+  font-size: 14px;
+  font-weight: bold;
+  letter-spacing: 2px;
+  color: var(--verde);
+}
+
+#marca span { color: var(--acento); }
+
+#controles-audio {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+#etiqueta-volumen {
+  font-size: 11px;
+  letter-spacing: 1px;
+  color: var(--tinta-tenue);
+}
+
+#control-volumen {
+  width: 96px;
+  accent-color: var(--verde);
+}
+
+#btn-sonido {
+  font-family: var(--fuente);
+  font-size: 11px;
+  font-weight: bold;
+  letter-spacing: 1px;
+  padding: 6px 10px;
+  color: var(--fondo);
+  background: var(--verde);
+  border: 0;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+#btn-sonido.apagado {
+  background: #39425f;
+  color: var(--tinta-tenue);
+}
+
+/* ---------- Zona de juego ---------- */
+
+#escenario {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+}
+
+#marco {
+  position: relative;
+  width: 600px;
+  height: 800px;
+  max-width: 100%;
+  max-height: 100%;
+}
+
+#lienzo {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: #070a14;
+  border: 2px solid var(--borde);
+  border-radius: 6px;
+  touch-action: none;
+}
+
+/* ---------- Capas de menu ---------- */
+
+.capa {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 5% 8%;
+  text-align: center;
+  background: var(--fondo-panel);
+  border-radius: 6px;
+  overflow: auto;
+}
+
+.capa[hidden] { display: none; }
+
+#emblema {
+  width: min(30%, 150px);
+  height: auto;
+  image-rendering: auto;
+}
+
+.titulo-juego {
+  margin: 0;
+  font-size: clamp(24px, 7vw, 46px);
+  line-height: 1.05;
+  letter-spacing: 3px;
+  color: var(--acento);
+  text-shadow: 3px 3px 0 #1c7a3a, 6px 6px 0 rgba(0, 0, 0, 0.5);
+}
+
+.titulo-juego span { color: var(--verde); }
+
+.titulo-capa {
+  margin: 0;
+  font-size: clamp(22px, 6vw, 40px);
+  letter-spacing: 4px;
+  color: var(--acento);
+}
+
+.titulo-capa.peligro { color: var(--peligro); }
+.titulo-capa.exito { color: var(--verde); }
+
+.lema {
+  margin: 0;
+  font-size: 13px;
+  color: var(--tinta-tenue);
+  letter-spacing: 1px;
+}
+
+.marcador-menu {
+  margin: 0;
+  font-size: 14px;
+  letter-spacing: 2px;
+  color: var(--tinta);
+}
+
+.marcador-menu strong { color: var(--acento); }
+
+.boton {
+  font-family: var(--fuente);
+  font-size: 16px;
+  font-weight: bold;
+  letter-spacing: 2px;
+  padding: 12px 26px;
+  min-width: 190px;
+  min-height: 48px;
+  color: var(--tinta);
+  background: #16203a;
+  border: 2px solid var(--borde);
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.boton:hover { background: #1e2b4d; }
+
+.boton:focus-visible {
+  outline: 3px solid var(--acento);
+  outline-offset: 2px;
+}
+
+.boton.principal {
+  color: #06210f;
+  background: var(--verde);
+  border-color: #7cf29a;
+}
+
+.boton.principal:hover { background: #5fe085; }
+
+.controles {
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px 14px;
+  font-size: 12px;
+  color: var(--tinta-tenue);
+}
+
+.controles b { color: var(--tinta); }
+
+.tenue {
+  margin: 0;
+  font-size: 12px;
+  color: var(--tinta-tenue);
+}
+
+/* ---------- Botonera tactil ---------- */
+
+#botonera {
+  display: none;
+  flex: 0 0 auto;
+  gap: 8px;
+  padding: 8px 10px 10px;
+}
+
+body.tactil #botonera { display: flex; }
+
+.tacto {
+  flex: 1 1 0;
+  min-height: 64px;
+  font-family: var(--fuente);
+  font-size: 20px;
+  font-weight: bold;
+  letter-spacing: 1px;
+  color: var(--tinta);
+  background: #16203a;
+  border: 2px solid var(--borde);
+  border-radius: 10px;
+  touch-action: none;
+  user-select: none;
+  cursor: pointer;
+}
+
+.tacto.disparo {
+  flex: 1.6 1 0;
+  font-size: 15px;
+  color: #06210f;
+  background: var(--verde);
+  border-color: #7cf29a;
+}
+
+.tacto.pulsado { filter: brightness(1.4); }
+
+/* ---------- Pie y avisos ---------- */
+
+#pie {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  padding: 6px 12px 10px;
+  font-size: 11px;
+  color: var(--tinta-tenue);
+  border-top: 1px solid var(--borde);
+}
+
+#pie b { color: var(--tinta); }
+
+#pie a {
+  color: var(--acento);
+  text-decoration: none;
+  border: 1px solid rgba(255, 227, 107, 0.4);
+  border-radius: 999px;
+  padding: 4px 12px;
+}
+
+#pie a:hover { background: rgba(255, 227, 107, 0.12); }
+
+.aviso {
+  flex: 0 0 auto;
+  margin: 0;
+  padding: 6px 12px;
+  font-size: 11px;
+  color: #ffd7a1;
+  background: rgba(255, 155, 110, 0.12);
+  text-align: center;
+}
+
+.aviso[hidden] { display: none; }
+
+/* ---------- Carga ---------- */
+
+#pista-progreso {
+  width: min(70%, 320px);
+  height: 12px;
+  background: #10182e;
+  border: 2px solid var(--borde);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+#barra-progreso {
+  width: 0;
+  height: 100%;
+  background: var(--verde);
+  transition: width 0.15s linear;
+}
+
+/* ---------- Accesibilidad ---------- */
+
+.oculto-visual {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---------- Telefono en horizontal ----------
+   En apaisado la altura es lo escaso: si los botones van debajo, el area de
+   juego se queda en una franja. Se pasan a los lados, sobre el margen negro
+   que sobra a izquierda y derecha del lienzo, y se recupera la pantalla. */
+
+@media (orientation: landscape) and (max-height: 560px) {
+  #cabecera { padding: 2px 10px; }
+  #marca { font-size: 11px; letter-spacing: 1px; }
+  #btn-sonido { padding: 4px 8px; }
+  #escenario { padding: 2px; }
+  #pie { display: none; }
+  /* Nada de rebote ni scroll: en apaisado la pantalla es justa y el juego
+     tiene que quedarse quieto bajo el dedo. */
+  html, body { overflow: hidden; }
+
+  /* El menu tambien se aprieta: en apaisado no cabe el emblema. */
+  #emblema { display: none; }
+  .capa { gap: 6px; padding: 4% 6%; }
+  .titulo-juego { font-size: clamp(20px, 5vh, 30px); }
+  .titulo-capa { font-size: clamp(18px, 5vh, 28px); }
+  .controles { font-size: 10px; gap: 2px 8px; }
+  .boton { min-height: 42px; padding: 8px 20px; }
+
+  body.tactil #botonera {
+    position: fixed;
+    inset: 0;
+    display: block;
+    padding: 0;
+    pointer-events: none;   /* solo los botones responden al tacto */
+    z-index: 2;
+  }
+
+  body.tactil #botonera .tacto {
+    position: absolute;
+    bottom: 14px;
+    width: 82px;
+    height: 82px;
+    min-height: 0;
+    border-radius: 50%;
+    font-size: 22px;
+    pointer-events: auto;
+  }
+
+  body.tactil #botonera [data-accion="izquierda"] { left: 12px; }
+  body.tactil #botonera [data-accion="derecha"] { left: 102px; }
+
+  body.tactil #botonera [data-accion="disparo"] {
+    right: 12px;
+    width: 100px;
+    height: 100px;
+    font-size: 13px;
+  }
+
+  body.tactil #botonera [data-accion="pausa"] {
+    right: 16px;
+    top: 10px;
+    bottom: auto;
+    width: 52px;
+    height: 52px;
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 520px) {
+  #etiqueta-volumen { display: none; }
+  #control-volumen { width: 70px; }
+  #marca { font-size: 12px; letter-spacing: 1px; }
+  .controles { font-size: 11px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #barra-progreso { transition: none; }
+}
