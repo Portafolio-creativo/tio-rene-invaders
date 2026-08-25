@@ -139,6 +139,13 @@
         jugadorMuere: 'tio-rene-death.wav',
         barrera: 'barrier-hit.wav',
         descenso: 'enemy-drop.wav',
+        /* La marcha son cuatro sonidos que se alternan paso a paso, como en
+           los arcade clasicos. Puedes poner cuatro gruniditos distintos. */
+        marcha1: 'march-1.wav',
+        marcha2: 'march-2.wav',
+        marcha3: 'march-3.wav',
+        marcha4: 'march-4.wav',
+        /* Zumbido del ovni: suena en bucle mientras cruza la pantalla. */
         ovni: 'ufo.wav',
         ovniMuere: 'ufo-hit.wav',
         nivel: 'level-start.wav',

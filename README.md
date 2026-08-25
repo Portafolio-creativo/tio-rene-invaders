@@ -200,17 +200,40 @@ y no depende de nada externo.
 
 Para poner voces reales del Tío René:
 
-1. Deja tus `.wav` en `assets/audio/` con los nombres que lista
-   `CONFIG.AUDIO.ARCHIVOS` (`tio-rene-shoot.wav`, `tio-rene-hit.wav`,
-   `tio-rene-death.wav`, `enemy-hit.wav`, `game-over.wav`, `victory.wav`…).
+1. Deja tus archivos en `assets/audio/` con estos nombres exactos:
+
+| Archivo | Cuándo suena | Duración sugerida |
+|---|---|---|
+| `tio-rene-shoot.wav` | Cada disparo | 0,2–0,4 s (suena muchísimo) |
+| `tio-rene-hit.wav` | Le pegan, pierde una vida | ~1 s |
+| `tio-rene-death.wav` | Última vida | 1–2 s |
+| `extra-life.wav` | Gana una vida (cada 5000 pts) | ~1 s |
+| `march-1..4.wav` | Marcha enemiga (4 se alternan paso a paso) | 0,1–0,2 s |
+| `enemy-hit.wav` | Muere un enemigo | ~0,3 s |
+| `enemy-drop.wav` | La formación baja un escalón | ~0,3 s |
+| `ufo.wav` | Zumbido del Platillo Completo, **en bucle** | 1–2 s que empalmen |
+| `ufo-hit.wav` | Cae el Platillo Completo | ~0,5 s |
+| `barrier-hit.wav` | Impacto en una barrera | ~0,2 s |
+| `level-start.wav` | Empieza un nivel | ~1 s |
+| `level-complete.wav` | Nivel superado | 1–2 s |
+| `game-over.wav` | Fin de la partida | 1–3 s |
+| `victory.wav` | Victoria final | 2–4 s |
+| `menu-select.wav` | Pulsar un botón | ~0,15 s |
+
+   **No hace falta ponerlos todos.** Los que falten siguen sonando
+   sintetizados, así que puedes ir reemplazándolos de a poco.
+
 2. En `js/config.js` pon `USAR_ARCHIVOS: true`.
+
 3. Ábrelo con el servidor local (§1, opción B): `file://` bloquea la carga.
 
 La lógica del juego no cambia: sigue llamando a `Audio.reproducir('disparo')`.
-Si un archivo falta, ese efecto vuelve solo al sonido sintetizado.
+Si quieres otros formatos (`.mp3`, `.ogg`) basta con cambiar el nombre en
+`CONFIG.AUDIO.ARCHIVOS`.
 
 > Nota: no se incluyen frases ni sonidos atribuidos a ninguna persona real. Si
-> quieres usar voces, tienes que tener los derechos para hacerlo.
+> vas a usar voces o clips de alguien, necesitas tener los derechos para
+> publicarlos, sobre todo con el juego en abierto.
 
 ## 8. Ajustar la dificultad
 

@@ -9,22 +9,35 @@ juego suena igual sin descargar nada.
 
 SI QUIERES PONER TUS PROPIOS SONIDOS (por ejemplo voces del Tio Rene):
 
-1. Deja aqui los .wav con estos nombres exactos:
+1. Deja aqui los archivos con estos nombres exactos (.wav es lo mas seguro;
+   .mp3 y .ogg tambien sirven si cambias el nombre en js/config.js):
 
-     tio-rene-shoot.wav     disparo
-     enemy-hit.wav          muere un enemigo
-     tio-rene-hit.wav       al Tio Rene le dan
-     tio-rene-death.wav     ultima vida
-     barrier-hit.wav        impacto en una barrera
-     enemy-drop.wav         la formacion baja un escalon
-     ufo.wav                zumbido del Platillo Completo
-     ufo-hit.wav            cae el Platillo Completo
-     level-start.wav        empieza un nivel
-     level-complete.wav     nivel superado
-     game-over.wav          fin de la partida
-     victory.wav            victoria
-     menu-select.wav        pulsar un boton
-     extra-life.wav         vida extra
+     DEL TIO RENE
+     tio-rene-shoot.wav   cada disparo. Corto (0.2-0.4 s): suena muchisimo
+     tio-rene-hit.wav     le pegan y pierde una vida
+     tio-rene-death.wav   ultima vida, se acaba la partida
+     extra-life.wav       gana una vida (cada 5000 puntos)
+
+     ENEMIGOS
+     march-1.wav          marcha enemiga, paso 1  (los cuatro se alternan
+     march-2.wav          marcha enemiga, paso 2   paso a paso; muy cortos,
+     march-3.wav          marcha enemiga, paso 3   0.1-0.2 s, o cansan)
+     march-4.wav          marcha enemiga, paso 4
+     enemy-hit.wav        muere un enemigo
+     enemy-drop.wav       la formacion baja un escalon
+     ufo.wav              zumbido del Platillo Completo: SUENA EN BUCLE
+                          mientras cruza, conviene que empalme bien
+     ufo-hit.wav          cae el Platillo Completo
+
+     PARTIDA
+     barrier-hit.wav      impacto en una barrera
+     level-start.wav      empieza un nivel
+     level-complete.wav   nivel superado
+     game-over.wav        fin de la partida
+     victory.wav          victoria final
+     menu-select.wav      pulsar un boton del menu
+
+   No hace falta ponerlos todos: los que falten siguen sonando sintetizados.
 
 2. En js/config.js cambia  USAR_ARCHIVOS: false  por  USAR_ARCHIVOS: true
 

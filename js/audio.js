@@ -211,7 +211,9 @@
       if (!activo || !soportado) { return; }
       crearContexto();
       if (!ctx) { return; }
-      tono({ tipo: 'square', desde: NOTAS_MARCHA[paso % NOTAS_MARCHA.length], dur: 0.10, vol: 0.20 });
+      var indice = paso % NOTAS_MARCHA.length;
+      if (reproducirBuffer('marcha' + (indice + 1))) { return; }
+      tono({ tipo: 'square', desde: NOTAS_MARCHA[indice], dur: 0.10, vol: 0.20 });
     },
 
     /* Zumbido continuo del ovni mientras cruza la pantalla. */
@@ -219,6 +221,16 @@
       if (!activo || !soportado || sirena) { return; }
       crearContexto();
       if (!ctx) { return; }
+      // Si hay un archivo para el ovni, se reproduce en bucle.
+      if (buffers.ovni) {
+        var fuente = ctx.createBufferSource();
+        fuente.buffer = buffers.ovni;
+        fuente.loop = true;
+        fuente.connect(masterGain);
+        fuente.start(ahora());
+        sirena = { fuente: fuente };
+        return;
+      }
       var osc = ctx.createOscillator();
       var lfo = ctx.createOscillator();
       var lfoGain = ctx.createGain();
@@ -236,9 +248,15 @@
     detenerSirena: function () {
       if (!sirena) { return; }
       try {
-        sirena.osc.stop(); sirena.lfo.stop();
-        sirena.g.disconnect();
-      } catch (e) { /* ya detenido */ }
+        if (sirena.fuente) {
+          sirena.fuente.stop();
+          sirena.fuente.disconnect();
+        } else {
+          sirena.osc.stop();
+          sirena.lfo.stop();
+          sirena.g.disconnect();
+        }
+      } catch (e) { /* ya estaba detenido */ }
       sirena = null;
     },
 
