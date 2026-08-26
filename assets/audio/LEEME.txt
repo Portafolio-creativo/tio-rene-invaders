@@ -1,50 +1,63 @@
 CARPETA DE AUDIO
 ================
 
-Esta carpeta esta vacia a proposito.
+El juego suena de DOS maneras a la vez:
 
-Todos los efectos del juego se generan en tiempo real con la Web Audio API
-(ver js/audio.js). No hay ningun archivo de sonido ajeno en el proyecto y el
-juego suena igual sin descargar nada.
+  1. ARCHIVOS (los .mp3 de esta carpeta): las frases del Tio Rene, en los
+     momentos importantes.
+  2. SINTESIS (js/audio.js, Web Audio API): todo lo demas, generado en vivo.
 
-SI QUIERES PONER TUS PROPIOS SONIDOS (por ejemplo voces del Tio Rene):
+QUE SUENA CON VOZ
 
-1. Deja aqui los archivos con estos nombres exactos (.wav es lo mas seguro;
-   .mp3 y .ogg tambien sirven si cambias el nombre en js/config.js):
+  tio-rene-intro.mp3     al cargar el juego ("ya llegamos ya")
+  tio-rene-hit.mp3       le pegan y pierde una vida
+  tio-rene-death.mp3     ultima vida
+  game-over.mp3          fin de la partida
+  victory.mp3            victoria final
+  level-start.mp3        empieza un nivel
+  level-complete.mp3     nivel superado
+  extra-life.mp3         vida extra (cada 5000 puntos)
+  ufo-hit.mp3            cae el Platillo Completo
 
-     DEL TIO RENE
-     tio-rene-shoot.wav   cada disparo. Corto (0.2-0.4 s): suena muchisimo
-     tio-rene-hit.wav     le pegan y pierde una vida
-     tio-rene-death.wav   ultima vida, se acaba la partida
-     extra-life.wav       gana una vida (cada 5000 puntos)
+QUE SUENA SINTETIZADO, Y POR QUE
 
-     ENEMIGOS
-     march-1.wav          marcha enemiga, paso 1  (los cuatro se alternan
-     march-2.wav          marcha enemiga, paso 2   paso a paso; muy cortos,
-     march-3.wav          marcha enemiga, paso 3   0.1-0.2 s, o cansan)
-     march-4.wav          marcha enemiga, paso 4
-     enemy-hit.wav        muere un enemigo
-     enemy-drop.wav       la formacion baja un escalon
-     ufo.wav              zumbido del Platillo Completo: SUENA EN BUCLE
-                          mientras cruza, conviene que empalme bien
-     ufo-hit.wav          cae el Platillo Completo
+  disparo, marcha1..4, enemigoMuere, barrera, descenso, menu, ovni
 
-     PARTIDA
-     barrier-hit.wav      impacto en una barrera
-     level-start.wav      empieza un nivel
-     level-complete.wav   nivel superado
-     game-over.wav        fin de la partida
-     victory.wav          victoria final
-     menu-select.wav      pulsar un boton del menu
+  Son los sonidos MUY repetitivos: el disparo suena cada 0,3 s y la marcha
+  enemiga cada 0,5 s. Una voz humana ahi cansa en menos de un minuto y tapa
+  el resto. Por eso van sintetizados, que es corto y seco.
 
-   No hace falta ponerlos todos: los que falten siguen sonando sintetizados.
+  Si igual quieres voz en alguno: deja el archivo aqui y agrega su linea en
+  CONFIG.AUDIO.ARCHIVOS (js/config.js). Usa clips de 0,2-0,3 s como mucho.
 
-2. En js/config.js cambia  USAR_ARCHIVOS: false  por  USAR_ARCHIVOS: true
+COMO CAMBIAR O AGREGAR UN SONIDO
 
-3. Abre el juego con un servidor local (node tools/servidor-local.mjs).
-   Con file:// el navegador bloquea la lectura de archivos y no se cargarian.
+  1. Deja el archivo en esta carpeta (.mp3, .wav o .ogg).
+  2. Agrega o cambia su linea en CONFIG.AUDIO.ARCHIVOS (js/config.js).
+     Solo se listan los que EXISTEN: apuntar a uno que falta ensucia la
+     consola con errores 404.
+  3. Pruebalo con servidor (node tools/servidor-local.mjs). Con file:// el
+     navegador bloquea la carga y se oye la version sintetizada.
 
-Si falta alguno, ese efecto vuelve solo al sonido sintetizado. La logica del
-juego no cambia nunca: siempre llama a Audio.reproducir('disparo').
+  Para apagar TODAS las voces de golpe: USAR_ARCHIVOS: false en js/config.js.
 
-Usa solo audio del que tengas los derechos.
+UN SOLO CANAL DE VOZ
+
+  Las frases pasan todas por un mismo canal: al empezar una se corta la
+  anterior. Sin eso se pisan (por ejemplo "nivel superado" con el "empieza
+  nivel" que llega dos segundos despues) y no se entiende ninguna.
+
+LA FRASE DE BIENVENIDA
+
+  Los navegadores no dejan sonar nada hasta que el usuario toca la pantalla.
+  Si al abrir todavia no hay permiso, la frase queda EN ESPERA y suena sola
+  en cuanto se toca. En el celular casi siempre pasa esto.
+
+ORIGEN Y DERECHOS
+
+  Los .mp3 son recortes de clips publicados en myinstants.com (busqueda
+  "tio rene"), cortados y normalizados con tools/ y ffmpeg. NO son material
+  propio de este proyecto: pertenecen a quien grabo los videos originales.
+  Antes de difundir el juego conviene tenerlo en cuenta. Para quitarlos,
+  basta con borrar los .mp3 o poner USAR_ARCHIVOS: false, y el juego vuelve
+  a sonar 100% sintetizado sin tocar nada mas.

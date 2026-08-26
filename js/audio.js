@@ -1,12 +1,17 @@
 /* AudioManager.
  *
- * Todos los sonidos son ORIGINALES y se generan con la Web Audio API: no hay
- * ningun archivo de audio ajeno en el proyecto.
+ * Dos fuentes de sonido conviviendo:
+ *   1. ARCHIVOS (assets/audio/): las frases del Tio Rene. Se usan en los
+ *      momentos: intro, golpe, muerte, game over, victoria, nivel, vida extra.
+ *   2. SINTESIS con Web Audio API: todo lo demas. Se usa a proposito en los
+ *      sonidos muy repetitivos (disparo, marcha, impactos), donde una voz
+ *      cansaria en segundos.
  *
- * Si algun dia quieres poner voces reales del Tio Rene, deja los .wav en
- * assets/audio/ con los nombres de CONFIG.AUDIO.ARCHIVOS y pon
- * CONFIG.AUDIO.USAR_ARCHIVOS = true. La logica del juego no cambia: sigue
- * llamando a Audio.reproducir('disparo').
+ * Que sonido sale de donde se decide en CONFIG.AUDIO.ARCHIVOS: lo que este
+ * listado ahi sale del archivo; lo que no, se sintetiza. Si un archivo falta
+ * o no carga, ese efecto vuelve solo a la version sintetizada.
+ *
+ * La logica del juego nunca cambia: siempre llama a Audio.reproducir(nombre).
  *
  * Si el navegador no soporta Web Audio, o el usuario silencia, todo se
  * degrada en silencio sin romper nada.
@@ -27,6 +32,8 @@
   var vocesActivas = 0;
   var MAX_VOCES = 14;
   var sirena = null;         // referencia al zumbido del ovni
+  var vozActual = null;      // frase del Tio Rene sonando ahora mismo
+  var pendiente = null;      // frase en espera de que se desbloquee el audio
 
   function crearContexto() {
     if (ctx || !soportado) { return; }
@@ -36,6 +43,9 @@
       masterGain = ctx.createGain();
       masterGain.gain.value = activo ? volumen : 0;
       masterGain.connect(ctx.destination);
+      if (typeof ctx.addEventListener === 'function') {
+        ctx.addEventListener('statechange', soltarPendiente);
+      }
     } catch (e) {
       soportado = false;
       ctx = null;
@@ -156,13 +166,42 @@
   /* Los cuatro tonos de la marcha enemiga, como en los arcade clasicos. */
   var NOTAS_MARCHA = [116, 104, 92, 82];
 
-  function reproducirBuffer(nombre) {
+  /* Reproduce un archivo cargado. Las frases habladas pasan todas por un
+     UNICO canal: al empezar una, se corta la anterior. Sin esto se pisan
+     entre si (por ejemplo, "nivel superado" con el "empieza nivel" que llega
+     dos segundos despues) y se entiende cualquier cosa. */
+  function reproducirBuffer(nombre, esVoz) {
     if (!ctx || !buffers[nombre]) { return false; }
     var src = ctx.createBufferSource();
     src.buffer = buffers[nombre];
     src.connect(masterGain);
+    if (esVoz) {
+      if (vozActual) {
+        try { vozActual.stop(); } catch (e) { /* ya habia terminado */ }
+      }
+      vozActual = src;
+      src.onended = function () { if (vozActual === src) { vozActual = null; } };
+    }
     src.start(ahora());
     return true;
+  }
+
+  /* Suelta la frase que quedo esperando a que hubiera permiso y archivo. */
+  function soltarPendiente() {
+    if (!pendiente || !activo || !ctx || ctx.state !== 'running') { return; }
+    if (!buffers[pendiente]) { return; }
+    var nombre = pendiente;
+    pendiente = null;
+    reproducirBuffer(nombre, true);
+  }
+
+  /* Empieza a descargar los archivos una sola vez. Se llama en cuanto existe
+     el contexto, sin esperar al primer toque: asi la frase de bienvenida ya
+     esta lista cuando el navegador da permiso para sonar. */
+  function asegurarArchivos() {
+    if (!ctx || asegurarArchivos.pedidos) { return; }
+    asegurarArchivos.pedidos = true;
+    cargarArchivos();
   }
 
   function cargarArchivos() {
@@ -181,7 +220,7 @@
       }).then(function (buffer) {
         if (buffer) { buffers[clave] = buffer; }
       })['catch'](function () { /* sin archivo: se usa la voz sintetizada */ });
-    }));
+    })).then(soltarPendiente);
   }
 
   var Audio = {
@@ -190,19 +229,34 @@
     desbloquear: function () {
       crearContexto();
       if (ctx && ctx.state === 'suspended') {
-        ctx.resume()['catch'](function () { /* ignorado */ });
+        // resume() es asincrono: hay que esperar a que el contexto este
+        // realmente activo antes de soltar la frase pendiente, o se pierde.
+        var reanudado = ctx.resume();
+        if (reanudado && typeof reanudado.then === 'function') {
+          reanudado.then(soltarPendiente)['catch'](function () { /* ignorado */ });
+        }
       }
-      if (ctx && !Audio._archivosPedidos) {
-        Audio._archivosPedidos = true;
-        cargarArchivos();
-      }
+      asegurarArchivos();
+      soltarPendiente();
+    },
+
+    /* Para la frase de bienvenida: los navegadores no dejan sonar nada antes
+       de que el usuario toque la pantalla. Si todavia no hay permiso (o el
+       archivo no termino de cargar), la frase queda en espera y suena sola en
+       cuanto se pueda. */
+    reproducirCuandoSePueda: function (nombre) {
+      if (!activo || !soportado) { return; }
+      crearContexto();
+      asegurarArchivos();
+      pendiente = nombre;
+      soltarPendiente();
     },
 
     reproducir: function (nombre) {
       if (!activo || !soportado) { return; }
       crearContexto();
       if (!ctx) { return; }
-      if (reproducirBuffer(nombre)) { return; }
+      if (reproducirBuffer(nombre, true)) { return; }
       var voz = VOCES[nombre];
       if (voz) { voz(); }
     },
@@ -212,7 +266,7 @@
       crearContexto();
       if (!ctx) { return; }
       var indice = paso % NOTAS_MARCHA.length;
-      if (reproducirBuffer('marcha' + (indice + 1))) { return; }
+      if (reproducirBuffer('marcha' + (indice + 1), false)) { return; }
       tono({ tipo: 'square', desde: NOTAS_MARCHA[indice], dur: 0.10, vol: 0.20 });
     },
 
@@ -264,7 +318,14 @@
     alternarActivo: function () {
       activo = !activo;
       Storage.guardarAudioActivo(activo);
-      if (!activo) { Audio.detenerSirena(); }
+      if (!activo) {
+        Audio.detenerSirena();
+        if (vozActual) {
+          try { vozActual.stop(); } catch (e) { /* ya habia terminado */ }
+          vozActual = null;
+        }
+        pendiente = null;
+      }
       if (masterGain) { masterGain.gain.value = activo ? volumen : 0; }
       return activo;
     },

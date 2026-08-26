@@ -125,35 +125,31 @@
 
     AUDIO: {
       VOLUMEN_INICIAL: 0.7,
-      /* Archivos opcionales que sustituyen a los sonidos sintetizados.
-         Deja USAR_ARCHIVOS en false si no tienes los .wav todavia:
-         el juego suena igual usando sintesis propia (Web Audio API).
-         Con file:// el navegador bloquea la carga de archivos: hace falta
-         un servidor local (ver README, seccion "Ejecutar"). */
-      USAR_ARCHIVOS: false,
+      /* Voces del Tio Rene. Ponlo en false y todo vuelve a sonar
+         sintetizado (Web Audio API), sin depender de ningun archivo.
+         OJO: con file:// el navegador bloquea la carga de archivos, asi
+         que abriendo con doble clic se oye la version sintetizada. Para
+         escuchar las voces hace falta un servidor (ver README §1). */
+      USAR_ARCHIVOS: true,
       RUTA: 'assets/audio/',
+      /* Solo se listan los archivos que EXISTEN: cada linea se pide al
+         servidor, asi que apuntar a uno que falta ensucia la consola.
+         Para anadir un sonido: dejalo en assets/audio/ y agrega su linea.
+         Lo que no este aqui suena sintetizado (js/audio.js), y eso es
+         deliberado en los sonidos muy repetitivos: el disparo suena cada
+         0,3 s y la marcha cada 0,5 s, asi que una voz ahi cansa enseguida. */
       ARCHIVOS: {
-        disparo: 'tio-rene-shoot.wav',
-        enemigoMuere: 'enemy-hit.wav',
-        jugadorGolpe: 'tio-rene-hit.wav',
-        jugadorMuere: 'tio-rene-death.wav',
-        barrera: 'barrier-hit.wav',
-        descenso: 'enemy-drop.wav',
-        /* La marcha son cuatro sonidos que se alternan paso a paso, como en
-           los arcade clasicos. Puedes poner cuatro gruniditos distintos. */
-        marcha1: 'march-1.wav',
-        marcha2: 'march-2.wav',
-        marcha3: 'march-3.wav',
-        marcha4: 'march-4.wav',
-        /* Zumbido del ovni: suena en bucle mientras cruza la pantalla. */
-        ovni: 'ufo.wav',
-        ovniMuere: 'ufo-hit.wav',
-        nivel: 'level-start.wav',
-        nivelCompleto: 'level-complete.wav',
-        gameOver: 'game-over.wav',
-        victoria: 'victory.wav',
-        menu: 'menu-select.wav',
-        vidaExtra: 'extra-life.wav'
+        intro: 'tio-rene-intro.mp3',          // al cargar el juego
+        jugadorGolpe: 'tio-rene-hit.mp3',     // le pegan
+        jugadorMuere: 'tio-rene-death.mp3',   // ultima vida
+        gameOver: 'game-over.mp3',
+        victoria: 'victory.mp3',
+        nivel: 'level-start.mp3',
+        nivelCompleto: 'level-complete.mp3',
+        vidaExtra: 'extra-life.mp3',
+        ovniMuere: 'ufo-hit.mp3'
+        /* Sintetizados a proposito (muy repetitivos):
+           disparo, marcha1..4, enemigoMuere, barrera, descenso, menu, ovni */
       }
     },
 

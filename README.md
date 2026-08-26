@@ -4,10 +4,11 @@ Arcade chileno para navegador. El Tío René, con su cabezota y su **mandíbula
 articulada**, defiende el barrio de una invasión disparando **desde la boca**.
 
 Inspirado en las mecánicas de los marcianitos clásicos (formación que baja,
-barreras, ovni de bonus). El código, los enemigos, los efectos y los sonidos son
+barreras, ovni de bonus). El código, los enemigos y los efectos de sonido son
 originales de este proyecto: no hay ni un sprite, ni un sonido, ni una línea de
-código copiada de ningún juego existente. La cara del protagonista es una **foto
-aportada por el autor del proyecto** (ver §14).
+código copiada de ningún juego existente. La **cara** del protagonista es una
+foto aportada por el autor del proyecto, y sus **frases** son recortes de clips
+publicados en myinstants.com (ver §14).
 
 - HTML5 + CSS + JavaScript. **Cero dependencias, cero CDN, cero red.**
 - Funciona con doble clic en `index.html` (`file://`) y publicado en cualquier
@@ -19,11 +20,12 @@ aportada por el autor del proyecto** (ver §14).
 ## 1. Ejecutar
 
 **Opción A — doble clic.** Abre `index.html`. El juego funciona completo:
-gráficos, sonido (sintetizado), récord, todo.
+gráficos, récord, todo. Ojo: con `file://` el navegador bloquea la lectura de
+archivos, así que **las voces del Tío René no suenan** y se oye la versión
+sintetizada.
 
-**Opción B — servidor local.** Solo hace falta si quieres cargar tus propios
-archivos de audio: con `file://` el navegador bloquea la lectura de archivos por
-`fetch`. Con Node instalado:
+**Opción B — servidor local.** Necesario para escuchar las voces. Con Node
+instalado:
 
 ```bash
 node tools/servidor-local.mjs
@@ -51,7 +53,7 @@ sirviendo el juego desde `/proyectos/tio-rene-invaders/`.
 |---|---|---|
 | Mover | `←` `→` (o `A` `D`) | botones ◀ ▶ |
 | Disparar | `ESPACIO` (o `↑`) | botón DISPARO |
-| Pausa | `P` o `ESC` | botón II |
+| Pausa | `P` o `ESC` | botón ❚❚ (barra de arriba) |
 | Empezar / continuar | `ENTER` | botones en pantalla |
 | Silenciar | `M` | botón SONIDO |
 | Modo depuración | `Ctrl` + `Shift` + `D` | — |
@@ -82,7 +84,7 @@ tio-rene-invaders/
 │   ├── storage.js          Récord y preferencias (localStorage seguro)
 │   ├── fallback-art.js     Dibujos de reserva si falta un archivo
 │   ├── assets.js           Carga de imágenes
-│   ├── audio.js            AudioManager (síntesis Web Audio)
+│   ├── audio.js            AudioManager (voces + síntesis Web Audio)
 │   ├── input.js            Teclado + botones táctiles
 │   ├── entities/           player, enemy, projectile, barrier, ufo, particles
 │   ├── systems/            collisions, score, levels
@@ -93,10 +95,11 @@ tio-rene-invaders/
 ├── assets/
 │   ├── sprites/            piezas del Tío René (.png) + enemigos y efectos (.svg)
 │   ├── ui/                 logo y favicon
-│   └── audio/              vacío: los sonidos se sintetizan (ver §8)
+│   └── audio/              9 frases del Tío René (.mp3); el resto se sintetiza
 └── tools/
     ├── servidor-local.mjs  servidor estático para pruebas
-    └── cortar-cara.py      corta una foto en cabeza + mandíbula + relleno
+    ├── cortar-cara.py      corta una foto en cabeza + mandíbula + relleno
+    └── hacer-miniatura.py  genera la miniatura para compartir el enlace
 ```
 
 ## 5. Intro
@@ -106,8 +109,8 @@ tamaño grande**, el título y el crédito ("creado por Eduardo Pérez"), mientr
 se cargan los recursos. La mandíbula bosteza sola, para que se vea la mecánica
 antes de jugar.
 
-Dura un mínimo de **2,6 s** aunque los archivos carguen al instante (si no,
-pasaría de largo en un parpadeo) y se puede **saltar tocando la pantalla o con
+Dura un mínimo de **3 s** —lo que tarda la frase de bienvenida— aunque los
+archivos carguen al instante, y se puede **saltar tocando la pantalla o con
 cualquier tecla**. Luego funde al menú.
 
 - Duración: `INTRO_MINIMA` en `js/main.js`.
@@ -216,48 +219,52 @@ JUGADOR.EXPRESIONES_SEPARADAS: true
 y añade `player-head-shoot`, `player-head-hit` y `player-head-dead` (`.png` o
 `.svg`) en `assets/sprites/`. Si faltan, se dibujan por código y el juego sigue.
 
-## 8. Cambiar los sonidos
+## 8. Sonidos
 
-Ahora mismo **no hay archivos de audio**: todos los efectos se generan en
-tiempo real con la Web Audio API (`js/audio.js`), así que el juego pesa poquísimo
-y no depende de nada externo.
+El juego suena de dos maneras a la vez:
 
-Para poner voces reales del Tío René:
+**Con la voz del Tío René** (archivos en `assets/audio/`), en los momentos:
 
-1. Deja tus archivos en `assets/audio/` con estos nombres exactos:
+| Archivo | Cuándo suena |
+|---|---|
+| `tio-rene-intro.mp3` | al cargar el juego ("ya llegamos ya") |
+| `tio-rene-hit.mp3` | le pegan, pierde una vida |
+| `tio-rene-death.mp3` | última vida |
+| `game-over.mp3` | fin de la partida |
+| `victory.mp3` | victoria final |
+| `level-start.mp3` | empieza un nivel |
+| `level-complete.mp3` | nivel superado |
+| `extra-life.mp3` | vida extra (cada 5000 puntos) |
+| `ufo-hit.mp3` | cae el Platillo Completo |
 
-| Archivo | Cuándo suena | Duración sugerida |
-|---|---|---|
-| `tio-rene-shoot.wav` | Cada disparo | 0,2–0,4 s (suena muchísimo) |
-| `tio-rene-hit.wav` | Le pegan, pierde una vida | ~1 s |
-| `tio-rene-death.wav` | Última vida | 1–2 s |
-| `extra-life.wav` | Gana una vida (cada 5000 pts) | ~1 s |
-| `march-1..4.wav` | Marcha enemiga (4 se alternan paso a paso) | 0,1–0,2 s |
-| `enemy-hit.wav` | Muere un enemigo | ~0,3 s |
-| `enemy-drop.wav` | La formación baja un escalón | ~0,3 s |
-| `ufo.wav` | Zumbido del Platillo Completo, **en bucle** | 1–2 s que empalmen |
-| `ufo-hit.wav` | Cae el Platillo Completo | ~0,5 s |
-| `barrier-hit.wav` | Impacto en una barrera | ~0,2 s |
-| `level-start.wav` | Empieza un nivel | ~1 s |
-| `level-complete.wav` | Nivel superado | 1–2 s |
-| `game-over.wav` | Fin de la partida | 1–3 s |
-| `victory.wav` | Victoria final | 2–4 s |
-| `menu-select.wav` | Pulsar un botón | ~0,15 s |
+**Sintetizado** (Web Audio API, sin archivos): `disparo`, `marcha1..4`,
+`enemigoMuere`, `barrera`, `descenso`, `menu` y el zumbido del ovni.
 
-   **No hace falta ponerlos todos.** Los que falten siguen sonando
-   sintetizados, así que puedes ir reemplazándolos de a poco.
+Eso último es **a propósito**: son los sonidos muy repetitivos. El disparo
+suena cada 0,3 s y la marcha enemiga cada 0,5 s; una voz humana ahí cansa en
+menos de un minuto y tapa todo lo demás. Sintetizado es corto y seco, que es
+lo que pide un arcade.
 
-2. En `js/config.js` pon `USAR_ARCHIVOS: true`.
+### Cambiar o agregar un sonido
 
-3. Ábrelo con el servidor local (§1, opción B): `file://` bloquea la carga.
+1. Deja el archivo en `assets/audio/` (`.mp3`, `.wav` u `.ogg`).
+2. Agrega o cambia su línea en `CONFIG.AUDIO.ARCHIVOS` (`js/config.js`). Solo
+   se listan los que **existen**: apuntar a uno que falta llena la consola de
+   errores 404.
+3. Pruébalo con servidor (§1, opción B). Con `file://` el navegador bloquea la
+   carga de archivos y se oye la versión sintetizada.
 
-La lógica del juego no cambia: sigue llamando a `Audio.reproducir('disparo')`.
-Si quieres otros formatos (`.mp3`, `.ogg`) basta con cambiar el nombre en
-`CONFIG.AUDIO.ARCHIVOS`.
+Para apagar todas las voces de golpe: `USAR_ARCHIVOS: false`.
 
-> Nota: no se incluyen frases ni sonidos atribuidos a ninguna persona real. Si
-> vas a usar voces o clips de alguien, necesitas tener los derechos para
-> publicarlos, sobre todo con el juego en abierto.
+### Dos detalles del sistema
+
+- **Un solo canal de voz:** al empezar una frase se corta la anterior. Sin eso
+  se pisan entre sí (por ejemplo "nivel superado" con el "empieza nivel" que
+  llega dos segundos después) y no se entiende ninguna.
+- **La frase de bienvenida espera permiso:** los navegadores no dejan sonar
+  nada hasta que el usuario toca la pantalla. Si al abrir todavía no hay
+  permiso, la frase queda en espera y suena sola en cuanto se toca. En el
+  celular casi siempre pasa eso.
 
 ## 9. Ajustar la dificultad
 
@@ -316,7 +323,10 @@ disparo y apertura de mandíbula · colisiones (disparo↔enemigo, disparo↔jug
 disparo↔barrera, disparo↔disparo, enemigo↔jugador, disparo↔ovni) · erosión de
 barreras · puntuación y vida extra · pérdida de vidas · game over · invasión ·
 fin de nivel · victoria y modo sin fin · pausa (congela de verdad: la partida no
-avanza) · reinicio · récord persistente · silencio y volumen · teclado ·
+avanza) · reinicio · récord persistente · silencio y volumen · **carga de las 9 voces (200, sin 404)** · **archivo vs.
+sintetizado según corresponde** · **el canal de voz corta la frase anterior** ·
+**`file://` con las voces activadas no rompe nada** (cae a sintetizado) ·
+teclado ·
 botones táctiles · atajo de depuración · redimensionado (móvil 375×812 vertical
 y 812×375 horizontal, ambos sin desbordes ni scroll y con los botones fuera del
 tablero; escritorio) · **localStorage bloqueado** (sigue jugándose, avisa) ·
@@ -382,12 +392,19 @@ Todo el material es original de este proyecto:
 | Código | Escrito para este proyecto |
 | Enemigos, proyectiles, barreras, efectos, logo de fondo | Dibujados en SVG para este proyecto |
 | Arte de reserva | Generado por código con Canvas 2D |
-| Sonidos | Sintetizados en tiempo real con Web Audio API |
+| Efectos del juego | Sintetizados en tiempo real con Web Audio API |
+| **Frases del Tío René** | **Recortes de clips de myinstants.com** (búsqueda "tio rene"), cortados y normalizados con ffmpeg |
 | Fuente | Monoespaciada del sistema |
 | **Cara del protagonista** | **Fotografía aportada por el autor del proyecto**, recortada en piezas con `tools/cortar-cara.py` |
 
 No se usaron sprites, sonidos, ROMs, código ni recursos extraídos de Space
 Invaders ni de ningún otro juego. La inspiración es **mecánica**, no gráfica.
+
+**Sobre las voces:** los `.mp3` de `assets/audio/` son recortes de clips
+publicados en myinstants.com. No son material propio de este proyecto:
+pertenecen a quien grabó los videos originales. Para quitarlos basta con
+borrar los archivos o poner `USAR_ARCHIVOS: false`, y el juego vuelve a sonar
+100 % sintetizado sin tocar nada más.
 
 **Sobre la fotografía:** las piezas `player-head.png`, `player-jaw.png`,
 `player-mouth.png`, `ui/logo.png` y `ui/favicon.png` salen de una foto que no

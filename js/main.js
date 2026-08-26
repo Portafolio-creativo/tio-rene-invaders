@@ -109,7 +109,7 @@
   /* La intro se ve un momento aunque los assets carguen al instante: si no,
      pasaria de largo en un parpadeo. Se puede saltar tocando o con cualquier
      tecla. */
-  var INTRO_MINIMA = 2600;
+  var INTRO_MINIMA = 3000;   // cubre la frase de bienvenida (2,65 s)
   var arranqueIntro = (global.performance && global.performance.now)
     ? global.performance.now() : Date.now();
   var assetsListos = false;
@@ -127,6 +127,10 @@
       juego.irAlMenu();
     });
   }
+
+  // Frase de bienvenida. Si el navegador todavia no da permiso para sonar,
+  // queda en espera y sale sola en cuanto el usuario toque la pantalla.
+  Audio.reproducirCuandoSePueda('intro');
 
   var capaCarga = document.getElementById('capa-carga');
   if (capaCarga) {
