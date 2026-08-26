@@ -17,7 +17,10 @@ QUE SUENA CON VOZ
   level-start.mp3        empieza un nivel
   level-complete.mp3     nivel superado
   extra-life.mp3         vida extra (cada 5000 puntos)
-  ufo-hit.mp3            cae el Platillo Completo
+  ufo-hit-1.mp3          cae la nave grande (1a mitad de "te paso por")
+  ufo-hit-2.mp3          cae la nave grande (2a mitad; se van alternando)
+  tio-rene-amb-1..6.mp3  charla de fondo durante la partida, a bajo volumen
+  tio-rene-racha-1..3.mp3  cada 5 naves derribadas; se van turnando
 
 QUE SUENA SINTETIZADO, Y POR QUE
 

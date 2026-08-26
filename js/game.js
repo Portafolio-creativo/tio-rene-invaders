@@ -11,6 +11,7 @@
 
   var TRI = global.TRI;
   var CONFIG = TRI.CONFIG;
+  var Util = TRI.Util;
   var Audio = TRI.Audio;
   var Colisiones = TRI.Colisiones;
   var Input = TRI.Input;
@@ -42,6 +43,10 @@
 
     this.estado = ESTADOS.CARGANDO;
     this.temporizador = 0;
+    this.temporizadorAmbiente = CONFIG.AUDIO.AMBIENTE.PRIMERA_ESPERA;
+    this.bajasSeguidas = 0;      // naves derribadas desde la ultima felicitacion
+    this.rachasLogradas = 0;     // para ir turnando las frases
+    this.ovnisDerribados = 0;    // para alternar las dos mitades de "te paso por"
     this.acumulado = 0;
     this.ultimoTiempo = 0;
     this.fps = 0;
@@ -82,6 +87,9 @@
   Juego.prototype.nuevaPartida = function () {
     this.puntuacion.reiniciar();
     this.niveles.reiniciar();
+    this.bajasSeguidas = 0;
+    this.rachasLogradas = 0;
+    this.ovnisDerribados = 0;
     this.prepararNivel();
     Audio.reproducir('nivel');
     this.cambiarEstado(ESTADOS.JUGANDO);
@@ -94,6 +102,7 @@
     this.ovni.reiniciar();
     this.jugador.reiniciar(true);
     for (var i = 0; i < this.barreras.length; i++) { this.barreras[i].reiniciar(); }
+    this.temporizadorAmbiente = CONFIG.AUDIO.AMBIENTE.PRIMERA_ESPERA;
     Input.limpiar();
   };
 
@@ -187,6 +196,7 @@
     this.actualizarDisparoJugador();
     this.actualizarEnemigos(dt);
     this.actualizarOvni(dt);
+    this.actualizarAmbiente(dt);
     this.resolverColisiones();
     this.comprobarFinDeNivel();
   };
@@ -222,6 +232,21 @@
     else if (evento === 'sale') { Audio.detenerSirena(); }
   };
 
+  /* Cada cierto rato el Tio Rene suelta una frase de fondo. Si en ese momento
+     hay algo mas importante sonando, se salta el turno y se reintenta luego:
+     el ambiente nunca compite con un aviso del juego. */
+  Juego.prototype.actualizarAmbiente = function (dt) {
+    var cfg = CONFIG.AUDIO.AMBIENTE;
+    if (!cfg.ACTIVO) { return; }
+    if (this.jugador.estado !== 'normal') { return; }
+    this.temporizadorAmbiente -= dt;
+    if (this.temporizadorAmbiente > 0) { return; }
+    var sono = Audio.ambiente();
+    this.temporizadorAmbiente = sono
+      ? Util.azar(cfg.ESPERA_MIN, cfg.ESPERA_MAX)
+      : 2;                                    // ocupado: se reintenta pronto
+  };
+
   Juego.prototype.resolverColisiones = function () {
     var self = this;
 
@@ -234,6 +259,7 @@
       self.efectos.texto(cx, cy, String(enemigo.puntos), '#ffe36b');
       if (self.puntuacion.sumar(enemigo.puntos)) { Audio.reproducir('vidaExtra'); }
       Audio.reproducir('enemigoMuere');
+      self.contarBaja();
     });
 
     Colisiones.jugadorContraOvni(this.proyectiles, this.ovni, function (ovni) {
@@ -242,7 +268,9 @@
       var cy = ovni.y + ovni.h / 2;
       ovni.activo = false;
       Audio.detenerSirena();
-      Audio.reproducir('ovniMuere');
+      var clips = CONFIG.AUDIO.OVNI_CLIPS;
+      Audio.reproducir(clips[self.ovnisDerribados % clips.length]);
+      self.ovnisDerribados++;
       self.efectos.destello(cx, cy, 70);
       self.efectos.chispas(cx, cy, 18, '#ffd0a0');
       self.efectos.texto(cx, cy, String(puntos), '#7cf29a');
@@ -269,6 +297,22 @@
       self.puntuacion.perderVida();
       self.golpearJugador();
     });
+  };
+
+  /* Cada N naves derribadas, el Tio Rene se felicita solo. Las frases se
+     turnan para que no sea siempre la misma. */
+  Juego.prototype.contarBaja = function () {
+    var cfg = CONFIG.AUDIO.RACHA;
+    if (!cfg.ACTIVO || cfg.CADA <= 0) { return; }
+    this.bajasSeguidas++;
+    if (this.bajasSeguidas < cfg.CADA) { return; }
+    this.bajasSeguidas = 0;
+    var clip = cfg.CLIPS[this.rachasLogradas % cfg.CLIPS.length];
+    this.rachasLogradas++;
+    Audio.reproducir(clip);
+    // Un guino visual para que la racha tambien se vea, no solo se oiga.
+    this.efectos.texto(this.jugador.x, this.jugador.y - 16,
+      '+' + (this.rachasLogradas * cfg.CADA), '#7cf29a');
   };
 
   Juego.prototype.golpearJugador = function () {

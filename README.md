@@ -113,6 +113,12 @@ Dura un mínimo de **3 s** —lo que tarda la frase de bienvenida— aunque los
 archivos carguen al instante, y se puede **saltar tocando la pantalla o con
 cualquier tecla**. Luego funde al menú.
 
+**Por qué a veces pide un toque:** ningún navegador deja sonar audio antes de
+que el usuario interactúe con la página. Si el audio está bloqueado, la intro
+muestra "TOCA PARA EMPEZAR" con la cara oculta, y al primer toque **aparecen la
+cara y la voz a la vez**. Si el navegador ya autoriza el sonido (o el usuario
+tiene el audio apagado), ese cartel no llega a verse y la intro arranca sola.
+
 - Duración: `INTRO_MINIMA` en `js/main.js`.
 - Tamaño de la cara: `#intro-cara` en `css/style.css`.
 - Cuánto abre la boca: los `@keyframes bostezo` del mismo archivo.
@@ -235,12 +241,22 @@ El juego suena de dos maneras a la vez:
 | `level-start.mp3` | empieza un nivel |
 | `level-complete.mp3` | nivel superado |
 | `extra-life.mp3` | vida extra (cada 5000 puntos) |
-| `ufo-hit.mp3` | cae el Platillo Completo |
+| `ufo-hit-1.mp3` / `ufo-hit-2.mp3` | cae el Platillo Completo (dos mitades que se alternan) |
+| `tio-rene-amb-1..6.mp3` | frases de fondo durante la partida |
+| `tio-rene-racha-1..3.mp3` | cada 5 naves derribadas |
 
 **Sintetizado** (Web Audio API, sin archivos): `disparo`, `marcha1..4`,
 `enemigoMuere`, `barrera`, `descenso`, `menu` y el zumbido del ovni.
 
-Eso último es **a propósito**: son los sonidos muy repetitivos. El disparo
+Además, mientras juegas suenan solas **frases de fondo** cada 11–24 s
+(`AMBIENTE` en `js/config.js`), a un tercio del volumen, y cada **5 naves
+derribadas** una frase de celebración que se va turnando (`RACHA`). Al derribar
+la nave grande suena "te paso por" partida en dos mitades que se alternan.
+
+Todo eso se apaga con `ACTIVO: false` en su bloque de `CONFIG.AUDIO`.
+
+Que el disparo y la marcha vayan sintetizados es **a propósito**: son los
+sonidos muy repetitivos. El disparo
 suena cada 0,3 s y la marcha enemiga cada 0,5 s; una voz humana ahí cansa en
 menos de un minuto y tapa todo lo demás. Sintetizado es corto y seco, que es
 lo que pide un arcade.

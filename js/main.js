@@ -68,8 +68,7 @@
 
   Input.alAccion(function (accion) {
     if (juego.estado === ESTADOS.CARGANDO && accion !== 'foco-perdido') {
-      Audio.desbloquear();
-      terminarIntro();
+      toqueEnIntro();
       return;
     }
     if (accion === 'cualquiera') { Audio.desbloquear(); return; }
@@ -119,8 +118,11 @@
       ? global.performance.now() : Date.now();
   }
 
+  var introRevelada = false;
+  var temporizadorIntro = null;
+
   function terminarIntro() {
-    if (!assetsListos || juego.estado !== ESTADOS.CARGANDO) { return; }
+    if (!assetsListos || !introRevelada || juego.estado !== ESTADOS.CARGANDO) { return; }
     assetsListos = false;              // evita entrar dos veces
     ui.cerrarIntro(function () {
       redimensionar();
@@ -128,16 +130,42 @@
     });
   }
 
-  // Frase de bienvenida. Si el navegador todavia no da permiso para sonar,
-  // queda en espera y sale sola en cuanto el usuario toque la pantalla.
-  Audio.reproducirCuandoSePueda('intro');
+  function programarFinIntro() {
+    if (!assetsListos || !introRevelada) { return; }
+    if (temporizadorIntro) { global.clearTimeout(temporizadorIntro); }
+    temporizadorIntro = global.setTimeout(terminarIntro,
+      Math.max(0, INTRO_MINIMA - (ahoraMs() - arranqueIntro)));
+  }
+
+  /* Aparece la cara Y suena la frase, a la vez. Si hubo que esperar un toque,
+     el minimo de la intro se cuenta desde este momento, no desde la carga. */
+  function revelarIntro() {
+    if (introRevelada) { return; }
+    introRevelada = true;
+    if (capaCarga) { capaCarga.classList.remove('esperando-toque'); }
+    Audio.desbloquear();
+    Audio.reproducirCuandoSePueda('intro');
+    arranqueIntro = ahoraMs();
+    programarFinIntro();
+  }
+
+  /* Un toque durante la intro: el primero la revela, los siguientes la saltan. */
+  function toqueEnIntro() {
+    if (!introRevelada) { revelarIntro(); } else { terminarIntro(); }
+  }
 
   var capaCarga = document.getElementById('capa-carga');
   if (capaCarga) {
-    capaCarga.addEventListener('pointerdown', function () {
-      Audio.desbloquear();
-      terminarIntro();
-    });
+    capaCarga.addEventListener('pointerdown', toqueEnIntro);
+  }
+
+  /* Si el navegador ya autoriza el sonido (o el usuario tiene el audio
+     apagado), no hace falta pedir ningun toque: la intro arranca sola. */
+  Audio.preparar();
+  if (!Audio.estaActivo() || Audio.puedeSonar()) {
+    revelarIntro();
+  } else if (capaCarga) {
+    capaCarga.classList.add('esperando-toque');
   }
 
   Assets.cargarTodo(function (hechos, total) {
@@ -150,6 +178,6 @@
     }
     redimensionar();
     assetsListos = true;
-    global.setTimeout(terminarIntro, Math.max(0, INTRO_MINIMA - (ahoraMs() - arranqueIntro)));
+    programarFinIntro();
   });
 })(window);

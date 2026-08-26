@@ -34,6 +34,8 @@
   var sirena = null;         // referencia al zumbido del ovni
   var vozActual = null;      // frase del Tio Rene sonando ahora mismo
   var pendiente = null;      // frase en espera de que se desbloquee el audio
+  var ambienteGain = null;   // salida propia del ambiente, mas bajita
+  var ambienteActual = null; // frase de fondo sonando ahora mismo
 
   function crearContexto() {
     if (ctx || !soportado) { return; }
@@ -43,6 +45,11 @@
       masterGain = ctx.createGain();
       masterGain.gain.value = activo ? volumen : 0;
       masterGain.connect(ctx.destination);
+      // El ambiente cuelga del volumen general pero con su propio atenuador,
+      // asi el mando de volumen sigue controlandolo todo de una vez.
+      ambienteGain = ctx.createGain();
+      ambienteGain.gain.value = CONFIG.AUDIO.AMBIENTE.VOLUMEN;
+      ambienteGain.connect(masterGain);
       if (typeof ctx.addEventListener === 'function') {
         ctx.addEventListener('statechange', soltarPendiente);
       }
@@ -179,6 +186,8 @@
       if (vozActual) {
         try { vozActual.stop(); } catch (e) { /* ya habia terminado */ }
       }
+      // Una frase importante manda: calla la charla de fondo para que se oiga.
+      Audio.detenerAmbiente();
       vozActual = src;
       src.onended = function () { if (vozActual === src) { vozActual = null; } };
     }
@@ -240,6 +249,19 @@
       soltarPendiente();
     },
 
+    /* Prepara el contexto sin reproducir nada, para poder preguntar despues
+       si el navegador ya nos deja sonar. */
+    preparar: function () {
+      crearContexto();
+      asegurarArchivos();
+    },
+
+    /* true si el navegador ya autoriza el sonido (o sea, no hace falta pedir
+       un toque previo). Antes del primer gesto casi siempre es false. */
+    puedeSonar: function () {
+      return !!(ctx && ctx.state === 'running');
+    },
+
     /* Para la frase de bienvenida: los navegadores no dejan sonar nada antes
        de que el usuario toque la pantalla. Si todavia no hay permiso (o el
        archivo no termino de cargar), la frase queda en espera y suena sola en
@@ -257,7 +279,9 @@
       crearContexto();
       if (!ctx) { return; }
       if (reproducirBuffer(nombre, true)) { return; }
-      var voz = VOCES[nombre];
+      // Si el archivo no esta, cae en la version sintetizada. Los nombres
+      // numerados (ovniMuere1, ovniMuere2...) comparten la misma reserva.
+      var voz = VOCES[nombre] || VOCES[nombre.replace(/\d+$/, '')];
       if (voz) { voz(); }
     },
 
@@ -268,6 +292,32 @@
       var indice = paso % NOTAS_MARCHA.length;
       if (reproducirBuffer('marcha' + (indice + 1), false)) { return; }
       tono({ tipo: 'square', desde: NOTAS_MARCHA[indice], dur: 0.10, vol: 0.20 });
+    },
+
+    /* Charla de fondo: una frase suelta, bajita, mientras se juega.
+       Nunca pisa una frase importante ni se pisa a si misma. */
+    ambiente: function () {
+      var cfg = CONFIG.AUDIO.AMBIENTE;
+      if (!activo || !soportado || !cfg.ACTIVO) { return false; }
+      crearContexto();
+      if (!ctx || ctx.state !== 'running' || !ambienteGain) { return false; }
+      if (vozActual || ambienteActual) { return false; }   // ya hay alguien hablando
+      var disponibles = cfg.CLIPS.filter(function (n) { return !!buffers[n]; });
+      if (disponibles.length === 0) { return false; }
+      var nombre = disponibles[Math.floor(Math.random() * disponibles.length)];
+      var src = ctx.createBufferSource();
+      src.buffer = buffers[nombre];
+      src.connect(ambienteGain);
+      ambienteActual = src;
+      src.onended = function () { if (ambienteActual === src) { ambienteActual = null; } };
+      src.start(ahora());
+      return true;
+    },
+
+    detenerAmbiente: function () {
+      if (!ambienteActual) { return; }
+      try { ambienteActual.stop(); } catch (e) { /* ya habia terminado */ }
+      ambienteActual = null;
     },
 
     /* Zumbido continuo del ovni mientras cruza la pantalla. */
@@ -324,6 +374,7 @@
           try { vozActual.stop(); } catch (e) { /* ya habia terminado */ }
           vozActual = null;
         }
+        Audio.detenerAmbiente();
         pendiente = null;
       }
       if (masterGain) { masterGain.gain.value = activo ? volumen : 0; }
@@ -336,7 +387,10 @@
       if (masterGain) { masterGain.gain.value = activo ? volumen : 0; }
     },
     /* Al pausar o perder el foco se corta cualquier sonido sostenido. */
-    silenciarSostenidos: function () { Audio.detenerSirena(); }
+    silenciarSostenidos: function () {
+      Audio.detenerSirena();
+      Audio.detenerAmbiente();
+    }
   };
 
   global.TRI.Audio = Audio;

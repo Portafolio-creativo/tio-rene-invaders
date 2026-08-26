@@ -366,6 +366,35 @@ body.tactil #botonera { display: grid; }
 #intro-cara {
   width: min(74%, 300px);
   filter: drop-shadow(0 10px 22px rgba(0, 0, 0, 0.55));
+  transition: opacity 0.25s ease, transform 0.35s ease;
+}
+
+/* Mientras se espera el toque, la cara no esta: aparece justo cuando suena
+   la voz, para que entren juntas. */
+#capa-carga.esperando-toque #intro-cara {
+  opacity: 0;
+  transform: scale(0.9);
+}
+
+#intro-toque {
+  display: none;
+  margin: 0;
+  font-size: 15px;
+  font-weight: bold;
+  letter-spacing: 2px;
+  color: var(--acento);
+  animation: latido 1.3s ease-in-out infinite;
+}
+
+#capa-carga.esperando-toque #intro-toque { display: block; }
+
+/* Mientras se espera el toque no tiene sentido la barra de progreso. */
+#capa-carga.esperando-toque #pista-progreso,
+#capa-carga.esperando-toque #texto-carga { visibility: hidden; }
+
+@keyframes latido {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
 }
 
 #intro-cara img {
@@ -402,6 +431,10 @@ body.tactil #botonera { display: grid; }
 
 @media (prefers-reduced-motion: reduce) {
   #intro-boca { animation: none; }
+  #intro-toque { animation: none; }
+  /* Sin transicion: la cara aparece de golpe, sin depender de que el
+     navegador anime nada. */
+  #intro-cara { transition: none; }
 }
 
 /* ---------- Barra de progreso ---------- */
@@ -457,6 +490,7 @@ body.tactil #botonera { display: grid; }
   .titulo-juego { font-size: clamp(20px, 5vh, 30px); }
   .titulo-capa { font-size: clamp(18px, 5vh, 28px); }
   .controles { font-size: 10px; gap: 2px 8px; }
+  #intro-toque { font-size: 13px; }
   .boton { min-height: 42px; padding: 8px 20px; }
 
   /* Las dos filas de vertical no sirven en apaisado: los botones vuelven a

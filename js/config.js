@@ -147,9 +147,46 @@
         nivel: 'level-start.mp3',
         nivelCompleto: 'level-complete.mp3',
         vidaExtra: 'extra-life.mp3',
-        ovniMuere: 'ufo-hit.mp3'
+        /* Al derribar la nave grande: la frase "te paso por" partida en dos,
+           que se van alternando (primer ovni la primera mitad, segundo la
+           segunda). */
+        ovniMuere1: 'ufo-hit-1.mp3',
+        ovniMuere2: 'ufo-hit-2.mp3',
+        /* Frases de AMBIENTE: suenan solas cada cierto rato mientras juegas,
+           bajito, para que el Tio Rene nunca se calle del todo. */
+        ambiente1: 'tio-rene-amb-1.mp3',
+        ambiente2: 'tio-rene-amb-2.mp3',
+        ambiente3: 'tio-rene-amb-3.mp3',
+        ambiente4: 'tio-rene-amb-4.mp3',
+        ambiente5: 'tio-rene-amb-5.mp3',
+        ambiente6: 'tio-rene-amb-6.mp3',
+        /* Frases de RACHA: cada 5 naves derribadas. */
+        racha1: 'tio-rene-racha-1.mp3',
+        racha2: 'tio-rene-racha-2.mp3',
+        racha3: 'tio-rene-racha-3.mp3'
         /* Sintetizados a proposito (muy repetitivos):
            disparo, marcha1..4, enemigoMuere, barrera, descenso, menu, ovni */
+      },
+
+      /* Charla de fondo durante la partida. */
+      AMBIENTE: {
+        ACTIVO: true,
+        VOLUMEN: 0.34,     // proporcion del volumen general (0 a 1)
+        ESPERA_MIN: 11,    // segundos entre frase y frase
+        ESPERA_MAX: 24,
+        PRIMERA_ESPERA: 6, // cuanto tarda la primera al empezar el nivel
+        CLIPS: ['ambiente1', 'ambiente2', 'ambiente3', 'ambiente4', 'ambiente5', 'ambiente6']
+      },
+
+      /* Frases al derribar la nave grande, en orden. */
+      OVNI_CLIPS: ['ovniMuere1', 'ovniMuere2'],
+
+      /* Celebracion por racha de bajas. Las frases se van turnando: la 1a a
+         las 5 naves, la 2a a las 10, la 3a a las 15, y vuelta a empezar. */
+      RACHA: {
+        ACTIVO: true,
+        CADA: 5,           // naves derribadas entre felicitacion y felicitacion
+        CLIPS: ['racha1', 'racha2', 'racha3']
       }
     },
 
