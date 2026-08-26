@@ -68,6 +68,10 @@ body {
 
 #marca {
   margin: 0;
+  white-space: nowrap;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
   font-size: 14px;
   font-weight: bold;
   letter-spacing: 2px;
@@ -80,6 +84,7 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
+  flex: 0 0 auto;      /* manda el bloque de audio; el titulo cede */
 }
 
 #etiqueta-volumen {
@@ -95,6 +100,7 @@ body {
 
 #btn-sonido {
   font-family: var(--fuente);
+  white-space: nowrap;
   font-size: 11px;
   font-weight: bold;
   letter-spacing: 1px;
@@ -270,6 +276,15 @@ body.tactil #btn-pausa-barra { display: inline-block; }
   flex-wrap: wrap;          /* antes de recortarse, que baje de linea */
   gap: 6px 8px;
   width: 100%;
+  max-width: 100%;
+}
+
+/* Ninguna pieza puede ser mas ancha que el panel: si el texto no cabe, se
+   encoge en vez de empujar y crear barra de desplazamiento. */
+#fila-opciones > * {
+  max-width: 100%;
+  min-width: 0;
+  flex-shrink: 1;
 }
 
 #btn-instalar { margin-right: auto; }
@@ -305,6 +320,10 @@ body.tactil #btn-pausa-barra { display: inline-block; }
 }
 
 #ayuda-instalar[hidden] { display: none; }
+
+/* En el telefono el credito ya sale en el pie de la pagina: en el menu solo
+   ocuparia alto. */
+body.tactil #intro-credito { display: none; }
 
 /* Con el disparo automatico, su boton se atenua: sigue ahi pero ya no hace
    falta apretarlo. */
@@ -489,7 +508,7 @@ body.tactil #opcion-palanca[hidden] { display: flex; }
 /* ---------- Menu de entrada ---------- */
 
 #capa-menu {
-  gap: 8px;
+  gap: 6px;
   justify-content: center;
   /* Opaco a proposito: en las otras capas conviene ver la partida detras,
      pero aqui la cara grande es la protagonista y el Tio Rene del tablero se
@@ -500,7 +519,18 @@ body.tactil #opcion-palanca[hidden] { display: flex; }
 /* La cara entra desde el centro al abrir la pagina y luego late suave,
    invitando a pulsar JUGAR. */
 #intro-cara {
-  width: min(50%, 215px);
+  /* Medida por ALTURA del panel, no por ancho: asi se encoge sola cuando la
+     pantalla es baja (o cuando la fuente del telefono ocupa mas de lo que
+     ocupa en el escritorio) en vez de desbordar y salir cortada. */
+  height: 30%;
+  aspect-ratio: 360 / 396;      /* cabeza 249 + mandibula 147 */
+  width: auto;
+  max-width: min(52%, 215px);
+  /* CLAVE: puede encogerse. Si el texto ocupa mas de lo previsto (otra fuente,
+     pantalla mas baja), la cara cede espacio en vez de que el panel desborde
+     y salga cortada. */
+  flex: 0 1 auto;
+  min-height: 44px;
   filter: drop-shadow(0 10px 22px rgba(0, 0, 0, 0.55));
   animation: entrar-cara 0.55s cubic-bezier(0.2, 1.3, 0.4, 1) both,
              latir-cara 2.6s ease-in-out 0.6s infinite;
@@ -675,11 +705,24 @@ body.tactil #opcion-palanca[hidden] { display: flex; }
   }
 }
 
+/* En pantallas estrechas la barra no debe empujar la pagina a lo ancho: se
+   sacrifica el deslizador de volumen (queda el boton de silencio). */
+@media (max-width: 430px) {
+  #control-volumen { display: none; }
+  #marca { font-size: 10px; }
+}
+
 @media (max-width: 520px) {
   #etiqueta-volumen { display: none; }
-  #control-volumen { width: 70px; }
-  #marca { font-size: 12px; letter-spacing: 1px; }
+  #control-volumen { width: 62px; }
+  #marca { font-size: 11px; letter-spacing: 0; }
+  #btn-sonido { font-size: 10px; padding: 5px 8px; letter-spacing: 0; }
+  #btn-pausa-barra { font-size: 11px; padding: 5px 9px; }
+  #cabecera { gap: 6px; }
   .controles { font-size: 11px; }
+  .titulo-juego.intro { font-size: clamp(18px, 4.6vh, 28px); letter-spacing: 1px; }
+  .marcador-menu { font-size: 12px; }
+  .boton.principal { font-size: 15px; min-height: 44px; padding: 10px 20px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
