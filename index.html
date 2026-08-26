@@ -60,8 +60,11 @@
     <div id="marco">
       <canvas id="lienzo" width="600" height="800" aria-label="Zona de juego de Tío René Invaders" role="img"></canvas>
 
-      <!-- INTRO / CARGA -->
-      <section class="capa" id="capa-carga" hidden>
+      <!-- MENÚ: es lo PRIMERO que se ve, sin pantalla de carga previa. Va sin
+           "hidden" a proposito, para que el marco nunca aparezca vacio
+           mientras arranca el JavaScript. La cara entra desde el centro y
+           late junto al boton, invitando a pulsar. -->
+      <section class="capa" id="capa-menu">
         <!-- La cara va en tres piezas, igual que en el juego: al crecer el
              hueco central la mandibula baja sola y se ve el bostezo. -->
         <div id="intro-cara">
@@ -70,31 +73,16 @@
           <img id="intro-mandibula" src="assets/sprites/player-jaw.png" alt="" width="360" height="147">
         </div>
         <h1 class="titulo-juego intro">TÍO RENÉ<br><span>INVADERS</span></h1>
-        <p id="intro-credito">creado por Eduardo Pérez</p>
-        <!-- Los navegadores no dejan sonar nada antes de un gesto del usuario.
-             Por eso, si el audio esta bloqueado, la cara y la voz esperan a
-             este toque y aparecen juntas. Si el navegador ya autoriza el
-             sonido, este cartel no llega a verse. -->
-        <p id="intro-toque">TOCA PARA EMPEZAR</p>
-        <div id="pista-progreso"><div id="barra-progreso"></div></div>
-        <p id="texto-carga" class="tenue">CARGANDO</p>
-      </section>
-
-      <!-- MENÚ -->
-      <section class="capa" id="capa-menu" hidden>
-        <img id="emblema" src="assets/ui/logo.png" width="320" height="320" alt="">
-        <h1 class="titulo-juego">TÍO RENÉ<br><span>INVADERS</span></h1>
-        <p class="lema">La cabezota que defiende el barrio</p>
         <p class="marcador-menu">RÉCORD <strong id="record-menu">00000</strong></p>
-        <button type="button" id="btn-jugar" class="boton principal">JUGAR</button>
+        <button type="button" id="btn-jugar" class="boton principal palpita">JUGAR</button>
         <ul class="controles">
           <li><b>← →</b> mover</li>
           <li><b>ESPACIO</b> disparar</li>
           <li><b>P</b> pausa</li>
-          <li><b>ENTER</b> empezar</li>
           <li><b>M</b> silenciar</li>
         </ul>
-        <p class="tenue">En el teléfono usa los botones de abajo.</p>
+        <p id="intro-credito">creado por Eduardo Pérez</p>
+        <p id="texto-carga" class="tenue">CARGANDO…</p>
       </section>
 
       <!-- PAUSA -->

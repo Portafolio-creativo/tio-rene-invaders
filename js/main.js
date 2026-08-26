@@ -19,7 +19,7 @@
   var juego = new TRI.Juego(renderer);
 
   var ui = new TRI.UI({
-    jugar: function () { juego.nuevaPartida(); },
+    jugar: function () { juego.nuevaPartida(true); },
     menu: function () { juego.irAlMenu(); },
     reanudar: function () { juego.alternarPausa(); },
     seguir: function () { juego.continuarTrasVictoria(); }
@@ -67,10 +67,6 @@
   }
 
   Input.alAccion(function (accion) {
-    if (juego.estado === ESTADOS.CARGANDO && accion !== 'foco-perdido') {
-      toqueEnIntro();
-      return;
-    }
     if (accion === 'cualquiera') { Audio.desbloquear(); return; }
     if (accion === 'pausa') {
       if (juego.estado === ESTADOS.JUGANDO || juego.estado === ESTADOS.PAUSA) { juego.alternarPausa(); }
@@ -96,8 +92,11 @@
      (por ejemplo: TRI.instancia.juego.alternarDepuracion()). */
   TRI.instancia = { juego: juego, ui: ui, renderer: renderer, redimensionar: redimensionar };
 
-  /* ---- Arranque ---- */
-  ui.mostrar(ESTADOS.CARGANDO, juego.datosHUD());
+  /* ---- Arranque ----
+     Se entra DIRECTO al menu: la cara y el boton JUGAR estan desde el primer
+     instante, asi el marco nunca se ve vacio. */
+  juego.irAlMenu();              // el estado tambien arranca en MENU
+  ui.progresoCarga(0, 1);        // ...pero JUGAR espera a que carguen los dibujos
   redimensionar();
   global.requestAnimationFrame(bucle);
 
@@ -105,84 +104,23 @@
     ui.avisar('Tu navegador no deja guardar datos: el record no se conservara al cerrar.');
   }
 
-  /* La intro se ve un momento aunque los assets carguen al instante: si no,
-     pasaria de largo en un parpadeo. Se puede saltar tocando o con cualquier
-     tecla. */
-  var INTRO_MINIMA = 3000;   // cubre la frase de bienvenida (2,65 s)
-  var arranqueIntro = (global.performance && global.performance.now)
-    ? global.performance.now() : Date.now();
-  var assetsListos = false;
-
-  function ahoraMs() {
-    return (global.performance && global.performance.now)
-      ? global.performance.now() : Date.now();
-  }
-
-  var introRevelada = false;
-  var temporizadorIntro = null;
-
-  function terminarIntro() {
-    if (!assetsListos || !introRevelada || juego.estado !== ESTADOS.CARGANDO) { return; }
-    assetsListos = false;              // evita entrar dos veces
-    ui.cerrarIntro(function () {
-      redimensionar();
-      juego.irAlMenu();
-    });
-  }
-
-  function programarFinIntro() {
-    if (!assetsListos || !introRevelada) { return; }
-    if (temporizadorIntro) { global.clearTimeout(temporizadorIntro); }
-    temporizadorIntro = global.setTimeout(terminarIntro,
-      Math.max(0, INTRO_MINIMA - (ahoraMs() - arranqueIntro)));
-  }
-
-  /* Aparece la cara Y suena la frase, a la vez. Si hubo que esperar un toque,
-     el minimo de la intro se cuenta desde este momento, no desde la carga. */
-  function revelarIntro() {
-    if (introRevelada) { return; }
-    introRevelada = true;
-    if (capaCarga) { capaCarga.classList.remove('esperando-toque'); }
-    Audio.desbloquear();
-    Audio.reproducirCuandoSePueda('intro');
-    arranqueIntro = ahoraMs();
-    programarFinIntro();
-  }
-
-  /* Un toque durante la intro: el primero la revela, los siguientes la saltan. */
-  function toqueEnIntro() {
-    if (!introRevelada) { revelarIntro(); } else { terminarIntro(); }
-  }
-
-  var capaCarga = document.getElementById('capa-carga');
-  if (capaCarga) {
-    capaCarga.addEventListener('pointerdown', toqueEnIntro);
-  }
-
-  /* Red barredera: el PRIMER contacto en cualquier parte de la pagina revela
-     la intro. Da igual si el dedo cae en el tablero, en la cabecera o en el
-     pie; no hace falta acertarle al cartel. Se quitan solos al primer uso. */
+  /* Red barredera: el PRIMER contacto en cualquier parte de la pagina
+     desbloquea el audio. Da igual donde caiga el dedo; se retira sola. */
   var EVENTOS_DESPERTAR = ['pointerdown', 'touchstart', 'mousedown', 'keydown'];
   function despertar() {
     EVENTOS_DESPERTAR.forEach(function (nombre) {
       document.removeEventListener(nombre, despertar, true);
     });
-    if (juego.estado === ESTADOS.CARGANDO) { toqueEnIntro(); }
-    else { Audio.desbloquear(); }
+    Audio.desbloquear();
   }
   EVENTOS_DESPERTAR.forEach(function (nombre) {
     document.addEventListener(nombre, despertar, true);   // fase de captura
   });
 
-  /* Se intenta arrancar el sonido sin pedir nada. Solo si el navegador se
-     niega aparece el cartel de "toca para empezar". */
-  Audio.intentarArranque(function (pudoSonar) {
-    if (pudoSonar || !Audio.estaActivo()) {
-      revelarIntro();
-    } else if (capaCarga && !introRevelada) {
-      capaCarga.classList.add('esperando-toque');
-    }
-  });
+  /* Se intenta arrancar el audio sin pedir nada: si el navegador ya lo
+     autoriza (segunda visita, o app instalada), al pulsar JUGAR la frase de
+     bienvenida sale al instante. */
+  Audio.intentarArranque(function () { /* el resultado no cambia la pantalla */ });
 
   Assets.cargarTodo(function (hechos, total) {
     ui.progresoCarga(hechos, total);
@@ -193,7 +131,6 @@
       ui.avisar('Faltan ' + resultado.fallidos.length + ' imagenes; se usan dibujos de reserva.');
     }
     redimensionar();
-    assetsListos = true;
-    programarFinIntro();
+    ui.listoParaJugar();
   });
 })(window);

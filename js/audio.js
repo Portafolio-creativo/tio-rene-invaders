@@ -195,6 +195,36 @@
     return true;
   }
 
+  /* Baraja de frases de ambiente. En vez de sortear cada vez (que repite la
+     misma dos veces seguidas mas a menudo de lo que uno cree), se barajan
+     todas y se van sacando; cuando se acaban, se vuelve a barajar. Asi no se
+     repite ninguna hasta haber pasado por todas. */
+  var baraja = [];
+
+  function sacarDeLaBaraja(clips) {
+    var disponibles = clips.filter(function (n) { return !!buffers[n]; });
+    if (disponibles.length === 0) { return null; }
+    // Se rellena cuando se agota (o si cambio la lista de clips).
+    if (baraja.length === 0) {
+      baraja = disponibles.slice();
+      for (var i = baraja.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var tmp = baraja[i]; baraja[i] = baraja[j]; baraja[j] = tmp;
+      }
+      // Evita que la ultima de una ronda sea la primera de la siguiente.
+      // OJO: se saca con pop(), o sea por el FINAL; la siguiente en salir es
+      // baraja[baraja.length - 1], no baraja[0].
+      if (baraja.length > 1 && baraja[baraja.length - 1] === ultimaAmbiente) {
+        baraja.unshift(baraja.pop());   // la repetida pasa al final de la ronda
+      }
+    }
+    var nombre = baraja.pop();
+    ultimaAmbiente = nombre;
+    return nombre;
+  }
+
+  var ultimaAmbiente = null;
+
   /* Suelta la frase que quedo esperando a que hubiera permiso y archivo. */
   function soltarPendiente() {
     if (!pendiente || !activo || !ctx || ctx.state !== 'running') { return; }
@@ -331,9 +361,8 @@
       crearContexto();
       if (!ctx || ctx.state !== 'running' || !ambienteGain) { return false; }
       if (vozActual || ambienteActual) { return false; }   // ya hay alguien hablando
-      var disponibles = cfg.CLIPS.filter(function (n) { return !!buffers[n]; });
-      if (disponibles.length === 0) { return false; }
-      var nombre = disponibles[Math.floor(Math.random() * disponibles.length)];
+      var nombre = sacarDeLaBaraja(cfg.CLIPS);
+      if (!nombre) { return false; }
       var src = ctx.createBufferSource();
       src.buffer = buffers[nombre];
       src.connect(ambienteGain);

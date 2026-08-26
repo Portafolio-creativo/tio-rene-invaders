@@ -168,12 +168,6 @@ body.tactil #btn-pausa-barra { display: inline-block; }
 
 .capa[hidden] { display: none; }
 
-#emblema {
-  width: min(30%, 150px);
-  height: auto;
-  image-rendering: auto;
-}
-
 .titulo-juego {
   margin: 0;
   font-size: clamp(24px, 7vw, 46px);
@@ -352,55 +346,40 @@ body.tactil #botonera { display: grid; }
 
 .aviso[hidden] { display: none; }
 
-/* ---------- Intro / carga ---------- */
+/* ---------- Menu de entrada ---------- */
 
-#capa-carga {
-  gap: 14px;
+#capa-menu {
+  gap: 10px;
   justify-content: center;
-  transition: opacity 0.35s ease;
+  /* Opaco a proposito: en las otras capas conviene ver la partida detras,
+     pero aqui la cara grande es la protagonista y el Tio Rene del tablero se
+     transparentaba debajo, ensuciando la pantalla. */
+  background: var(--fondo);
 }
 
-#capa-carga.saliendo { opacity: 0; }
-
-/* La cara, bien grande: es la protagonista de la intro. */
+/* La cara entra desde el centro al abrir la pagina y luego late suave,
+   invitando a pulsar JUGAR. */
 #intro-cara {
-  width: min(74%, 300px);
+  width: min(56%, 240px);
   filter: drop-shadow(0 10px 22px rgba(0, 0, 0, 0.55));
-  transition: opacity 0.25s ease, transform 0.35s ease;
-}
-
-/* Mientras se espera el toque, la cara no esta: aparece justo cuando suena
-   la voz, para que entren juntas. */
-#capa-carga.esperando-toque #intro-cara {
-  opacity: 0;
-  transform: scale(0.9);
-}
-
-#intro-toque {
-  display: none;
-  margin: 0;
-  font-size: 15px;
-  font-weight: bold;
-  letter-spacing: 2px;
-  color: var(--acento);
-  animation: latido 1.3s ease-in-out infinite;
-}
-
-#capa-carga.esperando-toque #intro-toque { display: block; }
-
-/* Mientras se espera el toque no tiene sentido la barra de progreso. */
-#capa-carga.esperando-toque #pista-progreso,
-#capa-carga.esperando-toque #texto-carga { visibility: hidden; }
-
-@keyframes latido {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.35; }
+  animation: entrar-cara 0.55s cubic-bezier(0.2, 1.3, 0.4, 1) both,
+             latir-cara 2.6s ease-in-out 0.6s infinite;
 }
 
 #intro-cara img {
   display: block;
   width: 100%;
   height: auto;
+}
+
+@keyframes entrar-cara {
+  from { opacity: 0; transform: scale(0.35); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes latir-cara {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.045); }
 }
 
 /* El hueco de la boca. El relleno de arriba se mide en % del ANCHO, asi que
@@ -417,24 +396,39 @@ body.tactil #botonera { display: grid; }
   62%, 80% { padding-top: 13%; }
 }
 
+/* El boton tambien late, para que la vista vaya de la cara al boton. */
+.boton.palpita {
+  animation: latir-boton 1.5s ease-in-out infinite;
+}
+
+@keyframes latir-boton {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(124, 242, 154, 0.55); }
+  50% { transform: scale(1.06); box-shadow: 0 0 0 12px rgba(124, 242, 154, 0); }
+}
+
+.boton.palpita:disabled {
+  animation: none;
+  opacity: 0.45;
+  cursor: default;
+}
+
 .titulo-juego.intro {
   font-size: clamp(20px, 5.5vh, 34px);
   letter-spacing: 2px;
 }
 
 #intro-credito {
-  margin: -6px 0 0;
+  margin: 0;
   font-size: 11px;
   letter-spacing: 1px;
   color: var(--tinta-tenue);
 }
 
+#texto-carga[hidden] { display: none; }
+
 @media (prefers-reduced-motion: reduce) {
-  #intro-boca { animation: none; }
-  #intro-toque { animation: none; }
-  /* Sin transicion: la cara aparece de golpe, sin depender de que el
-     navegador anime nada. */
-  #intro-cara { transition: none; }
+  #intro-boca, .boton.palpita { animation: none; }
+  #intro-cara { animation: entrar-cara 0.01s both; }
 }
 
 /* ---------- Barra de progreso ---------- */
@@ -484,13 +478,15 @@ body.tactil #botonera { display: grid; }
      tiene que quedarse quieto bajo el dedo. */
   html, body { overflow: hidden; }
 
-  /* El menu tambien se aprieta: en apaisado no cabe el emblema. */
-  #emblema { display: none; }
-  .capa { gap: 6px; padding: 4% 6%; }
+  /* En apaisado sobra poca altura: se quita la lista de teclas (para eso
+     estan los botones en pantalla) y la cara se lleva el espacio ganado. */
+  #intro-cara { width: min(46%, 150px); }
+  .controles { display: none; }
+  #intro-credito { font-size: 10px; }
+  .capa { gap: 5px; padding: 3% 6%; }
   .titulo-juego { font-size: clamp(20px, 5vh, 30px); }
   .titulo-capa { font-size: clamp(18px, 5vh, 28px); }
   .controles { font-size: 10px; gap: 2px 8px; }
-  #intro-toque { font-size: 13px; }
   .boton { min-height: 42px; padding: 8px 20px; }
 
   /* Las dos filas de vertical no sirven en apaisado: los botones vuelven a

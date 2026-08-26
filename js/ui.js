@@ -18,14 +18,13 @@
   function UI(acciones) {
     this.acciones = acciones;
     this.capas = {
-      carga: $('capa-carga'),
       menu: $('capa-menu'),
       pausa: $('capa-pausa'),
       gameOver: $('capa-game-over'),
       victoria: $('capa-victoria')
     };
-    this.progreso = $('barra-progreso');
     this.textoCarga = $('texto-carga');
+    this.botonJugar = $('btn-jugar');
     this.recordMenu = $('record-menu');
     this.puntosFinal = $('puntos-final');
     this.recordFinal = $('record-final');
@@ -53,7 +52,9 @@
       if (!el) { return; }
       el.addEventListener('click', function () {
         Audio.desbloquear();
-        Audio.reproducir('menu');
+        // En JUGAR no suena el "bip": lo que toca es la frase de bienvenida,
+        // y las dos comparten canal de voz.
+        if (par[1] !== 'jugar') { Audio.reproducir('menu'); }
         self.acciones[par[1]]();
       });
     });
@@ -84,24 +85,19 @@
     this.botonSonido.classList.toggle('apagado', !activo);
   };
 
+  /* Mientras cargan los dibujos, el boton JUGAR esta apagado y debajo se ve
+     el avance. Como todo pesa poco, normalmente dura un pestaneo. */
   UI.prototype.progresoCarga = function (hechos, total) {
-    if (this.progreso) {
-      this.progreso.style.width = Math.round((hechos / total) * 100) + '%';
-    }
+    if (this.botonJugar) { this.botonJugar.disabled = true; }
     if (this.textoCarga) {
+      this.textoCarga.hidden = false;
       this.textoCarga.textContent = 'CARGANDO ' + hechos + ' / ' + total;
     }
   };
 
-  /* Funde la intro y avisa cuando termina. */
-  UI.prototype.cerrarIntro = function (alTerminar) {
-    var capa = this.capas.carga;
-    if (!capa || capa.hidden) { alTerminar(); return; }
-    capa.classList.add('saliendo');
-    global.setTimeout(function () {
-      capa.classList.remove('saliendo');
-      alTerminar();
-    }, 350);
+  UI.prototype.listoParaJugar = function () {
+    if (this.botonJugar) { this.botonJugar.disabled = false; }
+    if (this.textoCarga) { this.textoCarga.hidden = true; }
   };
 
   UI.prototype.ocultarTodo = function () {
@@ -120,9 +116,7 @@
 
   UI.prototype.mostrar = function (estado, datos) {
     this.ocultarTodo();
-    if (estado === ESTADOS.CARGANDO) {
-      this.capas.carga.hidden = false;
-    } else if (estado === ESTADOS.MENU) {
+    if (estado === ESTADOS.CARGANDO || estado === ESTADOS.MENU) {
       this.capas.menu.hidden = false;
       if (this.recordMenu) { this.recordMenu.textContent = Util.formatearPuntos(datos.record); }
       this.enfocar('btn-jugar');

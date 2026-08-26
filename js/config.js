@@ -140,8 +140,12 @@
          0,3 s y la marcha cada 0,5 s, asi que una voz ahi cansa enseguida. */
       ARCHIVOS: {
         intro: 'tio-rene-intro.mp3',          // al cargar el juego
-        jugadorGolpe: 'tio-rene-hit.mp3',     // le pegan
+        jugadorGolpe: 'tio-rene-hit.mp3',     // le pegan (impacto)
         jugadorMuere: 'tio-rene-death.mp3',   // ultima vida
+        /* "Se murio": suena CADA vez que pierde una vida, turnandose. */
+        muerte1: 'muerte-1.mp3',
+        muerte2: 'muerte-2.mp3',
+        muerte3: 'muerte-3.mp3',
         gameOver: 'game-over.mp3',
         victoria: 'victory.mp3',
         nivel: 'level-start.mp3',
@@ -152,14 +156,43 @@
            segunda). */
         ovniMuere1: 'ufo-hit-1.mp3',
         ovniMuere2: 'ufo-hit-2.mp3',
-        /* Frases de AMBIENTE: suenan solas cada cierto rato mientras juegas,
-           bajito, para que el Tio Rene nunca se calle del todo. */
-        ambiente1: 'tio-rene-amb-1.mp3',
-        ambiente2: 'tio-rene-amb-2.mp3',
-        ambiente3: 'tio-rene-amb-3.mp3',
-        ambiente4: 'tio-rene-amb-4.mp3',
-        ambiente5: 'tio-rene-amb-5.mp3',
-        ambiente6: 'tio-rene-amb-6.mp3',
+        /* Frases de AMBIENTE: el monton del que se va sacando la charla de
+           fondo. Se barajan para que no se repitan hasta agotarlas todas. */
+        ambiente1: 'amb-01.mp3',
+        ambiente2: 'amb-02.mp3',
+        ambiente3: 'amb-03.mp3',
+        ambiente4: 'amb-04.mp3',
+        ambiente5: 'amb-05.mp3',
+        ambiente6: 'amb-06.mp3',
+        ambiente7: 'amb-07.mp3',
+        ambiente8: 'amb-08.mp3',
+        ambiente9: 'amb-09.mp3',
+        ambiente10: 'amb-10.mp3',
+        ambiente11: 'amb-11.mp3',
+        ambiente12: 'amb-12.mp3',
+        ambiente13: 'amb-13.mp3',
+        ambiente14: 'amb-14.mp3',
+        ambiente15: 'amb-15.mp3',
+        ambiente16: 'amb-16.mp3',
+        ambiente17: 'amb-17.mp3',
+        ambiente18: 'amb-18.mp3',
+        ambiente19: 'amb-19.mp3',
+        ambiente20: 'amb-20.mp3',
+        ambiente21: 'amb-21.mp3',
+        ambiente22: 'amb-22.mp3',
+        ambiente23: 'amb-23.mp3',
+        ambiente24: 'amb-24.mp3',
+        ambiente25: 'amb-25.mp3',
+        ambiente26: 'amb-26.mp3',
+        ambiente27: 'amb-27.mp3',
+        ambiente28: 'amb-28.mp3',
+        ambiente29: 'amb-29.mp3',
+        ambiente30: 'amb-30.mp3',
+        ambiente31: 'amb-31.mp3',
+        ambiente32: 'amb-32.mp3',
+        ambiente33: 'amb-33.mp3',
+        ambiente34: 'amb-34.mp3',
+        ambiente35: 'amb-35.mp3',
         /* Frases de RACHA: cada 5 naves derribadas. */
         racha1: 'tio-rene-racha-1.mp3',
         racha2: 'tio-rene-racha-2.mp3',
@@ -175,11 +208,16 @@
         ESPERA_MIN: 11,    // segundos entre frase y frase
         ESPERA_MAX: 24,
         PRIMERA_ESPERA: 6, // cuanto tarda la primera al empezar el nivel
-        CLIPS: ['ambiente1', 'ambiente2', 'ambiente3', 'ambiente4', 'ambiente5', 'ambiente6']
+        CLIPS: [
+          'ambiente1', 'ambiente2', 'ambiente3', 'ambiente4', 'ambiente5', 'ambiente6', 'ambiente7', 'ambiente8', 'ambiente9', 'ambiente10', 'ambiente11', 'ambiente12', 'ambiente13', 'ambiente14', 'ambiente15', 'ambiente16', 'ambiente17', 'ambiente18', 'ambiente19', 'ambiente20', 'ambiente21', 'ambiente22', 'ambiente23', 'ambiente24', 'ambiente25', 'ambiente26', 'ambiente27', 'ambiente28', 'ambiente29', 'ambiente30', 'ambiente31', 'ambiente32', 'ambiente33', 'ambiente34', 'ambiente35'
+        ]
       },
 
       /* Frases al derribar la nave grande, en orden. */
       OVNI_CLIPS: ['ovniMuere1', 'ovniMuere2'],
+
+      /* Frases de "se murio", una por cada vida perdida. */
+      MUERTE_CLIPS: ['muerte1', 'muerte2', 'muerte3'],
 
       /* Celebracion por racha de bajas. Las frases se van turnando: la 1a a
          las 5 naves, la 2a a las 10, la 3a a las 15, y vuelta a empezar. */

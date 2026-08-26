@@ -103,42 +103,29 @@ tio-rene-invaders/
     └── hacer-miniatura.py  genera la miniatura para compartir el enlace
 ```
 
-## 5. Intro
+## 5. Pantalla de entrada
 
-Al abrir el juego aparece una **pantalla de entrada con la cara del Tío René a
-tamaño grande**, el título y el crédito ("creado por Eduardo Pérez"), mientras
-se cargan los recursos. La mandíbula bosteza sola, para que se vea la mecánica
-antes de jugar.
+Al abrir la página **lo primero y único que se ve es el menú**: la cara del Tío
+René entrando desde el centro, el título, el récord y el botón **JUGAR**. La
+cara y el botón laten para invitar a pulsar, y la mandíbula bosteza sola. No hay
+pantalla de carga previa ni marco vacío: el menú va sin `hidden` en el HTML, así
+que está ahí desde antes de que arranque el JavaScript.
 
-Dura un mínimo de **3 s** —lo que tarda la frase de bienvenida— aunque los
-archivos carguen al instante, y se puede **saltar tocando la pantalla o con
-cualquier tecla**. Luego funde al menú.
+Mientras cargan los dibujos (un pestañeo), JUGAR está apagado y debajo se ve el
+avance. Al pulsarlo suena **"ya llegamos ya"** y empieza la partida.
 
-### Por qué a veces pide un toque
-
-Ningún navegador deja sonar audio antes de que el usuario interactúe con la
-página; es una política de Chrome, Firefox y Safari contra las webs que
-arrancan solas con ruido. **No hay forma legítima de saltársela.** Lo que hace
-el juego es aprovechar las tres vías que sí existen:
-
-1. **Lo intenta sin pedir nada.** Al cargar prueba a arrancar el audio
-   (`Audio.intentarArranque`). Chrome lo autoriza por su cuenta cuando ya
-   visitaste el sitio antes, así que **a partir de la segunda visita suele
-   sonar solo**, sin cartel.
-2. **Si no puede, cualquier contacto sirve.** Hay un detector en toda la página
-   (fase de captura): el primer toque, clic o tecla —caiga donde caiga— revela
-   la cara y lanza la voz a la vez. No hay que acertarle al cartel.
-3. **Instalado como app, suena siempre al abrir.** Una app añadida a la
-   pantalla de inicio arranca con el audio ya autorizado. Ver §6.
-
-Y si quieres forzarlo en tu propio navegador: en Chrome, candado de la barra de
-direcciones → Configuración del sitio → Sonido → Permitir.
-
-- Duración: `INTRO_MINIMA` en `js/main.js`.
 - Tamaño de la cara: `#intro-cara` en `css/style.css`.
-- Cuánto abre la boca: los `@keyframes bostezo` del mismo archivo.
-- Con "movimiento reducido" activado en el sistema, el bostezo se queda quieto
-  (la cara se ve igual de grande).
+- Entrada y latido: `@keyframes entrar-cara`, `latir-cara`, `latir-boton`.
+- Cuánto abre la boca: `@keyframes bostezo`.
+- Con "movimiento reducido" activado, nada late ni bosteza (la cara aparece
+  igual, sin animación).
+
+**Por qué la voz sale al pulsar y no antes:** ningún navegador deja sonar audio
+hasta que el usuario interactúa. Es política de Chrome, Firefox y Safari, y no
+hay forma legítima de saltársela. Por eso la bienvenida se dispara justo con el
+botón: **el gesto de pulsar JUGAR es lo que habilita el sonido**. Si el
+navegador ya lo autoriza (segunda visita, o la app instalada según §6), suena
+igual de inmediato.
 
 ## 6. Instalar como app (y que suene al abrir)
 
@@ -275,16 +262,22 @@ El juego suena de dos maneras a la vez:
 | `level-complete.mp3` | nivel superado |
 | `extra-life.mp3` | vida extra (cada 5000 puntos) |
 | `ufo-hit-1.mp3` / `ufo-hit-2.mp3` | cae el Platillo Completo (dos mitades que se alternan) |
-| `tio-rene-amb-1..6.mp3` | frases de fondo durante la partida |
+| `muerte-1..3.mp3` | cada vez que pierde una vida (se turnan) |
+| `amb-01..35.mp3` | charla de fondo durante la partida |
 | `tio-rene-racha-1..3.mp3` | cada 5 naves derribadas |
 
 **Sintetizado** (Web Audio API, sin archivos): `disparo`, `marcha1..4`,
 `enemigoMuere`, `barrera`, `descenso`, `menu` y el zumbido del ovni.
 
 Además, mientras juegas suenan solas **frases de fondo** cada 11–24 s
-(`AMBIENTE` en `js/config.js`), a un tercio del volumen, y cada **5 naves
-derribadas** una frase de celebración que se va turnando (`RACHA`). Al derribar
-la nave grande suena "te paso por" partida en dos mitades que se alternan.
+(`AMBIENTE` en `js/config.js`), a un tercio del volumen. Son **35 frases** y se
+reparten **barajadas**: no se repite ninguna hasta haber pasado por las 35, y
+nunca sale la misma dos veces seguidas.
+
+Cada **5 naves derribadas** suena una frase de celebración que se va turnando
+(`RACHA`), **cada vez que pierde una vida** una de "se murió" (`MUERTE_CLIPS`),
+y al derribar la nave grande, "te paso por" partida en dos mitades que se
+alternan.
 
 Todo eso se apaga con `ACTIVO: false` en su bloque de `CONFIG.AUDIO`.
 

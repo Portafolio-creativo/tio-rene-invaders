@@ -47,6 +47,7 @@
     this.bajasSeguidas = 0;      // naves derribadas desde la ultima felicitacion
     this.rachasLogradas = 0;     // para ir turnando las frases
     this.ovnisDerribados = 0;    // para alternar las dos mitades de "te paso por"
+    this.muertes = 0;            // para turnar las frases de "se murio"
     this.acumulado = 0;
     this.ultimoTiempo = 0;
     this.fps = 0;
@@ -84,14 +85,18 @@
     this.cambiarEstado(ESTADOS.MENU);
   };
 
-  Juego.prototype.nuevaPartida = function () {
+  /* conBienvenida: al pulsar JUGAR desde el menu suena "ya llegamos" en vez
+     del aviso de nivel. Las dos frases juntas se pisarian (van por el mismo
+     canal de voz), asi que se elige una. */
+  Juego.prototype.nuevaPartida = function (conBienvenida) {
     this.puntuacion.reiniciar();
     this.niveles.reiniciar();
     this.bajasSeguidas = 0;
     this.rachasLogradas = 0;
     this.ovnisDerribados = 0;
+    this.muertes = 0;
     this.prepararNivel();
-    Audio.reproducir('nivel');
+    Audio.reproducir(conBienvenida ? 'intro' : 'nivel');
     this.cambiarEstado(ESTADOS.JUGANDO);
   };
 
@@ -119,7 +124,7 @@
   /* Tecla Enter / boton principal segun el estado actual. */
   Juego.prototype.aceptar = function () {
     Audio.desbloquear();
-    if (this.estado === ESTADOS.MENU) { Audio.reproducir('menu'); this.nuevaPartida(); }
+    if (this.estado === ESTADOS.MENU) { this.nuevaPartida(true); }
     else if (this.estado === ESTADOS.PAUSA) { this.alternarPausa(); }
     else if (this.estado === ESTADOS.GAME_OVER) { Audio.reproducir('menu'); this.nuevaPartida(); }
     else if (this.estado === ESTADOS.VICTORIA) { this.continuarTrasVictoria(); }
@@ -323,11 +328,13 @@
     this.efectos.destello(this.jugador.x, p.cabeza.y + 30, 90);
     this.efectos.chispas(this.jugador.x, p.cabeza.y + 30, 16, '#ff9b6e');
     Audio.detenerSirena();
+    // En CADA vida perdida suena una frase de "se murio", turnandose. Si es la
+    // ultima, ademas se le suma la frase de final de partida.
+    var frases = CONFIG.AUDIO.MUERTE_CLIPS;
+    Audio.reproducir(frases[this.muertes % frases.length]);
+    this.muertes++;
     if (ultima) {
       this.temporizador = 2.0;
-      Audio.reproducir('jugadorMuere');
-    } else {
-      Audio.reproducir('jugadorGolpe');
     }
   };
 

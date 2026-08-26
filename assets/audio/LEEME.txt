@@ -9,18 +9,21 @@ El juego suena de DOS maneras a la vez:
 
 QUE SUENA CON VOZ
 
-  tio-rene-intro.mp3     al cargar el juego ("ya llegamos ya")
-  tio-rene-hit.mp3       le pegan y pierde una vida
-  tio-rene-death.mp3     ultima vida
+  tio-rene-intro.mp3     al pulsar JUGAR ("ya llegamos ya")
+  tio-rene-hit.mp3       impacto al recibir un disparo
+  muerte-1..3.mp3        CADA vez que pierde una vida; se van turnando
+  tio-rene-death.mp3     (reserva sintetizada del final de partida)
   game-over.mp3          fin de la partida
   victory.mp3            victoria final
   level-start.mp3        empieza un nivel
   level-complete.mp3     nivel superado
   extra-life.mp3         vida extra (cada 5000 puntos)
-  ufo-hit-1.mp3          cae la nave grande (1a mitad de "te paso por")
-  ufo-hit-2.mp3          cae la nave grande (2a mitad; se van alternando)
-  tio-rene-amb-1..6.mp3  charla de fondo durante la partida, a bajo volumen
-  tio-rene-racha-1..3.mp3  cada 5 naves derribadas; se van turnando
+  ufo-hit-1/2.mp3        cae la nave grande ("te paso por", dos mitades)
+  tio-rene-racha-1..3    cada 5 naves derribadas; se turnan
+  amb-01..35.mp3         charla de fondo durante la partida
+
+  Las 35 frases de fondo se reparten BARAJADAS: no se repite ninguna hasta
+  haber pasado por las 35, y nunca sale la misma dos veces seguidas.
 
 QUE SUENA SINTETIZADO, Y POR QUE
 
