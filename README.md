@@ -8,7 +8,7 @@ barreras, ovni de bonus). El código, los enemigos y los efectos de sonido son
 originales de este proyecto: no hay ni un sprite, ni un sonido, ni una línea de
 código copiada de ningún juego existente. La **cara** del protagonista es una
 foto aportada por el autor del proyecto, y sus **frases** son recortes de clips
-publicados en myinstants.com (ver §14).
+publicados en myinstants.com (ver §15).
 
 - HTML5 + CSS + JavaScript. **Cero dependencias, cero CDN, cero red.**
 - Funciona con doble clic en `index.html` (`file://`) y publicado en cualquier
@@ -76,6 +76,7 @@ bloque `@media (orientation: landscape)` (horizontal).
 ```
 tio-rene-invaders/
 ├── index.html              Página única del juego
+├── manifest.webmanifest    Para instalarlo como app (§6)
 ├── _headers                Cabeceras de seguridad (Netlify/Cloudflare)
 ├── css/style.css           Marco, menús y botones táctiles
 ├── js/
@@ -94,7 +95,7 @@ tio-rene-invaders/
 │   └── main.js             Arranque y bucle principal
 ├── assets/
 │   ├── sprites/            piezas del Tío René (.png) + enemigos y efectos (.svg)
-│   ├── ui/                 logo y favicon
+│   ├── ui/                 logo, favicon, iconos de app y miniatura
 │   └── audio/              9 frases del Tío René (.mp3); el resto se sintetiza
 └── tools/
     ├── servidor-local.mjs  servidor estático para pruebas
@@ -113,11 +114,25 @@ Dura un mínimo de **3 s** —lo que tarda la frase de bienvenida— aunque los
 archivos carguen al instante, y se puede **saltar tocando la pantalla o con
 cualquier tecla**. Luego funde al menú.
 
-**Por qué a veces pide un toque:** ningún navegador deja sonar audio antes de
-que el usuario interactúe con la página. Si el audio está bloqueado, la intro
-muestra "TOCA PARA EMPEZAR" con la cara oculta, y al primer toque **aparecen la
-cara y la voz a la vez**. Si el navegador ya autoriza el sonido (o el usuario
-tiene el audio apagado), ese cartel no llega a verse y la intro arranca sola.
+### Por qué a veces pide un toque
+
+Ningún navegador deja sonar audio antes de que el usuario interactúe con la
+página; es una política de Chrome, Firefox y Safari contra las webs que
+arrancan solas con ruido. **No hay forma legítima de saltársela.** Lo que hace
+el juego es aprovechar las tres vías que sí existen:
+
+1. **Lo intenta sin pedir nada.** Al cargar prueba a arrancar el audio
+   (`Audio.intentarArranque`). Chrome lo autoriza por su cuenta cuando ya
+   visitaste el sitio antes, así que **a partir de la segunda visita suele
+   sonar solo**, sin cartel.
+2. **Si no puede, cualquier contacto sirve.** Hay un detector en toda la página
+   (fase de captura): el primer toque, clic o tecla —caiga donde caiga— revela
+   la cara y lanza la voz a la vez. No hay que acertarle al cartel.
+3. **Instalado como app, suena siempre al abrir.** Una app añadida a la
+   pantalla de inicio arranca con el audio ya autorizado. Ver §6.
+
+Y si quieres forzarlo en tu propio navegador: en Chrome, candado de la barra de
+direcciones → Configuración del sitio → Sonido → Permitir.
 
 - Duración: `INTRO_MINIMA` en `js/main.js`.
 - Tamaño de la cara: `#intro-cara` en `css/style.css`.
@@ -125,7 +140,25 @@ tiene el audio apagado), ese cartel no llega a verse y la intro arranca sola.
 - Con "movimiento reducido" activado en el sistema, el bostezo se queda quieto
   (la cara se ve igual de grande).
 
-## 6. Arquitectura
+## 6. Instalar como app (y que suene al abrir)
+
+El juego trae un `manifest.webmanifest`, así que se puede **instalar en la
+pantalla de inicio**. Vale la pena por dos motivos: se abre a pantalla completa
+sin la barra del navegador, y —lo importante— **una app instalada arranca con
+el audio ya autorizado**, así que el "ya llegamos ya" suena solo al abrirla, sin
+tocar nada.
+
+- **Android (Chrome):** menú ⋮ → "Añadir a pantalla de inicio" / "Instalar app".
+- **iPhone (Safari):** botón compartir → "Añadir a pantalla de inicio".
+- **PC (Chrome/Edge):** icono de instalar en la barra de direcciones.
+
+El icono sale de la cara del Tío René (`assets/ui/icono-192.png` y `-512.png`,
+generados con `tools/hacer-miniatura.py` a partir de la misma foto).
+
+Nota para la CSP: el manifiesto necesita `manifest-src 'self'`. Con
+`default-src 'none'` y sin esa directiva, el navegador lo bloquea en silencio.
+
+## 7. Arquitectura
 
 - **Bucle:** `requestAnimationFrame` con **paso fijo** de 1/120 s y acumulador.
   La simulación es idéntica a 30, 60 o 144 Hz; solo cambia cuántos fotogramas
@@ -144,7 +177,7 @@ tiene el audio apagado), ese cartel no llega a verse y la intro arranca sola.
   escala conservando la proporción, con `devicePixelRatio` (tope ×2). Nada se
   deforma en ninguna pantalla.
 
-## 7. Cambiar al Tío René (cabeza, mandíbula, cuerpo)
+## 8. Cambiar al Tío René (cabeza, mandíbula, cuerpo)
 
 Cada pieza es **un archivo suelto** en `assets/sprites/`. Reemplaza el archivo y
 el juego cambia: no hay que tocar código.
@@ -225,7 +258,7 @@ JUGADOR.EXPRESIONES_SEPARADAS: true
 y añade `player-head-shoot`, `player-head-hit` y `player-head-dead` (`.png` o
 `.svg`) en `assets/sprites/`. Si faltan, se dibujan por código y el juego sigue.
 
-## 8. Sonidos
+## 9. Sonidos
 
 El juego suena de dos maneras a la vez:
 
@@ -282,7 +315,7 @@ Para apagar todas las voces de golpe: `USAR_ARCHIVOS: false`.
   permiso, la frase queda en espera y suena sola en cuanto se toca. En el
   celular casi siempre pasa eso.
 
-## 9. Ajustar la dificultad
+## 10. Ajustar la dificultad
 
 Todo está en **`js/config.js`**. Los más útiles:
 
@@ -314,7 +347,7 @@ el juego.
 Tras superar el nivel 5 sale la pantalla de **VICTORIA**; desde ahí se puede
 seguir en modo sin fin, con los niveles subiendo indefinidamente.
 
-## 10. Modo depuración
+## 11. Modo depuración
 
 `Ctrl` + `Shift` + `D` durante la partida muestra cajas de colisión, FPS,
 estado, número de enemigos vivos, ritmo de la marcha, proyectiles, apertura de
@@ -329,7 +362,7 @@ TRI.instancia.juego.niveles.nivel = 4;
 TRI.instancia.juego.prepararNivel();
 ```
 
-## 11. Pruebas hechas
+## 12. Pruebas hechas
 
 Probado con Chrome sobre `http://`, sobre `file://` y servido desde una
 subcarpeta (`/proyectos/tio-rene-invaders/`):
@@ -349,7 +382,7 @@ tablero; escritorio) · **localStorage bloqueado** (sigue jugándose, avisa) ·
 **localStorage con datos corruptos** (se descartan) · **archivos de sprite
 ausentes** (dibujo de reserva y aviso) · consola sin errores propios.
 
-## 12. Miniatura al compartir (WhatsApp y redes)
+## 13. Miniatura al compartir (WhatsApp y redes)
 
 Cuando se comparte el enlace, WhatsApp, Telegram, Facebook o X muestran una
 **miniatura con la cara del Tío René y el título**. Eso lo dan las etiquetas
@@ -377,7 +410,7 @@ imagen, WhatsApp recuerda que no había ninguna. Trucos para forzar el refresco:
   (`developers.facebook.com/tools/debug`) y pulsa "Scrape Again": eso vacía el
   caché que también usa WhatsApp.
 
-## 13. Seguridad y privacidad
+## 14. Seguridad y privacidad
 
 - **Sin `eval`, sin `new Function`, sin `innerHTML`.** Todo el texto se escribe
   con `textContent`, así que no hay superficie de inyección de HTML.
@@ -396,7 +429,7 @@ imagen, WhatsApp recuerda que no había ninguna. Trucos para forzar el refresco:
 - El único enlace externo es el botón de apoyo del pie, con
   `rel="noopener noreferrer"`.
 
-## 14. Dependencias y licencias
+## 15. Dependencias y licencias
 
 **Ninguna dependencia.** Ni librerías, ni frameworks, ni fuentes descargadas
 (se usa la pila monoespaciada del sistema).
@@ -429,7 +462,7 @@ los derechos de esa imagen (quién la tomó) y el consentimiento de la persona
 que aparece, sobre todo si el sitio va a ser público. Si algún día hay que
 cambiarla, se sustituye con `tools/cortar-cara.py` y no hay que tocar código.
 
-## 15. Créditos
+## 16. Créditos
 
 Un juego de **Eduardo Pérez**.
 Si te gusta: [💛 Apoya mi trabajo](https://maladifusion.github.io/apoyo/)

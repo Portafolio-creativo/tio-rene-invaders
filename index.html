@@ -3,12 +3,21 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' file:; style-src 'self' file:; img-src 'self' file: data:; media-src 'self' file: data:; connect-src 'self' file:; font-src 'self' file:; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' file:; style-src 'self' file:; img-src 'self' file: data:; media-src 'self' file: data:; connect-src 'self' file:; font-src 'self' file:; manifest-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="color-scheme" content="dark">
 <meta name="description" content="Tio Rene Invaders: arcade chileno de naves donde el Tio Rene dispara desde la mandibula.">
 <title>TÍO RENÉ INVADERS</title>
 <link rel="icon" href="assets/ui/favicon.png" type="image/png">
+<!-- Instalable en la pantalla de inicio. Una app instalada arranca con el
+     audio YA autorizado, asi que ahi el "ya llegamos ya" suena solo al abrir,
+     sin tener que tocar nada. -->
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="assets/ui/icono-192.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Tío René">
 
 <!-- Miniatura al compartir el enlace (WhatsApp, Telegram, Facebook, X...).
      og:image tiene que ser una URL ABSOLUTA para que el previsualizador la

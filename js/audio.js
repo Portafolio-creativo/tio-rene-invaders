@@ -256,6 +256,35 @@
       asegurarArchivos();
     },
 
+    /* Intenta arrancar el audio SIN esperar ningun gesto y avisa si lo logro.
+       Merece la pena intentarlo siempre: Chrome autoriza el sonido por su
+       cuenta cuando ya visitaste el sitio antes, y una app instalada en la
+       pantalla de inicio lo tiene autorizado de entrada. Solo si esto falla
+       hay que pedirle al usuario que toque.
+       OJO: sin gesto previo, resume() puede quedarse colgado sin resolver
+       nunca, asi que hay que competir contra un plazo. */
+    intentarArranque: function (alSaber, msEspera) {
+      crearContexto();
+      asegurarArchivos();
+      var respondido = false;
+      function responder(pudo) {
+        if (respondido) { return; }
+        respondido = true;
+        alSaber(pudo);
+      }
+      if (!ctx || !activo) { responder(false); return; }
+      if (ctx.state === 'running') { responder(true); return; }
+      global.setTimeout(function () { responder(ctx.state === 'running'); }, msEspera || 350);
+      try {
+        var p = ctx.resume();
+        if (p && typeof p.then === 'function') {
+          p.then(function () { responder(ctx.state === 'running'); })['catch'](function () { responder(false); });
+        }
+      } catch (e) {
+        responder(false);
+      }
+    },
+
     /* true si el navegador ya autoriza el sonido (o sea, no hace falta pedir
        un toque previo). Antes del primer gesto casi siempre es false. */
     puedeSonar: function () {

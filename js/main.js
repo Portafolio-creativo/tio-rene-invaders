@@ -159,14 +159,30 @@
     capaCarga.addEventListener('pointerdown', toqueEnIntro);
   }
 
-  /* Si el navegador ya autoriza el sonido (o el usuario tiene el audio
-     apagado), no hace falta pedir ningun toque: la intro arranca sola. */
-  Audio.preparar();
-  if (!Audio.estaActivo() || Audio.puedeSonar()) {
-    revelarIntro();
-  } else if (capaCarga) {
-    capaCarga.classList.add('esperando-toque');
+  /* Red barredera: el PRIMER contacto en cualquier parte de la pagina revela
+     la intro. Da igual si el dedo cae en el tablero, en la cabecera o en el
+     pie; no hace falta acertarle al cartel. Se quitan solos al primer uso. */
+  var EVENTOS_DESPERTAR = ['pointerdown', 'touchstart', 'mousedown', 'keydown'];
+  function despertar() {
+    EVENTOS_DESPERTAR.forEach(function (nombre) {
+      document.removeEventListener(nombre, despertar, true);
+    });
+    if (juego.estado === ESTADOS.CARGANDO) { toqueEnIntro(); }
+    else { Audio.desbloquear(); }
   }
+  EVENTOS_DESPERTAR.forEach(function (nombre) {
+    document.addEventListener(nombre, despertar, true);   // fase de captura
+  });
+
+  /* Se intenta arrancar el sonido sin pedir nada. Solo si el navegador se
+     niega aparece el cartel de "toca para empezar". */
+  Audio.intentarArranque(function (pudoSonar) {
+    if (pudoSonar || !Audio.estaActivo()) {
+      revelarIntro();
+    } else if (capaCarga && !introRevelada) {
+      capaCarga.classList.add('esperando-toque');
+    }
+  });
 
   Assets.cargarTodo(function (hechos, total) {
     ui.progresoCarga(hechos, total);

@@ -29,6 +29,7 @@ const TIPOS = {
   '.mp3': 'audio/mpeg',
   '.ogg': 'audio/ogg',
   '.json': 'application/json; charset=utf-8',
+  '.webmanifest': 'application/manifest+json; charset=utf-8',
   '.txt': 'text/plain; charset=utf-8'
 };
 
