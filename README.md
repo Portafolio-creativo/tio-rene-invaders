@@ -58,6 +58,11 @@ sirviendo el juego desde `/proyectos/tio-rene-invaders/`.
 | Silenciar | `M` | botón SONIDO |
 | Modo depuración | `Ctrl` + `Shift` + `D` | — |
 
+**Disparo automático:** en el menú, a la derecha, hay un interruptor
+**DISPARO AUTO**. Encendido, el Tío René dispara solo y el jugador únicamente
+se preocupa de moverse. La preferencia se recuerda entre partidas, y el botón
+táctil de disparo pasa a decir AUTO y se atenúa.
+
 En el teléfono los botones aparecen solos:
 
 - **En vertical**, en dos filas bajo el tablero: arriba **izquierda y derecha**
@@ -86,7 +91,8 @@ tio-rene-invaders/
 │   ├── fallback-art.js     Dibujos de reserva si falta un archivo
 │   ├── assets.js           Carga de imágenes
 │   ├── audio.js            AudioManager (voces + síntesis Web Audio)
-│   ├── input.js            Teclado + botones táctiles
+│   ├── input.js            Teclado + botones táctiles + disparo automático
+│   ├── instalar.js         Botón de instalar (solo si se puede)
 │   ├── entities/           player, enemy, projectile, barrier, ufo, particles
 │   ├── systems/            collisions, score, levels
 │   ├── renderer.js         Todo el dibujo en canvas
@@ -134,6 +140,14 @@ pantalla de inicio**. Vale la pena por dos motivos: se abre a pantalla completa
 sin la barra del navegador, y —lo importante— **una app instalada arranca con
 el audio ya autorizado**, así que el "ya llegamos ya" suena solo al abrirla, sin
 tocar nada.
+
+En el menú aparece un botón **📲 INSTALAR** que lanza la instalación con un
+toque. Solo se muestra si de verdad se puede: escucha el evento
+`beforeinstallprompt` del navegador y se esconde si el juego **ya está
+instalado** (`display-mode: standalone`) o en cuanto se completa la instalación.
+En iPhone ese evento no existe, así que ahí el botón explica el camino a mano.
+
+También se puede a la antigua:
 
 - **Android (Chrome):** menú ⋮ → "Añadir a pantalla de inicio" / "Instalar app".
 - **iPhone (Safari):** botón compartir → "Añadir a pantalla de inicio".

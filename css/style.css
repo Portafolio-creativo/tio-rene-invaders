@@ -235,6 +235,73 @@ body.tactil #btn-pausa-barra { display: inline-block; }
 
 .boton.principal:hover { background: #5fe085; }
 
+/* Boton secundario: instalar. Discreto, no compite con JUGAR. */
+.boton.secundario {
+  font-size: 13px;
+  letter-spacing: 1px;
+  min-width: 0;
+  min-height: 36px;
+  padding: 7px 14px;
+  color: var(--acento);
+  background: transparent;
+  border-color: rgba(255, 227, 107, 0.45);
+}
+
+.boton.secundario:hover { background: rgba(255, 227, 107, 0.12); }
+.boton.secundario[hidden] { display: none; }
+
+/* Interruptor de disparo automatico */
+/* Instalar a la izquierda, disparo automatico a la derecha. Con flex-end +
+   margin-right:auto, el check queda a la derecha este o no el otro boton. */
+#fila-opciones {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  width: 100%;
+}
+
+#btn-instalar { margin-right: auto; }
+
+#opcion-auto {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 6px 12px;
+  font-size: 11px;
+  font-weight: bold;
+  letter-spacing: 1px;
+  color: var(--tinta-tenue);
+  background: #131c33;
+  border: 1px solid var(--borde);
+  border-radius: 999px;
+  cursor: pointer;
+  user-select: none;
+}
+
+#opcion-auto:has(input:checked) {
+  color: #06210f;
+  background: var(--verde);
+  border-color: #7cf29a;
+}
+
+#chk-auto {
+  width: 17px;
+  height: 17px;
+  margin: 0;
+  accent-color: #1c7a3a;
+  cursor: pointer;
+}
+
+#ayuda-instalar[hidden] { display: none; }
+
+/* Con el disparo automatico, su boton se atenua: sigue ahi pero ya no hace
+   falta apretarlo. */
+body.auto-disparo .tacto.disparo {
+  opacity: 0.55;
+  font-size: 15px;
+}
+
 .controles {
   margin: 6px 0 0;
   padding: 0;
@@ -349,7 +416,7 @@ body.tactil #botonera { display: grid; }
 /* ---------- Menu de entrada ---------- */
 
 #capa-menu {
-  gap: 10px;
+  gap: 8px;
   justify-content: center;
   /* Opaco a proposito: en las otras capas conviene ver la partida detras,
      pero aqui la cara grande es la protagonista y el Tio Rene del tablero se
@@ -360,7 +427,7 @@ body.tactil #botonera { display: grid; }
 /* La cara entra desde el centro al abrir la pagina y luego late suave,
    invitando a pulsar JUGAR. */
 #intro-cara {
-  width: min(56%, 240px);
+  width: min(50%, 215px);
   filter: drop-shadow(0 10px 22px rgba(0, 0, 0, 0.55));
   animation: entrar-cara 0.55s cubic-bezier(0.2, 1.3, 0.4, 1) both,
              latir-cara 2.6s ease-in-out 0.6s infinite;

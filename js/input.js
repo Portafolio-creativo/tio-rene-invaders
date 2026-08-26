@@ -9,6 +9,7 @@
   var estado = { izquierda: false, derecha: false, disparo: false };
   var suscriptores = [];
   var tactil = false;
+  var autoDisparo = false;   // dispara solo; el jugador solo se mueve
 
   var TECLAS_IZQ = { ArrowLeft: 1, KeyA: 1 };
   var TECLAS_DER = { ArrowRight: 1, KeyD: 1 };
@@ -99,6 +100,19 @@
     },
 
     esTactil: function () { return tactil; },
+
+    /* Lo que el juego debe consultar para saber si hay que disparar: junta el
+       boton pulsado y el modo automatico. */
+    disparando: function () {
+      return autoDisparo || estado.disparo;
+    },
+
+    autoDisparoActivo: function () { return autoDisparo; },
+
+    fijarAutoDisparo: function (activo) {
+      autoDisparo = !!activo;
+      return autoDisparo;
+    },
 
     /* callback(accion) con: pausa | aceptar | silencio | depurar | cualquiera |
        foco-perdido */

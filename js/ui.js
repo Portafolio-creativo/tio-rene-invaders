@@ -33,6 +33,7 @@
     this.avisoAlmacenamiento = $('aviso-almacenamiento');
     this.botonSonido = $('btn-sonido');
     this.control = $('control-volumen');
+    this.chkAuto = $('chk-auto');
     this.conectar();
   }
 
@@ -75,7 +76,28 @@
         Audio.reproducir('menu');
       });
     }
+    if (this.chkAuto) {
+      var autoGuardado = TRI.Storage.leerAutoDisparo();
+      TRI.Input.fijarAutoDisparo(autoGuardado);
+      this.chkAuto.checked = autoGuardado;
+      this.pintarAutoDisparo(autoGuardado);
+      this.chkAuto.addEventListener('change', function () {
+        var activo = TRI.Input.fijarAutoDisparo(self.chkAuto.checked);
+        TRI.Storage.guardarAutoDisparo(activo);
+        self.pintarAutoDisparo(activo);
+        Audio.desbloquear();
+        Audio.reproducir('menu');
+      });
+    }
     this.pintarBotonSonido(Audio.estaActivo());
+  };
+
+  /* Con el disparo automatico encendido, el boton de disparo pasa a decir
+     AUTO y se atenua: sigue funcionando, pero ya no hace falta apretarlo. */
+  UI.prototype.pintarAutoDisparo = function (activo) {
+    document.body.classList.toggle('auto-disparo', activo);
+    var boton = document.querySelector('.tacto.disparo');
+    if (boton) { boton.textContent = activo ? 'AUTO' : 'DISPARO'; }
   };
 
   UI.prototype.pintarBotonSonido = function (activo) {

@@ -61,6 +61,8 @@
   global.addEventListener('orientationchange', pedirReajuste);
 
   /* ---- Entrada ---- */
+  TRI.Instalar.iniciar();
+
   var esTactil = Input.iniciar(botonera);
   if (esTactil || (global.matchMedia && global.matchMedia('(pointer: coarse)').matches)) {
     document.body.classList.add('tactil');

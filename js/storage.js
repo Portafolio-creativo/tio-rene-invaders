@@ -55,6 +55,14 @@
       escribirCrudo(CONFIG.ALMACENAMIENTO.CLAVE_AUDIO, activo ? '1' : '0');
     },
 
+    /* Disparo automatico: el jugador solo se preocupa de moverse. */
+    leerAutoDisparo: function () {
+      return leerCrudo(CONFIG.ALMACENAMIENTO.CLAVE_AUTODISPARO) === '1';
+    },
+    guardarAutoDisparo: function (activo) {
+      escribirCrudo(CONFIG.ALMACENAMIENTO.CLAVE_AUTODISPARO, activo ? '1' : '0');
+    },
+
     leerVolumen: function () {
       var v = parseFloat(leerCrudo(CONFIG.ALMACENAMIENTO.CLAVE_VOLUMEN));
       if (!isFinite(v) || isNaN(v) || v < 0 || v > 1) { return CONFIG.AUDIO.VOLUMEN_INICIAL; }

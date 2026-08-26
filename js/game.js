@@ -207,7 +207,7 @@
   };
 
   Juego.prototype.actualizarDisparoJugador = function () {
-    if (!Input.estado.disparo) { return; }
+    if (!Input.disparando()) { return; }
     if (this.proyectiles.contar(true) >= CONFIG.JUGADOR.MAX_PROYECTILES) { return; }
     var boca = this.jugador.intentarDisparar();
     if (!boca) { return; }
