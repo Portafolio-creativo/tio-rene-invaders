@@ -58,6 +58,13 @@ sirviendo el juego desde `/proyectos/tio-rene-invaders/`.
 | Silenciar | `M` | botón SONIDO |
 | Modo depuración | `Ctrl` + `Shift` + `D` | — |
 
+**Palanca (por defecto en el teléfono):** en vez de dos flechas sueltas, un
+mando redondo con las flechas dibujadas que se maneja **arrastrando el dedo sin
+levantarlo**. Tiene zona muerta al centro para que el personaje no tiemble, y
+usa captura del puntero: aunque el dedo se salga del círculo, sigue mandando.
+Desde el menú (interruptor **PALANCA**) se puede volver a las dos flechas. La
+elección se recuerda y solo se ofrece si hay pantalla táctil.
+
 **Disparo automático:** en el menú, a la derecha, hay un interruptor
 **DISPARO AUTO**. Encendido, el Tío René dispara solo y el jugador únicamente
 se preocupa de moverse. La preferencia se recuerda entre partidas, y el botón
@@ -177,6 +184,11 @@ Nota para la CSP: el manifiesto necesita `manifest-src 'self'`. Con
 - **Escalado:** el juego se dibuja siempre en un lienzo lógico de 600×800 y se
   escala conservando la proporción, con `devicePixelRatio` (tope ×2). Nada se
   deforma en ninguna pantalla.
+- **Alto de pantalla en el móvil:** `#app` usa `100dvh` (con `100vh` y `100%`
+  de reserva). `100%` **no descuenta la barra de direcciones** del navegador
+  móvil, así que el contenido se salía por arriba; `dvh` sí la tiene en cuenta
+  y se reajusta cuando la barra aparece o desaparece. Además `html, body`
+  llevan `overflow: hidden`: el juego siempre cabe, nunca hay que desplazarse.
 
 ## 8. Cambiar al Tío René (cabeza, mandíbula, cuerpo)
 

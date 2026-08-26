@@ -11,6 +11,11 @@
   var tactil = false;
   var autoDisparo = false;   // dispara solo; el jugador solo se mueve
 
+  /* Proporcion del radio que hay que pasar para que la palanca cuente como
+     movimiento. Sin esta zona muerta, el dedo quieto en el centro haria
+     temblar al personaje. */
+  var ZONA_MUERTA = 0.16;
+
   var TECLAS_IZQ = { ArrowLeft: 1, KeyA: 1 };
   var TECLAS_DER = { ArrowRight: 1, KeyD: 1 };
   var TECLAS_DISPARO = { Space: 1, KeyW: 1, ArrowUp: 1 };
@@ -78,6 +83,54 @@
     el.addEventListener('contextmenu', function (ev) { ev.preventDefault(); });
   }
 
+  /* La palanca: se arrastra el dedo sin levantarlo. Se usa la captura del
+     puntero para no perder el dedo si sale del circulo mientras arrastra. */
+  function conectarPalanca(el) {
+    if (!el) { return; }
+    var mando = el.querySelector('#palanca-mando');
+    var arrastrando = false;
+
+    function mover(clienteX) {
+      var caja = el.getBoundingClientRect();
+      var radio = caja.width / 2;
+      if (radio <= 0) { return; }
+      var dx = (clienteX - (caja.left + radio)) / radio;
+      dx = Math.max(-1, Math.min(1, dx));
+      estado.izquierda = dx < -ZONA_MUERTA;
+      estado.derecha = dx > ZONA_MUERTA;
+      if (mando) { mando.style.transform = 'translate(-50%, -50%) translateX(' + (dx * radio * 0.52) + 'px)'; }
+    }
+
+    function soltar() {
+      arrastrando = false;
+      estado.izquierda = false;
+      estado.derecha = false;
+      el.classList.remove('pulsado');
+      if (mando) { mando.style.transform = 'translate(-50%, -50%)'; }
+    }
+
+    el.addEventListener('pointerdown', function (ev) {
+      ev.preventDefault();
+      tactil = true;
+      arrastrando = true;
+      el.classList.add('pulsado');
+      if (el.setPointerCapture && ev.pointerId !== undefined) {
+        try { el.setPointerCapture(ev.pointerId); } catch (e) { /* ignorado */ }
+      }
+      mover(ev.clientX);
+      emitir('cualquiera');
+    });
+    el.addEventListener('pointermove', function (ev) {
+      if (!arrastrando) { return; }
+      ev.preventDefault();
+      mover(ev.clientX);
+    });
+    el.addEventListener('pointerup', soltar);
+    el.addEventListener('pointercancel', soltar);
+    el.addEventListener('lostpointercapture', soltar);
+    el.addEventListener('contextmenu', function (ev) { ev.preventDefault(); });
+  }
+
   var Input = {
     estado: estado,
 
@@ -95,6 +148,7 @@
         ? contenedorBotones.ownerDocument : global.document;
       var botones = raiz.querySelectorAll('[data-accion]');
       for (var i = 0; i < botones.length; i++) { conectarBoton(botones[i]); }
+      conectarPalanca(raiz.getElementById('palanca'));
       tactil = ('ontouchstart' in global) || (global.navigator && global.navigator.maxTouchPoints > 0);
       return tactil;
     },
@@ -112,6 +166,15 @@
     fijarAutoDisparo: function (activo) {
       autoDisparo = !!activo;
       return autoDisparo;
+    },
+
+    /* Cambia entre palanca y flechas sueltas. Al cambiar se sueltan las
+       direcciones, para no dejar al personaje corriendo solo. */
+    fijarPalanca: function (activa) {
+      document.body.classList.toggle('control-palanca', !!activa);
+      estado.izquierda = false;
+      estado.derecha = false;
+      return !!activa;
     },
 
     /* callback(accion) con: pausa | aceptar | silencio | depurar | cualquiera |

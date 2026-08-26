@@ -83,6 +83,10 @@
           <button type="button" id="btn-instalar" class="boton secundario" hidden>
             📲 INSTALAR
           </button>
+          <label id="opcion-palanca" for="chk-palanca" hidden>
+            <input type="checkbox" id="chk-palanca" checked>
+            <span>PALANCA</span>
+          </label>
           <label id="opcion-auto" for="chk-auto">
             <input type="checkbox" id="chk-auto">
             <span>DISPARO AUTO</span>
@@ -132,6 +136,15 @@
        mitad y mitad); fila 2 = disparo a todo el ancho. La pausa vive en la
        barra de arriba. En horizontal se reacomodan a los lados (ver CSS). -->
   <div id="botonera" aria-label="Controles táctiles">
+    <!-- Palanca: se arrastra el dedo sin levantarlo. Lleva las flechas
+         dibujadas para que se entienda que mueve a los lados. Es la opción
+         por defecto en el teléfono; se puede cambiar por las dos flechas
+         sueltas desde el menú. -->
+    <div id="palanca" role="group" aria-label="Palanca de movimiento">
+      <span class="palanca-flecha izq" aria-hidden="true">◀</span>
+      <span class="palanca-flecha der" aria-hidden="true">▶</span>
+      <span id="palanca-mando" aria-hidden="true"></span>
+    </div>
     <button type="button" class="tacto" data-accion="izquierda" aria-label="Mover a la izquierda">◀</button>
     <button type="button" class="tacto" data-accion="derecha" aria-label="Mover a la derecha">▶</button>
     <button type="button" class="tacto disparo" data-accion="disparo" aria-label="Disparar">DISPARO</button>

@@ -34,6 +34,7 @@
     this.botonSonido = $('btn-sonido');
     this.control = $('control-volumen');
     this.chkAuto = $('chk-auto');
+    this.chkPalanca = $('chk-palanca');
     this.conectar();
   }
 
@@ -89,7 +90,24 @@
         Audio.reproducir('menu');
       });
     }
+    if (this.chkPalanca) {
+      var conPalanca = TRI.Storage.leerPalanca();
+      TRI.Input.fijarPalanca(conPalanca);
+      this.chkPalanca.checked = conPalanca;
+      this.chkPalanca.addEventListener('change', function () {
+        var activa = TRI.Input.fijarPalanca(self.chkPalanca.checked);
+        TRI.Storage.guardarPalanca(activa);
+        Audio.desbloquear();
+        Audio.reproducir('menu');
+      });
+    }
     this.pintarBotonSonido(Audio.estaActivo());
+  };
+
+  /* La eleccion palanca/flechas solo tiene sentido con pantalla tactil. */
+  UI.prototype.mostrarOpcionPalanca = function (mostrar) {
+    var op = $('opcion-palanca');
+    if (op) { op.hidden = !mostrar; }
   };
 
   /* Con el disparo automatico encendido, el boton de disparo pasa a decir

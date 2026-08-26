@@ -20,6 +20,10 @@ html, body {
   height: 100%;
   margin: 0;
   padding: 0;
+  /* El juego SIEMPRE cabe en pantalla: nada de desplazamiento. Sin esto, en
+     el navegador del celular la pagina se puede desplazar y la cabecera queda
+     fuera de la vista. */
+  overflow: hidden;
 }
 
 body {
@@ -34,14 +38,20 @@ body {
 #app {
   display: flex;
   flex-direction: column;
+  /* En el navegador del movil, 100% NO descuenta la barra de direcciones: el
+     contenido se sale por arriba. 100dvh si tiene en cuenta esa barra y se
+     ajusta cuando aparece o desaparece. Se dejan los tres, de menos a mas
+     moderno, y el navegador se queda con el ultimo que entienda. */
   height: 100%;
-  min-height: 100%;
+  height: 100vh;
+  height: 100dvh;
   /* CUIDADO: los margenes de seguridad (notch, bordes curvos, barra de
      gestos) van SOLO arriba y abajo. Si se aplican tambien a los lados, todo
      el juego se corre hacia un costado y deja una franja vacia al otro.
      Los laterales se aplican mas abajo, solo a las barras. */
   padding-top: env(safe-area-inset-top);
   padding-bottom: env(safe-area-inset-bottom);
+  overflow: hidden;
 }
 
 /* ---------- Cabecera ---------- */
@@ -257,7 +267,8 @@ body.tactil #btn-pausa-barra { display: inline-block; }
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 8px;
+  flex-wrap: wrap;          /* antes de recortarse, que baje de linea */
+  gap: 6px 8px;
   width: 100%;
 }
 
@@ -342,6 +353,68 @@ body.auto-disparo .tacto.disparo {
 }
 
 body.tactil #botonera { display: grid; }
+
+/* ---------- Palanca de movimiento ----------
+   Redonda, se arrastra el dedo sin levantarlo. Lleva las flechas dibujadas
+   para que se lea de un vistazo que mueve a los lados. Ocupa la fila de
+   arriba entera, en el lugar de las dos flechas sueltas. */
+#palanca {
+  display: none;
+  grid-column: 1 / -1;
+  position: relative;
+  justify-self: center;
+  width: 132px;
+  height: 78px;
+  border-radius: 999px;
+  background: #16203a;
+  border: 2px solid var(--borde);
+  touch-action: none;
+  user-select: none;
+  cursor: grab;
+}
+
+body.control-palanca #palanca { display: block; }
+/* Con palanca, las flechas sueltas desaparecen (y al reves). */
+body.control-palanca [data-accion="izquierda"],
+body.control-palanca [data-accion="derecha"] { display: none; }
+
+#palanca.pulsado { cursor: grabbing; border-color: #7cf29a; }
+
+.palanca-flecha {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 19px;
+  font-weight: bold;
+  color: var(--tinta-tenue);
+  pointer-events: none;
+}
+
+.palanca-flecha.izq { left: 13px; }
+.palanca-flecha.der { right: 13px; }
+
+/* El mando que sigue al dedo */
+#palanca-mando {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 54px;
+  height: 54px;
+  margin: 0;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: var(--verde);
+  border: 2px solid #7cf29a;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.45);
+  pointer-events: none;
+  transition: transform 0.08s ease-out;
+}
+
+#palanca.pulsado #palanca-mando { transition: none; }
+
+/* En el telefono, la lista de teclas no sirve de nada y ocupa alto. */
+body.tactil .controles { display: none; }
+body.tactil #opcion-palanca[hidden] { display: flex; }
 
 .tacto {
   min-height: 66px;
@@ -578,6 +651,16 @@ body.tactil #botonera { display: grid; }
     min-height: 0;
     border-radius: 50%;
     font-size: 22px;
+    pointer-events: auto;
+  }
+
+  /* En apaisado la palanca tambien flota abajo a la izquierda. */
+  body.tactil.control-palanca #palanca {
+    position: absolute;
+    left: calc(12px + env(safe-area-inset-left));
+    bottom: 14px;
+    width: 150px;
+    height: 82px;
     pointer-events: auto;
   }
 

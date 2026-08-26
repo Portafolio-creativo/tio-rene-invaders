@@ -63,6 +63,14 @@
       escribirCrudo(CONFIG.ALMACENAMIENTO.CLAVE_AUTODISPARO, activo ? '1' : '0');
     },
 
+    /* Tipo de control tactil: palanca (por defecto) o dos flechas sueltas. */
+    leerPalanca: function () {
+      return leerCrudo(CONFIG.ALMACENAMIENTO.CLAVE_PALANCA) !== '0';
+    },
+    guardarPalanca: function (activa) {
+      escribirCrudo(CONFIG.ALMACENAMIENTO.CLAVE_PALANCA, activa ? '1' : '0');
+    },
+
     leerVolumen: function () {
       var v = parseFloat(leerCrudo(CONFIG.ALMACENAMIENTO.CLAVE_VOLUMEN));
       if (!isFinite(v) || isNaN(v) || v < 0 || v > 1) { return CONFIG.AUDIO.VOLUMEN_INICIAL; }

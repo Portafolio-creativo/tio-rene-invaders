@@ -64,9 +64,10 @@
   TRI.Instalar.iniciar();
 
   var esTactil = Input.iniciar(botonera);
-  if (esTactil || (global.matchMedia && global.matchMedia('(pointer: coarse)').matches)) {
-    document.body.classList.add('tactil');
-  }
+  var conTacto = esTactil || (global.matchMedia && global.matchMedia('(pointer: coarse)').matches);
+  if (conTacto) { document.body.classList.add('tactil'); }
+  // La eleccion palanca/flechas solo se ofrece si hay pantalla tactil.
+  ui.mostrarOpcionPalanca(conTacto);
 
   Input.alAccion(function (accion) {
     if (accion === 'cualquiera') { Audio.desbloquear(); return; }

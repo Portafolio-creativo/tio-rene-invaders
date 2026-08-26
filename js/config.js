@@ -245,6 +245,7 @@
       CLAVE_AUDIO: 'tioRene.audio',
       CLAVE_VOLUMEN: 'tioRene.volumen',
       CLAVE_AUTODISPARO: 'tioRene.autoDisparo',
+      CLAVE_PALANCA: 'tioRene.palanca',
       RECORD_MAX: 99999999
     }
   };
