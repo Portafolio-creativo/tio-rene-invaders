@@ -9,6 +9,28 @@
 <meta name="description" content="Tio Rene Invaders: arcade chileno de naves donde el Tio Rene dispara desde la mandibula.">
 <title>TÍO RENÉ INVADERS</title>
 <link rel="icon" href="assets/ui/favicon.png" type="image/png">
+
+<!-- Miniatura al compartir el enlace (WhatsApp, Telegram, Facebook, X...).
+     og:image tiene que ser una URL ABSOLUTA para que el previsualizador la
+     lea; por eso apunta al dominio de publicacion. Si mueves el juego a otra
+     URL, actualiza las cuatro lineas og:url / og:image / twitter:image. -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Tío René Invaders">
+<meta property="og:title" content="TÍO RENÉ INVADERS">
+<meta property="og:description" content="El Tío René defiende el barrio disparando desde la boca. Arcade chileno para tu navegador. ¡Juega gratis!">
+<meta property="og:url" content="https://cotizadora.github.io/tio-rene-invaders/">
+<meta property="og:image" content="https://cotizadora.github.io/tio-rene-invaders/assets/ui/og-cover.jpg">
+<meta property="og:image:secure_url" content="https://cotizadora.github.io/tio-rene-invaders/assets/ui/og-cover.jpg">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="La cara del Tío René junto al título Tío René Invaders">
+<meta property="og:locale" content="es_CL">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="TÍO RENÉ INVADERS">
+<meta name="twitter:description" content="El Tío René defiende el barrio disparando desde la boca. Arcade chileno para tu navegador.">
+<meta name="twitter:image" content="https://cotizadora.github.io/tio-rene-invaders/assets/ui/og-cover.jpg">
+<meta name="theme-color" content="#070a14">
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -18,6 +40,7 @@
   <header id="cabecera">
     <p id="marca">TÍO RENÉ <span>INVADERS</span></p>
     <div id="controles-audio">
+      <button type="button" id="btn-pausa-barra" class="tacto-sistema" data-accion="pausa" aria-label="Pausa">❚❚</button>
       <button type="button" id="btn-sonido" aria-pressed="true">SONIDO: SI</button>
       <label id="etiqueta-volumen" for="control-volumen">VOL</label>
       <input type="range" id="control-volumen" min="0" max="100" step="5" value="70" aria-label="Volumen">
@@ -88,11 +111,13 @@
     </div>
   </main>
 
+  <!-- Controles tactiles. En vertical: fila 1 = izquierda + derecha (pegados,
+       mitad y mitad); fila 2 = disparo a todo el ancho. La pausa vive en la
+       barra de arriba. En horizontal se reacomodan a los lados (ver CSS). -->
   <div id="botonera" aria-label="Controles táctiles">
     <button type="button" class="tacto" data-accion="izquierda" aria-label="Mover a la izquierda">◀</button>
     <button type="button" class="tacto" data-accion="derecha" aria-label="Mover a la derecha">▶</button>
     <button type="button" class="tacto disparo" data-accion="disparo" aria-label="Disparar">DISPARO</button>
-    <button type="button" class="tacto" data-accion="pausa" aria-label="Pausa">II</button>
   </div>
 
   <p id="aviso-almacenamiento" class="aviso" hidden></p>

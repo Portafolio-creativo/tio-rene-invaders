@@ -7,7 +7,7 @@ Inspirado en las mecánicas de los marcianitos clásicos (formación que baja,
 barreras, ovni de bonus). El código, los enemigos, los efectos y los sonidos son
 originales de este proyecto: no hay ni un sprite, ni un sonido, ni una línea de
 código copiada de ningún juego existente. La cara del protagonista es una **foto
-aportada por el autor del proyecto** (ver §13).
+aportada por el autor del proyecto** (ver §14).
 
 - HTML5 + CSS + JavaScript. **Cero dependencias, cero CDN, cero red.**
 - Funciona con doble clic en `index.html` (`file://`) y publicado en cualquier
@@ -56,11 +56,18 @@ sirviendo el juego desde `/proyectos/tio-rene-invaders/`.
 | Silenciar | `M` | botón SONIDO |
 | Modo depuración | `Ctrl` + `Shift` + `D` | — |
 
-En el teléfono **en vertical** los botones van en una barra bajo el tablero. **En
-horizontal** se colocan solos a los lados (izquierda/derecha abajo a la
-izquierda, disparo abajo a la derecha, pausa arriba), sobre el margen que sobra
-a los costados del tablero: así el juego no se queda en una franja. En ninguna
-orientación un botón tapa la zona de juego.
+En el teléfono los botones aparecen solos:
+
+- **En vertical**, en dos filas bajo el tablero: arriba **izquierda y derecha**
+  pegados (mitad y mitad), y abajo **DISPARO** a todo el ancho. La **pausa** va
+  en la barra de arriba (el botón ❚❚).
+- **En horizontal**, flotan a los lados sobre el margen que sobra junto al
+  tablero (izquierda/derecha abajo a la izquierda, disparo abajo a la derecha),
+  para no comerle altura al juego.
+
+En ninguna orientación un botón tapa la zona de juego. El reparto de los botones
+está en `css/style.css`: la rejilla de dos filas en `#botonera` (vertical) y el
+bloque `@media (orientation: landscape)` (horizontal).
 
 ## 4. Estructura
 
@@ -316,7 +323,35 @@ tablero; escritorio) · **localStorage bloqueado** (sigue jugándose, avisa) ·
 **localStorage con datos corruptos** (se descartan) · **archivos de sprite
 ausentes** (dibujo de reserva y aviso) · consola sin errores propios.
 
-## 12. Seguridad y privacidad
+## 12. Miniatura al compartir (WhatsApp y redes)
+
+Cuando se comparte el enlace, WhatsApp, Telegram, Facebook o X muestran una
+**miniatura con la cara del Tío René y el título**. Eso lo dan las etiquetas
+Open Graph del `<head>` de `index.html` y la imagen `assets/ui/og-cover.jpg`
+(1200×630, ~93 KB).
+
+**Importante:** `og:image` y `og:url` son URLs **absolutas** que apuntan a
+`https://cotizadora.github.io/tio-rene-invaders/`. Si mueves el juego a otro
+dominio o carpeta, hay que actualizar esas líneas en `index.html`, o la
+miniatura no cargará.
+
+Para regenerar la imagen (por ejemplo si cambias la foto):
+
+```bash
+python tools/hacer-miniatura.py mi-foto.png
+```
+
+**Si WhatsApp no muestra la miniatura al probar:** guarda el preview en caché
+por varios días. Si ya compartiste el enlace *antes* de que existiera la
+imagen, WhatsApp recuerda que no había ninguna. Trucos para forzar el refresco:
+
+- Comparte el enlace con un parámetro extra que no cambia el juego:
+  `…/tio-rene-invaders/?v=2` (cada número nuevo cuenta como enlace distinto).
+- O pega el enlace en el depurador de Facebook
+  (`developers.facebook.com/tools/debug`) y pulsa "Scrape Again": eso vacía el
+  caché que también usa WhatsApp.
+
+## 13. Seguridad y privacidad
 
 - **Sin `eval`, sin `new Function`, sin `innerHTML`.** Todo el texto se escribe
   con `textContent`, así que no hay superficie de inyección de HTML.
@@ -335,7 +370,7 @@ ausentes** (dibujo de reserva y aviso) · consola sin errores propios.
 - El único enlace externo es el botón de apoyo del pie, con
   `rel="noopener noreferrer"`.
 
-## 13. Dependencias y licencias
+## 14. Dependencias y licencias
 
 **Ninguna dependencia.** Ni librerías, ni frameworks, ni fuentes descargadas
 (se usa la pila monoespaciada del sistema).
@@ -361,7 +396,7 @@ los derechos de esa imagen (quién la tomó) y el consentimiento de la persona
 que aparece, sobre todo si el sitio va a ser público. Si algún día hay que
 cambiarla, se sustituye con `tools/cortar-cara.py` y no hay que tocar código.
 
-## 14. Créditos
+## 15. Créditos
 
 Un juego de **Eduardo Pérez**.
 Si te gusta: [💛 Apoya mi trabajo](https://maladifusion.github.io/apoyo/)

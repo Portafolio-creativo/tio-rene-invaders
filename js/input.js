@@ -87,10 +87,13 @@
         estado.izquierda = false; estado.derecha = false; estado.disparo = false;
         emitir('foco-perdido');
       });
-      if (contenedorBotones) {
-        var botones = contenedorBotones.querySelectorAll('[data-accion]');
-        for (var i = 0; i < botones.length; i++) { conectarBoton(botones[i]); }
-      }
+      // Se conectan TODOS los [data-accion] del documento, no solo los de un
+      // contenedor: asi el boton de pausa puede vivir en la barra superior y
+      // los de mover/disparar en la botonera de abajo.
+      var raiz = contenedorBotones && contenedorBotones.ownerDocument
+        ? contenedorBotones.ownerDocument : global.document;
+      var botones = raiz.querySelectorAll('[data-accion]');
+      for (var i = 0; i < botones.length; i++) { conectarBoton(botones[i]); }
       tactil = ('ontouchstart' in global) || (global.navigator && global.navigator.maxTouchPoints > 0);
       return tactil;
     },
