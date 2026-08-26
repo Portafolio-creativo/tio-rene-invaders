@@ -67,6 +67,11 @@
   }
 
   Input.alAccion(function (accion) {
+    if (juego.estado === ESTADOS.CARGANDO && accion !== 'foco-perdido') {
+      Audio.desbloquear();
+      terminarIntro();
+      return;
+    }
     if (accion === 'cualquiera') { Audio.desbloquear(); return; }
     if (accion === 'pausa') {
       if (juego.estado === ESTADOS.JUGANDO || juego.estado === ESTADOS.PAUSA) { juego.alternarPausa(); }
@@ -101,6 +106,36 @@
     ui.avisar('Tu navegador no deja guardar datos: el record no se conservara al cerrar.');
   }
 
+  /* La intro se ve un momento aunque los assets carguen al instante: si no,
+     pasaria de largo en un parpadeo. Se puede saltar tocando o con cualquier
+     tecla. */
+  var INTRO_MINIMA = 2600;
+  var arranqueIntro = (global.performance && global.performance.now)
+    ? global.performance.now() : Date.now();
+  var assetsListos = false;
+
+  function ahoraMs() {
+    return (global.performance && global.performance.now)
+      ? global.performance.now() : Date.now();
+  }
+
+  function terminarIntro() {
+    if (!assetsListos || juego.estado !== ESTADOS.CARGANDO) { return; }
+    assetsListos = false;              // evita entrar dos veces
+    ui.cerrarIntro(function () {
+      redimensionar();
+      juego.irAlMenu();
+    });
+  }
+
+  var capaCarga = document.getElementById('capa-carga');
+  if (capaCarga) {
+    capaCarga.addEventListener('pointerdown', function () {
+      Audio.desbloquear();
+      terminarIntro();
+    });
+  }
+
   Assets.cargarTodo(function (hechos, total) {
     ui.progresoCarga(hechos, total);
   }).then(function (resultado) {
@@ -110,6 +145,7 @@
       ui.avisar('Faltan ' + resultado.fallidos.length + ' imagenes; se usan dibujos de reserva.');
     }
     redimensionar();
-    juego.irAlMenu();
+    assetsListos = true;
+    global.setTimeout(terminarIntro, Math.max(0, INTRO_MINIMA - (ahoraMs() - arranqueIntro)));
   });
 })(window);

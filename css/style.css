@@ -318,7 +318,59 @@ body.tactil #botonera { display: flex; }
 
 .aviso[hidden] { display: none; }
 
-/* ---------- Carga ---------- */
+/* ---------- Intro / carga ---------- */
+
+#capa-carga {
+  gap: 14px;
+  justify-content: center;
+  transition: opacity 0.35s ease;
+}
+
+#capa-carga.saliendo { opacity: 0; }
+
+/* La cara, bien grande: es la protagonista de la intro. */
+#intro-cara {
+  width: min(74%, 300px);
+  filter: drop-shadow(0 10px 22px rgba(0, 0, 0, 0.55));
+}
+
+#intro-cara img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* El hueco de la boca. El relleno de arriba se mide en % del ANCHO, asi que
+   el bostezo guarda la misma proporcion que en el juego a cualquier tamano.
+   Al crecer empuja la mandibula hacia abajo, sin transformaciones. */
+#intro-boca {
+  padding-top: 0;
+  background: url("../assets/sprites/player-mouth.png") center / 100% 100% no-repeat;
+  animation: bostezo 2.4s ease-in-out infinite;
+}
+
+@keyframes bostezo {
+  0%, 52%, 100% { padding-top: 0; }
+  62%, 80% { padding-top: 13%; }
+}
+
+.titulo-juego.intro {
+  font-size: clamp(20px, 5.5vh, 34px);
+  letter-spacing: 2px;
+}
+
+#intro-credito {
+  margin: -6px 0 0;
+  font-size: 11px;
+  letter-spacing: 1px;
+  color: var(--tinta-tenue);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #intro-boca { animation: none; }
+}
+
+/* ---------- Barra de progreso ---------- */
 
 #pista-progreso {
   width: min(70%, 320px);

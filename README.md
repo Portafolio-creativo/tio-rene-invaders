@@ -7,7 +7,7 @@ Inspirado en las mecánicas de los marcianitos clásicos (formación que baja,
 barreras, ovni de bonus). El código, los enemigos, los efectos y los sonidos son
 originales de este proyecto: no hay ni un sprite, ni un sonido, ni una línea de
 código copiada de ningún juego existente. La cara del protagonista es una **foto
-aportada por el autor del proyecto** (ver §12).
+aportada por el autor del proyecto** (ver §13).
 
 - HTML5 + CSS + JavaScript. **Cero dependencias, cero CDN, cero red.**
 - Funciona con doble clic en `index.html` (`file://`) y publicado en cualquier
@@ -86,13 +86,30 @@ tio-rene-invaders/
 ├── assets/
 │   ├── sprites/            piezas del Tío René (.png) + enemigos y efectos (.svg)
 │   ├── ui/                 logo y favicon
-│   └── audio/              vacío: los sonidos se sintetizan (ver §7)
+│   └── audio/              vacío: los sonidos se sintetizan (ver §8)
 └── tools/
     ├── servidor-local.mjs  servidor estático para pruebas
     └── cortar-cara.py      corta una foto en cabeza + mandíbula + relleno
 ```
 
-## 5. Arquitectura
+## 5. Intro
+
+Al abrir el juego aparece una **pantalla de entrada con la cara del Tío René a
+tamaño grande**, el título y el crédito ("creado por Eduardo Pérez"), mientras
+se cargan los recursos. La mandíbula bosteza sola, para que se vea la mecánica
+antes de jugar.
+
+Dura un mínimo de **2,6 s** aunque los archivos carguen al instante (si no,
+pasaría de largo en un parpadeo) y se puede **saltar tocando la pantalla o con
+cualquier tecla**. Luego funde al menú.
+
+- Duración: `INTRO_MINIMA` en `js/main.js`.
+- Tamaño de la cara: `#intro-cara` en `css/style.css`.
+- Cuánto abre la boca: los `@keyframes bostezo` del mismo archivo.
+- Con "movimiento reducido" activado en el sistema, el bostezo se queda quieto
+  (la cara se ve igual de grande).
+
+## 6. Arquitectura
 
 - **Bucle:** `requestAnimationFrame` con **paso fijo** de 1/120 s y acumulador.
   La simulación es idéntica a 30, 60 o 144 Hz; solo cambia cuántos fotogramas
@@ -111,7 +128,7 @@ tio-rene-invaders/
   escala conservando la proporción, con `devicePixelRatio` (tope ×2). Nada se
   deforma en ninguna pantalla.
 
-## 6. Cambiar al Tío René (cabeza, mandíbula, cuerpo)
+## 7. Cambiar al Tío René (cabeza, mandíbula, cuerpo)
 
 Cada pieza es **un archivo suelto** en `assets/sprites/`. Reemplaza el archivo y
 el juego cambia: no hay que tocar código.
@@ -192,7 +209,7 @@ JUGADOR.EXPRESIONES_SEPARADAS: true
 y añade `player-head-shoot`, `player-head-hit` y `player-head-dead` (`.png` o
 `.svg`) en `assets/sprites/`. Si faltan, se dibujan por código y el juego sigue.
 
-## 7. Cambiar los sonidos
+## 8. Cambiar los sonidos
 
 Ahora mismo **no hay archivos de audio**: todos los efectos se generan en
 tiempo real con la Web Audio API (`js/audio.js`), así que el juego pesa poquísimo
@@ -235,7 +252,7 @@ Si quieres otros formatos (`.mp3`, `.ogg`) basta con cambiar el nombre en
 > vas a usar voces o clips de alguien, necesitas tener los derechos para
 > publicarlos, sobre todo con el juego en abierto.
 
-## 8. Ajustar la dificultad
+## 9. Ajustar la dificultad
 
 Todo está en **`js/config.js`**. Los más útiles:
 
@@ -267,7 +284,7 @@ el juego.
 Tras superar el nivel 5 sale la pantalla de **VICTORIA**; desde ahí se puede
 seguir en modo sin fin, con los niveles subiendo indefinidamente.
 
-## 9. Modo depuración
+## 10. Modo depuración
 
 `Ctrl` + `Shift` + `D` durante la partida muestra cajas de colisión, FPS,
 estado, número de enemigos vivos, ritmo de la marcha, proyectiles, apertura de
@@ -282,7 +299,7 @@ TRI.instancia.juego.niveles.nivel = 4;
 TRI.instancia.juego.prepararNivel();
 ```
 
-## 10. Pruebas hechas
+## 11. Pruebas hechas
 
 Probado con Chrome sobre `http://`, sobre `file://` y servido desde una
 subcarpeta (`/proyectos/tio-rene-invaders/`):
@@ -299,7 +316,7 @@ tablero; escritorio) · **localStorage bloqueado** (sigue jugándose, avisa) ·
 **localStorage con datos corruptos** (se descartan) · **archivos de sprite
 ausentes** (dibujo de reserva y aviso) · consola sin errores propios.
 
-## 11. Seguridad y privacidad
+## 12. Seguridad y privacidad
 
 - **Sin `eval`, sin `new Function`, sin `innerHTML`.** Todo el texto se escribe
   con `textContent`, así que no hay superficie de inyección de HTML.
@@ -318,7 +335,7 @@ ausentes** (dibujo de reserva y aviso) · consola sin errores propios.
 - El único enlace externo es el botón de apoyo del pie, con
   `rel="noopener noreferrer"`.
 
-## 12. Dependencias y licencias
+## 13. Dependencias y licencias
 
 **Ninguna dependencia.** Ni librerías, ni frameworks, ni fuentes descargadas
 (se usa la pila monoespaciada del sistema).
@@ -344,7 +361,7 @@ los derechos de esa imagen (quién la tomó) y el consentimiento de la persona
 que aparece, sobre todo si el sitio va a ser público. Si algún día hay que
 cambiarla, se sustituye con `tools/cortar-cara.py` y no hay que tocar código.
 
-## 13. Créditos
+## 14. Créditos
 
 Un juego de **Eduardo Pérez**.
 Si te gusta: [💛 Apoya mi trabajo](https://maladifusion.github.io/apoyo/)

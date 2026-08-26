@@ -93,6 +93,17 @@
     }
   };
 
+  /* Funde la intro y avisa cuando termina. */
+  UI.prototype.cerrarIntro = function (alTerminar) {
+    var capa = this.capas.carga;
+    if (!capa || capa.hidden) { alTerminar(); return; }
+    capa.classList.add('saliendo');
+    global.setTimeout(function () {
+      capa.classList.remove('saliendo');
+      alTerminar();
+    }, 350);
+  };
+
   UI.prototype.ocultarTodo = function () {
     var claves = Object.keys(this.capas);
     for (var i = 0; i < claves.length; i++) {

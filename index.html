@@ -28,9 +28,17 @@
     <div id="marco">
       <canvas id="lienzo" width="600" height="800" aria-label="Zona de juego de Tío René Invaders" role="img"></canvas>
 
-      <!-- CARGA -->
+      <!-- INTRO / CARGA -->
       <section class="capa" id="capa-carga" hidden>
-        <h2 class="titulo-capa">CARGANDO</h2>
+        <!-- La cara va en tres piezas, igual que en el juego: al crecer el
+             hueco central la mandibula baja sola y se ve el bostezo. -->
+        <div id="intro-cara">
+          <img id="intro-cabeza" src="assets/sprites/player-head.png" alt="" width="360" height="249">
+          <div id="intro-boca"></div>
+          <img id="intro-mandibula" src="assets/sprites/player-jaw.png" alt="" width="360" height="147">
+        </div>
+        <h1 class="titulo-juego intro">TÍO RENÉ<br><span>INVADERS</span></h1>
+        <p id="intro-credito">creado por Eduardo Pérez</p>
         <div id="pista-progreso"><div id="barra-progreso"></div></div>
         <p id="texto-carga" class="tenue">CARGANDO</p>
       </section>
