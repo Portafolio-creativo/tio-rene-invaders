@@ -324,6 +324,15 @@
 
   Juego.prototype.actualizarJefe = function (dt) {
     if (!this.jefe.activo) { return; }
+
+    // Agonizando: arde en el sitio y, al agotarse, revienta en pedazos.
+    if (this.jefe.enAgonia()) {
+      this.jefe.actualizar(dt);
+      this.arderJefe(dt);
+      if (!this.jefe.enAgonia()) { this.reventarJefe(); }
+      return;
+    }
+
     if (this.jefe.actualizar(dt) && this.proyectiles.contar(false) < CONFIG.JEFES.MAX_PROYECTILES) {
       var boca = this.jefe.bocaDeFuego();
       this.proyectiles.lanzar(boca.x, boca.y, false, this.enemigos.params.velocidadDisparo);
@@ -339,6 +348,42 @@
       this.puntuacion.perderVida();
       this.golpearJugador();
     }
+  };
+
+  /* Mientras agoniza: fuego que va a mas y sacudidas cortas encadenadas. */
+  Juego.prototype.arderJefe = function (dt) {
+    var caja = this.jefe.hitbox();
+    var q = this.jefe.progresoMuerte();      // 0 -> 1
+    // El fuego arrecia segun se acerca el estallido.
+    var brotes = Math.round(1 + q * 3);
+    for (var i = 0; i < brotes; i++) {
+      var x = caja.x + caja.w * (0.12 + 0.76 * Math.random());
+      var y = caja.y + caja.h * (0.12 + 0.76 * Math.random());
+      this.efectos.fuego(x, y, 2);
+      if (Math.random() < 0.30) { this.efectos.chispas(x, y, 4, '#ff7a4a'); }
+    }
+    if (this.renderer.sacudidaT <= 0) { this.renderer.sacudir(0.25, 6 + q * 8); }
+  };
+
+  /* El estallido final: la cara salta en pedazos, hoguera enorme y una tanda
+     de estallidos encadenados. Recien aqui deja de dibujarse el jefe. */
+  Juego.prototype.reventarJefe = function () {
+    var caja = this.jefe.hitbox();
+    var cx = caja.x + caja.w / 2, cy = caja.y + caja.h / 2;
+    // Trozos de la propia cara volando: se reservan ANTES de la hoguera, que
+    // si no el fuego se comeria sus huecos.
+    this.efectos.escombros(this.jefe.lienzo, caja, CONFIG.JEFES.TROZOS);
+    this.jefe.activo = false;
+    this.renderer.sacudir(0.9, 26);
+    this.efectos.destello(cx, cy, 320);
+    this.efectos.chispas(cx, cy, 70, '#ffd0a0');
+    for (var f = 0; f < CONFIG.JEFES.LLAMARADAS; f += 8) {
+      this.efectos.fuego(caja.x + caja.w * (0.1 + 0.8 * Math.random()),
+                         caja.y + caja.h * (0.1 + 0.8 * Math.random()), 8);
+    }
+    // Estallidos que siguen sonando y reventando un momento mas.
+    this.explosionJefe = { caja: caja, restan: CONFIG.JEFES.ESTALLIDOS, t: 0 };
+    Audio.reproducir('enemigoMuere');
   };
 
   Juego.prototype.resolverColisiones = function () {
@@ -377,25 +422,14 @@
         self.efectos.chispas(px, py, 7, '#ffd0a0');
         if (self.puntuacion.sumar(10)) { Audio.reproducir('vidaExtra'); }
         Audio.reproducir('enemigoMuere');
-        if (jefe.derrotado()) {
-          var caja = jefe.hitbox();
-          jefe.activo = false;
-          var cx = caja.x + caja.w / 2;
-          var cy = caja.y + caja.h / 2;
-          /* Estalla: no un fogonazo y ya, sino una tanda de estallidos que se
-             van encadenando por toda la cara mientras la pantalla tiembla. */
-          self.explosionJefe = { caja: caja, restan: CONFIG.JEFES.ESTALLIDOS, t: 0 };
-          self.renderer.sacudir(0.8, 22);
-          self.efectos.destello(cx, cy, 260);
-          self.efectos.chispas(cx, cy, 60, '#ffd0a0');
-          // Hoguera inicial: el grueso del fuego sale de golpe y luego lo van
-          // alimentando los estallidos encadenados.
-          for (var f = 0; f < CONFIG.JEFES.LLAMARADAS; f += 10) {
-            self.efectos.fuego(caja.x + caja.w * (0.15 + 0.7 * Math.random()),
-                               caja.y + caja.h * (0.15 + 0.7 * Math.random()), 10);
-          }
-          self.efectos.texto(cx, cy, String(CONFIG.JEFES.PUNTOS), '#7cf29a');
-          if (self.puntuacion.sumar(CONFIG.JEFES.PUNTOS)) { Audio.reproducir('vidaExtra'); }
+        if (jefe.derrotado() && !jefe.enAgonia()) {
+          // No se apaga: empieza a AGONIZAR. La cara se queda ardiendo y
+          // temblando; el estallido en pedazos viene al final (actualizarJefe).
+          var caja = jefe.iniciarMuerte();
+          self.puntuacion.sumar(CONFIG.JEFES.PUNTOS);
+          self.efectos.texto(caja.x + caja.w / 2, caja.y + caja.h / 2,
+                             String(CONFIG.JEFES.PUNTOS), '#7cf29a');
+          self.renderer.sacudir(0.5, 10);
           Audio.reproducir(jefe.voces.muere || 'victoria');
         }
       });
@@ -479,7 +513,7 @@
 
   Juego.prototype.comprobarFinDeNivel = function () {
     if (this.esNivelDeJefe) {
-      if (this.jefe.activo) { return; }
+      if (this.jefe.activo) { return; }   // incluye la agonia
       // Que termine de reventar antes de pasar de nivel.
       if (this.explosionJefe && this.explosionJefe.restan > 0) { return; }
     } else if (this.enemigos.vivos > 0) { return; }

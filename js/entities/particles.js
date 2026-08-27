@@ -15,6 +15,21 @@
     this.lista = [];
   }
 
+  /* Un hueco del monton, desalojando si hace falta la particula a la que
+     menos vida le queda. 'prioridad' fuerza el desalojo: lo usan los escombros
+     del jefe, que no pueden quedarse sin salir por culpa del fuego. */
+  GestorEfectos.prototype.obtenerLibrePrioritario = function () {
+    var libre = this.obtenerLibre();
+    if (libre) { return libre; }
+    var peor = null;
+    for (var i = 0; i < this.lista.length; i++) {
+      var p = this.lista[i];
+      if (p.tipo === 'escombro') { continue; }   // no se comen entre ellos
+      if (!peor || p.vida < peor.vida) { peor = p; }
+    }
+    return peor;
+  };
+
   GestorEfectos.prototype.obtenerLibre = function () {
     for (var i = 0; i < this.lista.length; i++) {
       if (!this.lista[i].vivo) { return this.lista[i]; }
@@ -61,6 +76,36 @@
     }
   };
 
+  /* Escombros: pedazos DE LA PROPIA CARA del jefe que salen despedidos al
+     reventar. Cada trozo es un recorte del lienzo del jefe que vuela girando
+     y cae. Es lo que hace que se vea que estallo en pedazos, no que se apago. */
+  GestorEfectos.prototype.escombros = function (lienzo, caja, cantidad) {
+    var lado = lienzo.width;
+    for (var i = 0; i < cantidad; i++) {
+      var p = this.obtenerLibrePrioritario();
+      if (!p) { return; }
+      var trozo = lado * Util.azar(0.16, 0.30);
+      p.tipo = 'escombro';
+      p.lienzo = lienzo;
+      p.sx = Util.azar(0, lado - trozo);
+      p.sy = Util.azar(0, lado - trozo);
+      p.sw = trozo; p.sh = trozo;
+      p.escala = caja.w / lado;
+      // sale desde donde estaba ese trozo dentro de la cara
+      p.x = caja.x + (p.sx + trozo / 2) * p.escala;
+      p.y = caja.y + (p.sy + trozo / 2) * p.escala;
+      var ang = Util.azar(0, Math.PI * 2);
+      var vel = Util.azar(140, 380);
+      p.vx = Math.cos(ang) * vel;
+      p.vy = Math.sin(ang) * vel - 120;   // empujon hacia arriba
+      p.rot = Util.azar(0, Math.PI * 2);
+      p.vrot = Util.azar(-9, 9);
+      p.vida = Util.azar(0.9, 1.7);
+      p.maxVida = p.vida;
+      p.vivo = true;
+    }
+  };
+
   GestorEfectos.prototype.destello = function (x, y, tam) {
     var p = this.obtenerLibre();
     if (!p) { return; }
@@ -101,6 +146,11 @@
         p.y += p.vy * dt;
         p.vy -= 60 * dt;           // el calor tira hacia arriba
         p.vx *= (1 - dt * 1.2);
+      } else if (p.tipo === 'escombro') {
+        p.x += p.vx * dt;
+        p.y += p.vy * dt;
+        p.vy += 520 * dt;          // pesa: cae
+        p.rot += p.vrot * dt;
       }
     }
   };

@@ -21,6 +21,9 @@
     this.sacudidaT = 0;         // segundos que queda de sacudida
     this.sacudidaTotal = 1;
     this.sacudidaFuerza = 0;
+    // Lienzo auxiliar para tintar la cara del jefe respetando su silueta.
+    this.aux = document.createElement('canvas');
+    this.auxCtx = this.aux.getContext('2d');
     this.crearEstrellas(70);
   }
 
@@ -160,14 +163,42 @@
     if (!jefe.activo) { return; }
     var ctx = this.ctx;
     var c = jefe.hitbox();
-    ctx.drawImage(jefe.lienzo, Math.round(c.x), Math.round(c.y),
-                  Math.round(c.w), Math.round(c.h));
+    var x = Math.round(c.x), y = Math.round(c.y), w = Math.round(c.w), h = Math.round(c.h);
+
+    if (jefe.enAgonia()) {
+      /* Agonizando: la cara se sacude en el sitio y se pone al rojo vivo,
+         latiendo cada vez mas rapido, hasta reventar. */
+      var q = jefe.progresoMuerte();               // 0 -> 1
+      var tiembla = 2 + q * 11;
+      var pulso = 0.5 + 0.5 * Math.abs(Math.sin(q * 42));
+      // La cara al rojo vivo se compone en el lienzo auxiliar, para que el
+      // tinte solo toque la cara y no deje un rectangulo sobre el fondo.
+      var lado = jefe.lienzo.width;
+      this.aux.width = lado; this.aux.height = lado;
+      var a = this.auxCtx;
+      a.clearRect(0, 0, lado, lado);
+      a.globalCompositeOperation = 'source-over';
+      a.globalAlpha = 1;
+      a.drawImage(jefe.lienzo, 0, 0);
+      a.globalCompositeOperation = 'source-atop';   // solo pinta sobre la cara
+      a.globalAlpha = pulso * (0.4 + 0.55 * q);
+      a.fillStyle = q > 0.7 ? '#fff2c0' : '#ff5a2a';
+      a.fillRect(0, 0, lado, lado);
+      a.globalAlpha = 1;
+
+      ctx.save();
+      ctx.translate((Math.random() - 0.5) * tiembla, (Math.random() - 0.5) * tiembla);
+      ctx.drawImage(this.aux, x, y, w, h);
+      ctx.restore();
+      return;                                      // sin barra de vida: ya murio
+    }
+
+    ctx.drawImage(jefe.lienzo, x, y, w, h);
     if (jefe.destello > 0) {
       ctx.save();
       ctx.globalAlpha = Math.min(0.5, jefe.destello * 4);
       ctx.globalCompositeOperation = 'lighter';
-      ctx.drawImage(jefe.lienzo, Math.round(c.x), Math.round(c.y),
-                    Math.round(c.w), Math.round(c.h));
+      ctx.drawImage(jefe.lienzo, x, y, w, h);
       ctx.restore();
     }
     // Barra de vida, siempre del mismo ancho y arriba del todo: si siguiera al
@@ -224,6 +255,15 @@
         ctx.globalAlpha = Math.max(0, t);
         var tam = p.tam * (1.4 - t * 0.5);
         dibujarSprite(ctx, 'explosion', p.x - tam / 2, p.y - tam / 2, tam, tam);
+      } else if (p.tipo === 'escombro') {
+        var qe = p.vida / p.maxVida;
+        ctx.save();
+        ctx.globalAlpha = Math.min(1, qe * 1.6);
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.rot);
+        var d = p.sw * p.escala;
+        ctx.drawImage(p.lienzo, p.sx, p.sy, p.sw, p.sh, -d/2, -d/2, d, d);
+        ctx.restore();
       } else if (p.tipo === 'fuego') {
         /* La llama pasa de blanca a roja segun se apaga, y se
            dibuja en modo 'lighter' para que al superponerse las

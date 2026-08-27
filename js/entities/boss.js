@@ -51,6 +51,7 @@
       J.INTERVALO_DISPARO_BASE - 0.16 * vuelta);
     this.temporizadorDisparo = this.intervaloDisparo;
     this.quedanEnSalva = 0;
+    this.muriendo = 0;
     this.temporizadorZoom = 0;
     this.destello = 0;
     this.impactos = 0;
@@ -123,9 +124,30 @@
     };
   };
 
+  /* Arranca la agonia: deja de moverse y de disparar, se queda ardiendo y
+     temblando hasta que revienta. Devuelve la caja donde estaba, para centrar
+     ahi el incendio. */
+  Jefe.prototype.iniciarMuerte = function () {
+    this.muriendo = J.MUERTE_DURACION;
+    return this.hitbox();
+  };
+
+  Jefe.prototype.enAgonia = function () { return this.muriendo > 0; };
+
+  /* Cuanto lleva de agonia, de 0 (recien muerto) a 1 (a punto de estallar). */
+  Jefe.prototype.progresoMuerte = function () {
+    return 1 - Math.max(0, this.muriendo) / J.MUERTE_DURACION;
+  };
+
   Jefe.prototype.actualizar = function (dt) {
     if (!this.activo) { return false; }
     if (this.destello > 0) { this.destello -= dt; }
+
+    // Agonizando: no se mueve ni dispara, solo cuenta hasta reventar.
+    if (this.muriendo > 0) {
+      this.muriendo -= dt;
+      return false;
+    }
 
     /* Avance hacia el destino. Como se cambia de destino antes de llegar del
        todo y el eje vertical va mas lento, la trayectoria sale curva en vez

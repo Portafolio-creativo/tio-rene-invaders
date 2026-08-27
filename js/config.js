@@ -198,9 +198,13 @@
       PUNTOS: 750,
       /* Al caer revienta por partes: una tanda de estallidos encadenados
          mientras la pantalla tiembla. */
+      /* Muerte en dos actos: primero ARDE en el sitio, temblando y al rojo
+         vivo (MUERTE_DURACION segundos), y al final REVIENTA en pedazos. */
+      MUERTE_DURACION: 1.25,
       ESTALLIDOS: 26,
-      ESTALLIDO_CADA: 0.055,
-      LLAMARADAS: 70,           // chorros de fuego de la muerte
+      ESTALLIDO_CADA: 0.045,
+      LLAMARADAS: 90,           // chorros de fuego de la muerte
+      TROZOS: 14,               // en cuantos pedazos salta la cara al final
       /* Dispara en salvas: varios seguidos y luego descansa. */
       SALVA_TIROS: 3,
       SALVA_SEPARACION: 0.16,
