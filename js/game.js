@@ -157,6 +157,24 @@
   /* Lo asigna main.js: la entrada (cara + voz) y luego la partida. */
   Juego.prototype.alPulsarJugar = function () { this.nuevaPartida(true); };
 
+  /* Salta al siguiente nivel de jefe. Es para probar los jefes sin tener que
+     jugarse los niveles de en medio; no hay nada en pantalla que lo anuncie. */
+  Juego.prototype.saltarAJefe = function () {
+    var cada = CONFIG.JEFES.CADA;
+    var desde = (this.estado === ESTADOS.JUGANDO || this.estado === ESTADOS.PAUSA)
+      ? this.niveles.nivel : 0;
+    var destino = (Math.floor(desde / cada) + 1) * cada;
+    if (destino > CONFIG.NIVELES.TOTAL) { destino = cada; }   // vuelve al primero
+
+    if (this.estado !== ESTADOS.JUGANDO) {
+      this.nuevaPartida(false, true);
+    }
+    this.niveles.nivel = destino;
+    this.prepararNivel();
+    this.cambiarEstado(ESTADOS.JUGANDO);
+    return this.jefe.nombre;
+  };
+
   Juego.prototype.alternarDepuracion = function () {
     this.debug = !this.debug;
     return this.debug;

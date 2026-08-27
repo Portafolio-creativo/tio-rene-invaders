@@ -80,6 +80,14 @@ body {
 
 #marca span { color: var(--acento); }
 
+/* El titulo lleva un atajo escondido (ver main.js). Sin seleccion de texto:
+   cinco toques seguidos lo dejarian resaltado y cantarian que ahi pasa algo. */
+#marca {
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
 #controles-audio {
   display: flex;
   align-items: center;

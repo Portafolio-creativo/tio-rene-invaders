@@ -119,6 +119,35 @@
     global.requestAnimationFrame(bucle);
   }
 
+  /* ---- Atajo secreto ----
+     Cinco toques seguidos en el titulo de la barra saltan al siguiente nivel
+     de jefe. No hay nada que lo anuncie: el titulo parece un texto mas, no se
+     ilumina ni cambia el cursor, y cinco toques en menos de dos segundos no
+     salen por accidente. En teclado, Ctrl+Shift+J hace lo mismo.
+     Sirve para probar los jefes sin jugarse los niveles de en medio. */
+  var marca = document.getElementById('marca');
+  if (marca) {
+    var toques = 0, ultimoToque = 0;
+    marca.addEventListener('pointerdown', function () {
+      var ahora = Date.now();
+      toques = (ahora - ultimoToque > 700) ? 1 : toques + 1;
+      ultimoToque = ahora;
+      if (toques >= 5) {
+        toques = 0;
+        Audio.desbloquear();
+        juego.saltarAJefe();
+      }
+    });
+  }
+
+  global.addEventListener('keydown', function (ev) {
+    if (ev.code === 'KeyJ' && ev.ctrlKey && ev.shiftKey) {
+      ev.preventDefault();
+      Audio.desbloquear();
+      juego.saltarAJefe();
+    }
+  });
+
   /* Referencias vivas para depurar desde la consola del navegador
      (por ejemplo: TRI.instancia.juego.alternarDepuracion()). */
   TRI.instancia = { juego: juego, ui: ui, renderer: renderer, redimensionar: redimensionar };
