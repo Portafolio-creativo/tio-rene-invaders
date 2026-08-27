@@ -6,6 +6,30 @@
   'use strict';
 
   var CONFIG = {
+    /* Frases del Tio Rene para encabezar el mensaje al compartir el puntaje.
+       Salen de los titulos de sus propios clips en myinstants (los mismos que
+       suenan en el juego), no estan inventadas. Se dejan fuera a proposito las
+       mas subidas de tono y los insultos: el mensaje se manda a terceros que no
+       eligieron recibirlo. Los audios crudos siguen sonando dentro del juego,
+       que es donde el jugador si eligio estar. */
+    FRASES_COMPARTIR: [
+      'Ya llegamos ya',
+      'Me río toa la noche',
+      'Querí too',
+      '¿Qué pasa, primo?',
+      'Está bien un rato',
+      'Ando curao',
+      'No me hablí ma',
+      'Toi de campeón',
+      '¿Pa qué tomai tanto?',
+      'K pasa, hermano mío',
+      'Soy otro, loco',
+      'Se hace el interesante',
+      'Te estay picando a vío',
+      'Me disculpai, amorcito',
+      'Miau'
+    ],
+
     /* Donde vive el juego. Se usa al compartir el resultado; si algun dia
        cambia de direccion, se cambia AQUI y en las etiquetas og: del HTML. */
     ENLACE: 'https://portafolio-creativo.github.io/tio-rene-invaders/',

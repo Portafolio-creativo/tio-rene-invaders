@@ -141,7 +141,11 @@
          lo duplicaba: WhatsApp no lo descarta, lo pega al final del texto y
          el enlace salia dos veces seguidas. El texto viaja siempre; el url
          no, asi que el texto es el sitio seguro. */
-      var texto = 'Hice ' + Util.formatearPuntos(datos.puntos)
+      /* Cada mensaje sale encabezado por una frase distinta del Tio Rene,
+         para que compartir el puntaje no sea siempre el mismo texto. */
+      var frases = CONFIG.FRASES_COMPARTIR;
+      var frase = frases[Math.floor(Math.random() * frases.length)];
+      var texto = frase + '. Hice ' + Util.formatearPuntos(datos.puntos)
         + ' puntos en Tío René Invaders. ¿Le ganai?' + '\n' + CONFIG.ENLACE;
       var nav = global.navigator;
 
