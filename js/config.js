@@ -221,7 +221,10 @@
           sprite: 'boss-1', nombre: 'PAPI MICKY',
           voces: { aparece: 'mickyAparece', golpe: 'mickyGolpe', muere: 'mickyMuere' }
         },
-        { sprite: 'boss-2', nombre: 'JB THE VOICE' },
+        {
+          sprite: 'boss-2', nombre: 'JB THE VOICE',
+          voces: { aparece: 'jbAparece', golpe: 'jbGolpe', muere: 'jbMuere' }
+        },
         { sprite: 'boss-3', nombre: 'PÁJARO VERDE' },
         { sprite: 'boss-4', nombre: 'WASON KING' },
         { sprite: 'boss-5', nombre: 'HUEVITO REY' }
@@ -326,6 +329,10 @@
         mickyAparece: 'micky-aparece.mp3',
         mickyGolpe: 'micky-golpe.mp3',
         mickyMuere: 'micky-muere.mp3',
+        /* JB The Voice: un unico clip suyo de myinstants, partido en tres. */
+        jbAparece: 'jb-aparece.mp3',
+        jbGolpe: 'jb-golpe.mp3',
+        jbMuere: 'jb-muere.mp3',
         racha1: 'racha-queri-too.mp3',     // "queri too"
         racha2: 'racha-tio-rene.mp3',
         racha3: 'racha-miau.mp3',          // el "nau" cortito
