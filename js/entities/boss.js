@@ -20,9 +20,12 @@
   var Util = global.TRI.Util;
   var J = CONFIG.JEFES;
 
+  var MASCARA = 40;          // resolucion de la silueta para los impactos
+
   function Jefe() {
     this.activo = false;
     this.marcas = [];
+    this.mascara = null;
     this.lienzo = document.createElement('canvas');
     this.lienzo.width = J.ANCHO;
     this.lienzo.height = J.ALTO;
@@ -35,6 +38,7 @@
     this.datos = J.LISTA[vuelta % J.LISTA.length];
     this.sprite = this.datos.sprite;
     this.nombre = this.datos.nombre;
+    this.voces = this.datos.voces || {};
     this.activo = true;
 
     this.cx = CONFIG.ANCHO / 2;
@@ -46,12 +50,46 @@
       J.INTERVALO_DISPARO_MIN,
       J.INTERVALO_DISPARO_BASE - 0.16 * vuelta);
     this.temporizadorDisparo = this.intervaloDisparo;
+    this.quedanEnSalva = 0;
     this.temporizadorZoom = 0;
     this.destello = 0;
     this.impactos = 0;
     this.marcas.length = 0;
+    this.calcularMascara(Assets.obtener(this.sprite));
     this.nuevoDestino();
     this.repintar();
+  };
+
+  /* Silueta de la cara, leida de la transparencia del PNG. Sin esto los
+     disparos chocaban contra la caja cuadrada y reventaban en el aire, en las
+     esquinas donde no hay mas que fondo transparente. */
+  Jefe.prototype.calcularMascara = function (img) {
+    this.mascara = null;
+    if (!img) { return; }
+    try {
+      var c = document.createElement('canvas');
+      c.width = MASCARA;
+      c.height = MASCARA;
+      var ctx = c.getContext('2d');
+      ctx.drawImage(img, 0, 0, MASCARA, MASCARA);
+      var datos = ctx.getImageData(0, 0, MASCARA, MASCARA).data;
+      var m = new Uint8Array(MASCARA * MASCARA);
+      for (var i = 0; i < m.length; i++) { m[i] = datos[i * 4 + 3] > 40 ? 1 : 0; }
+      this.mascara = m;
+    } catch (e) {
+      this.mascara = null;    // lienzo "manchado": se cae a la caja entera
+    }
+  };
+
+  /* True si ese punto cae sobre la cara de verdad, no sobre el aire de las
+     esquinas. Si no hay mascara, vale toda la caja. */
+  Jefe.prototype.tocado = function (px, py) {
+    if (!this.mascara) { return true; }
+    var c = this.hitbox();
+    var u = (px - c.x) / c.w, v = (py - c.y) / c.h;
+    if (u < 0 || u >= 1 || v < 0 || v >= 1) { return false; }
+    var col = Math.floor(u * MASCARA), fil = Math.floor(v * MASCARA);
+    return this.mascara[fil * MASCARA + col] === 1;
   };
 
   Jefe.prototype.reiniciar = function () {
@@ -118,9 +156,17 @@
     this.cx = Util.limitar(this.cx, l.minX, l.maxX);
     this.cy = Util.limitar(this.cy, l.minY, l.maxY);
 
+    /* Disparo en salvas: suelta varios seguidos y luego descansa. Uno a uno
+       era demasiado manso para un jefe. */
     this.temporizadorDisparo -= dt;
     if (this.temporizadorDisparo <= 0) {
-      this.temporizadorDisparo = this.intervaloDisparo;
+      if (this.quedanEnSalva > 0) {
+        this.quedanEnSalva--;
+        this.temporizadorDisparo = J.SALVA_SEPARACION;
+      } else {
+        this.quedanEnSalva = J.SALVA_TIROS - 1;
+        this.temporizadorDisparo = this.intervaloDisparo;
+      }
       return true;
     }
     return false;

@@ -114,6 +114,7 @@
     if (this.esNivelDeJefe) {
       this.jefe.preparar(this.niveles.nivel);
       this.enemigos.vaciar();
+      if (this.jefe.voces.aparece) { Audio.reproducir(this.jefe.voces.aparece); }
     } else {
       this.jefe.reiniciar();
       this.enemigos.preparar(this.niveles.nivel);
@@ -310,16 +311,20 @@
     if (ex.t > 0) { return; }
     ex.t = CONFIG.JEFES.ESTALLIDO_CADA;
     ex.restan--;
-    var x = ex.caja.x + ex.caja.w * (0.15 + 0.7 * Math.random());
-    var y = ex.caja.y + ex.caja.h * (0.15 + 0.7 * Math.random());
-    this.efectos.destello(x, y, 80 + Math.random() * 70);
-    this.efectos.chispas(x, y, 16, ex.restan % 2 ? '#ffd0a0' : '#ff7a4a');
+    var x = ex.caja.x + ex.caja.w * (0.12 + 0.76 * Math.random());
+    var y = ex.caja.y + ex.caja.h * (0.12 + 0.76 * Math.random());
+    this.efectos.destello(x, y, 90 + Math.random() * 90);
+    this.efectos.chispas(x, y, 14, ex.restan % 2 ? '#ffd0a0' : '#ff7a4a');
+    this.efectos.fuego(x, y, 7);
+    // Cada dos estallidos se vuelve a zarandear: la sacudida no se apaga
+    // hasta que termina de reventar del todo.
+    if (ex.restan % 2 === 0) { this.renderer.sacudir(0.3, 13); }
     Audio.reproducir('enemigoMuere');
   };
 
   Juego.prototype.actualizarJefe = function (dt) {
     if (!this.jefe.activo) { return; }
-    if (this.jefe.actualizar(dt) && this.proyectiles.contar(false) < 4) {
+    if (this.jefe.actualizar(dt) && this.proyectiles.contar(false) < CONFIG.JEFES.MAX_PROYECTILES) {
       var boca = this.jefe.bocaDeFuego();
       this.proyectiles.lanzar(boca.x, boca.y, false, this.enemigos.params.velocidadDisparo);
     }
@@ -360,7 +365,14 @@
         var px = p.x + p.w / 2, py = p.y;
         if (px < caja.x || px > caja.x + caja.w) { return; }
         if (py < caja.y || py > caja.y + caja.h) { return; }
+        // La cara tiene el fondo transparente: si el disparo cae en una
+        // esquina vacia, sigue de largo en vez de reventar en el aire.
+        if (!jefe.tocado(px, py)) { return; }
         jefe.impactar(px, py);
+        // Suelta una frase cada tantos golpes: en cada impacto seria un loro.
+        if (jefe.voces.golpe && jefe.impactos % CONFIG.JEFES.VOZ_CADA === 0) {
+          Audio.reproducir(jefe.voces.golpe);
+        }
         p.vivo = false;
         self.efectos.chispas(px, py, 7, '#ffd0a0');
         if (self.puntuacion.sumar(10)) { Audio.reproducir('vidaExtra'); }
@@ -373,12 +385,18 @@
           /* Estalla: no un fogonazo y ya, sino una tanda de estallidos que se
              van encadenando por toda la cara mientras la pantalla tiembla. */
           self.explosionJefe = { caja: caja, restan: CONFIG.JEFES.ESTALLIDOS, t: 0 };
-          self.renderer.sacudir(0.55, 16);
-          self.efectos.destello(cx, cy, 210);
-          self.efectos.chispas(cx, cy, 44, '#ffd0a0');
+          self.renderer.sacudir(0.8, 22);
+          self.efectos.destello(cx, cy, 260);
+          self.efectos.chispas(cx, cy, 60, '#ffd0a0');
+          // Hoguera inicial: el grueso del fuego sale de golpe y luego lo van
+          // alimentando los estallidos encadenados.
+          for (var f = 0; f < CONFIG.JEFES.LLAMARADAS; f += 10) {
+            self.efectos.fuego(caja.x + caja.w * (0.15 + 0.7 * Math.random()),
+                               caja.y + caja.h * (0.15 + 0.7 * Math.random()), 10);
+          }
           self.efectos.texto(cx, cy, String(CONFIG.JEFES.PUNTOS), '#7cf29a');
           if (self.puntuacion.sumar(CONFIG.JEFES.PUNTOS)) { Audio.reproducir('vidaExtra'); }
-          Audio.reproducir('victoria');
+          Audio.reproducir(jefe.voces.muere || 'victoria');
         }
       });
     }

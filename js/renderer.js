@@ -224,6 +224,22 @@
         ctx.globalAlpha = Math.max(0, t);
         var tam = p.tam * (1.4 - t * 0.5);
         dibujarSprite(ctx, 'explosion', p.x - tam / 2, p.y - tam / 2, tam, tam);
+      } else if (p.tipo === 'fuego') {
+        /* La llama pasa de blanca a roja segun se apaga, y se
+           dibuja en modo 'lighter' para que al superponerse las
+           brasas den el nucleo brillante del incendio. */
+        var q = p.vida / p.maxVida;
+        var rojo = 255;
+        var verde = Math.round(60 + 195 * q);
+        var azul = Math.round(30 * q * q);
+        ctx.save();
+        ctx.globalCompositeOperation = 'lighter';
+        ctx.globalAlpha = Math.min(1, q * 1.4) * 0.85;
+        ctx.fillStyle = 'rgb(' + rojo + ',' + verde + ',' + azul + ')';
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.tam * (0.35 + q * 0.65), 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
       } else if (p.tipo === 'texto') {
         ctx.globalAlpha = Math.max(0, t);
         ctx.fillStyle = p.color;

@@ -6,7 +6,10 @@
   'use strict';
 
   var Util = global.TRI.Util;
-  var MAX = 220;
+  /* Tope de particulas vivas. Subido para la muerte del jefe: con 220 el
+     incendio llegaba al tope enseguida y los ultimos estallidos no
+     pintaban nada. Se reutilizan del monton, no se crean sin freno. */
+  var MAX = 460;
 
   function GestorEfectos() {
     this.lista = [];
@@ -36,6 +39,24 @@
       p.maxVida = p.vida;
       p.tam = Util.azar(2, 4.5);
       p.color = color || '#ffe36b';
+      p.vivo = true;
+    }
+  };
+
+  /* Fuego: brasas que SUBEN y se apagan pasando de blanco a rojo. Al reves
+     que las chispas, que caen por su peso. */
+  GestorEfectos.prototype.fuego = function (x, y, cantidad) {
+    for (var i = 0; i < cantidad; i++) {
+      var p = this.obtenerLibre();
+      if (!p) { return; }
+      p.tipo = 'fuego';
+      p.x = x + Util.azar(-14, 14);
+      p.y = y + Util.azar(-14, 14);
+      p.vx = Util.azar(-42, 42);
+      p.vy = Util.azar(-150, -55);
+      p.vida = Util.azar(0.5, 1.25);
+      p.maxVida = p.vida;
+      p.tam = Util.azar(5, 15);
       p.vivo = true;
     }
   };
@@ -75,6 +96,11 @@
         p.vy += 320 * dt;          // gravedad
       } else if (p.tipo === 'texto') {
         p.y -= 34 * dt;
+      } else if (p.tipo === 'fuego') {
+        p.x += p.vx * dt;
+        p.y += p.vy * dt;
+        p.vy -= 60 * dt;           // el calor tira hacia arriba
+        p.vx *= (1 - dt * 1.2);
       }
     }
   };

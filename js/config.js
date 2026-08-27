@@ -193,17 +193,30 @@
       ZOOM_CADA_MAX: 3.4,
       /* Cuantos impactos cuesta tumbarlo. La cara no se borra a pedazos: se
          va deteriorando, y al llegar a esta cuenta estalla. */
-      IMPACTOS_OBJETIVO: 15,
+      IMPACTOS_OBJETIVO: 34,
+      MAX_PROYECTILES: 6,       // cuantos disparos suyos caben a la vez
       PUNTOS: 750,
       /* Al caer revienta por partes: una tanda de estallidos encadenados
          mientras la pantalla tiembla. */
-      ESTALLIDOS: 9,
-      ESTALLIDO_CADA: 0.07,
-      INTERVALO_DISPARO_BASE: 1.25,
-      INTERVALO_DISPARO_MIN: 0.45,
-      /* En el orden que pidio Eduardo. */
+      ESTALLIDOS: 26,
+      ESTALLIDO_CADA: 0.055,
+      LLAMARADAS: 70,           // chorros de fuego de la muerte
+      /* Dispara en salvas: varios seguidos y luego descansa. */
+      SALVA_TIROS: 3,
+      SALVA_SEPARACION: 0.16,
+      INTERVALO_DISPARO_BASE: 0.95,
+      INTERVALO_DISPARO_MIN: 0.34,
+      /* Cada cuantos impactos suelta una frase, para que no sea un loro. */
+      VOZ_CADA: 9,
+      /* En el orden que pidio Eduardo. Cada uno puede traer sus propias voces
+         (de myinstants, igual que las del Tio Rene). Los que aun no tienen
+         sonidos propios se quedan sin voz: mejor callado que con la voz de
+         otro. */
       LISTA: [
-        { sprite: 'boss-1', nombre: 'PAPI MICKY' },
+        {
+          sprite: 'boss-1', nombre: 'PAPI MICKY',
+          voces: { aparece: 'mickyAparece', golpe: 'mickyGolpe', muere: 'mickyMuere' }
+        },
         { sprite: 'boss-2', nombre: 'JB THE VOICE' },
         { sprite: 'boss-3', nombre: 'PÁJARO VERDE' },
         { sprite: 'boss-4', nombre: 'WASON KING' },
@@ -305,6 +318,10 @@
         ambiente54: 'amb-54.mp3',
         /* Racha: tres frases que se turnan, asi cada una vuelve a salir
            mucho mas espaciada. */
+        /* Voces de los jefes. Papi Micky, de myinstants. */
+        mickyAparece: 'micky-aparece.mp3',
+        mickyGolpe: 'micky-golpe.mp3',
+        mickyMuere: 'micky-muere.mp3',
         racha1: 'racha-queri-too.mp3',     // "queri too"
         racha2: 'racha-tio-rene.mp3',
         racha3: 'racha-miau.mp3',          // el "nau" cortito
