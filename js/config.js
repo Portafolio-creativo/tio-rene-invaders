@@ -120,7 +120,7 @@
 
     NIVELES: {
       TOTAL: 5,                 // al superar este nivel: VICTORIA
-      ESPERA_ENTRE_NIVELES: 2.4 // segundos del cartel "NIVEL N"
+      ESPERA_ENTRE_NIVELES: 3.2 // segundos del cartel "NIVEL N"
     },
 
     AUDIO: {
@@ -150,7 +150,7 @@
         victoria: 'victoria-me-rio.mp3',   // "me rio toa la noche", entera
         ovniAparece: 'ovni-miau.mp3',      // el "miau" cuando cruza la nave
         nivel: 'level-start.mp3',
-        nivelCompleto: 'level-complete.mp3',
+        nivelCompleto: 'nivel-completo-me-rio.mp3',   // "me rio toa la noche"
         vidaExtra: 'extra-life.mp3',
         /* Al derribar la nave grande: la frase "te paso por" partida en dos,
            que se van alternando (primer ovni la primera mitad, segundo la
@@ -195,10 +195,7 @@
         ambiente34: 'amb-34.mp3',
         ambiente35: 'amb-35.mp3',
         /* Frases de RACHA: cada 5 naves derribadas. */
-        racha1: 'racha-queri-too.mp3',     // "queri too"
-        racha2: 'racha-me-rio.mp3',        // "me rio toa la noche"
-        racha3: 'tio-rene-racha-2.mp3',
-        racha4: 'tio-rene-racha-3.mp3'
+        racha1: 'racha-queri-too.mp3',     // "queri too", cada 8 bajas
         /* Sintetizados a proposito (muy repetitivos):
            disparo, marcha1..4, enemigoMuere, barrera, descenso, menu, ovni */
       },
@@ -221,12 +218,11 @@
       /* Frases de "se murio", una por cada vida perdida. */
       MUERTE_CLIPS: ['muerte1', 'muerte2', 'muerte3'],
 
-      /* Celebracion por racha de bajas. Las frases se van turnando: la 1a a
-         las 5 naves, la 2a a las 10, la 3a a las 15, y vuelta a empezar. */
+      /* Cada 8 naves derribadas suena "queri too". */
       RACHA: {
         ACTIVO: true,
-        CADA: 5,           // naves derribadas entre felicitacion y felicitacion
-        CLIPS: ['racha1', 'racha2', 'racha3', 'racha4']
+        CADA: 8,
+        CLIPS: ['racha1']
       }
     },
 

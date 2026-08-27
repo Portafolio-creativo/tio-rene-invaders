@@ -48,6 +48,7 @@
     this.rachasLogradas = 0;     // para ir turnando las frases
     this.ovnisDerribados = 0;    // para alternar las dos mitades de "te paso por"
     this.muertes = 0;            // para turnar las frases de "se murio"
+    this.veniaDeSuperarNivel = false;
     this.acumulado = 0;
     this.ultimoTiempo = 0;
     this.fps = 0;
@@ -185,7 +186,10 @@
       this.temporizador -= dt;
       this.efectos.actualizar(dt);
       if (this.temporizador <= 0) {
-        Audio.reproducir('nivel');
+        // Si venimos de superar una etapa, la frase de "me rio toa la noche"
+        // sigue sonando: no se le encima el aviso de nivel (comparten canal).
+        if (!this.veniaDeSuperarNivel) { Audio.reproducir('nivel'); }
+        this.veniaDeSuperarNivel = false;
         this.cambiarEstado(ESTADOS.JUGANDO);
       }
       return;
@@ -362,6 +366,7 @@
       return;
     }
     Audio.reproducir('nivelCompleto');
+    this.veniaDeSuperarNivel = true;
     this.niveles.avanzar();
     this.prepararNivel();
     this.temporizador = CONFIG.NIVELES.ESPERA_ENTRE_NIVELES;

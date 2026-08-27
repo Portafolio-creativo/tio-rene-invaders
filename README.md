@@ -274,12 +274,13 @@ El juego suena de dos maneras a la vez:
 | `game-over.mp3` | fin de la partida |
 | `victory.mp3` | victoria final |
 | `level-start.mp3` | empieza un nivel |
-| `level-complete.mp3` | nivel superado |
+| `nivel-completo-me-rio.mp3` | etapa superada ("me río toa la noche", entera) |
 | `extra-life.mp3` | vida extra (cada 5000 puntos) |
 | `ufo-hit-1.mp3` / `ufo-hit-2.mp3` | cae el Platillo Completo (dos mitades que se alternan) |
 | `muerte-1..3.mp3` | cada vez que pierde una vida (se turnan) |
 | `amb-01..35.mp3` | charla de fondo durante la partida |
-| `tio-rene-racha-1..3.mp3` | cada 5 naves derribadas |
+| `racha-queri-too.mp3` | cada 8 naves derribadas ("queri too") |
+| `ovni-miau.mp3` | aparece la nave grande (el "miau") |
 
 **Sintetizado** (Web Audio API, sin archivos): `disparo`, `marcha1..4`,
 `enemigoMuere`, `barrera`, `descenso`, `menu` y el zumbido del ovni.
@@ -289,10 +290,15 @@ Además, mientras juegas suenan solas **frases de fondo** cada 11–24 s
 reparten **barajadas**: no se repite ninguna hasta haber pasado por las 35, y
 nunca sale la misma dos veces seguidas.
 
-Cada **5 naves derribadas** suena una frase de celebración que se va turnando
-(`RACHA`), **cada vez que pierde una vida** una de "se murió" (`MUERTE_CLIPS`),
-y al derribar la nave grande, "te paso por" partida en dos mitades que se
-alternan.
+Además hay frases con papel fijo, para que no se pierdan entre las de fondo:
+
+- **"Queri too"** cada **8 naves derribadas** (`RACHA.CADA`).
+- **"Me río toa la noche"**, entera, **al superar cada etapa**. Mientras suena
+  no se lanza el aviso de nivel, que la cortaría (comparten canal de voz); por
+  eso el cartel "NIVEL N" dura 3,2 s.
+- **"Miau"** cuando aparece la nave grande.
+- Una de "se murió" **cada vez que pierde una vida** (`MUERTE_CLIPS`), y al
+  derribar la nave grande, "te paso por" en dos mitades que se alternan.
 
 Todo eso se apaga con `ACTIVO: false` en su bloque de `CONFIG.AUDIO`.
 
