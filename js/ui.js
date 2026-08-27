@@ -15,18 +15,21 @@
 
   function $(id) { return document.getElementById(id); }
 
+  /* Lo que tarda la cara en crecer. Pasado ese tiempo aparece el control
+     parpadeando: no antes, para que no compita con la entrada. */
+  var ESPERA_INVITACION = 900;
+
   function UI(acciones) {
     this.acciones = acciones;
     this.capas = {
       menu: $('capa-menu'),
-      entrada: $('capa-entrada'),
       pausa: $('capa-pausa'),
       gameOver: $('capa-game-over'),
       victoria: $('capa-victoria')
     };
     this.textoCarga = $('texto-carga');
-    this.botonJugar = $('btn-jugar');
-    this.recordMenu = $('record-menu');
+    this.invitacion = $('invitacion');
+    this.portadaLista = false;
     this.puntosFinal = $('puntos-final');
     this.recordFinal = $('record-final');
     this.mensajeFinal = $('mensaje-final');
@@ -40,7 +43,6 @@
   UI.prototype.conectar = function () {
     var self = this;
     var mapa = [
-      ['btn-jugar', 'jugar'],
       ['btn-reanudar', 'reanudar'],
       ['btn-menu-pausa', 'menu'],
       ['btn-reintentar', 'jugar'],
@@ -53,9 +55,7 @@
       if (!el) { return; }
       el.addEventListener('click', function () {
         Audio.desbloquear();
-        // En JUGAR no suena el "bip": lo que toca es la frase de bienvenida,
-        // y las dos comparten canal de voz.
-        if (par[1] !== 'jugar') { Audio.reproducir('menu'); }
+        Audio.reproducir('menu');
         self.acciones[par[1]]();
       });
     });
@@ -132,10 +132,10 @@
     this.botonSonido.classList.toggle('apagado', !activo);
   };
 
-  /* Mientras cargan los dibujos, el boton JUGAR esta apagado y debajo se ve
-     el avance. Como todo pesa poco, normalmente dura un pestaneo. */
+  /* Mientras cargan los dibujos se ve el avance y el primer gesto todavia
+     no arranca la partida. Como todo pesa poco, dura un pestaneo. */
   UI.prototype.progresoCarga = function (hechos, total) {
-    if (this.botonJugar) { this.botonJugar.disabled = true; }
+    this.portadaLista = false;
     if (this.textoCarga) {
       this.textoCarga.hidden = false;
       this.textoCarga.textContent = 'CARGANDO ' + hechos + ' / ' + total;
@@ -143,31 +143,32 @@
   };
 
   UI.prototype.listoParaJugar = function () {
-    if (this.botonJugar) { this.botonJugar.disabled = false; }
+    this.portadaLista = true;
     if (this.textoCarga) { this.textoCarga.hidden = true; }
   };
 
-  /* La cara crece desde el centro mientras suena la voz, y al terminar avisa
-     para que empiece la partida. La animacion se reinicia cada vez quitando y
-     volviendo a poner el elemento en pantalla. */
-  UI.prototype.mostrarEntrada = function (ms, alTerminar) {
-    var capa = this.capas.entrada;
-    if (!capa) { alTerminar(); return; }
-    this.ocultarTodo();
-    capa.classList.remove('saliendo');
-    capa.hidden = false;
-    var cara = capa.querySelector('#intro-cara');
+  /* True cuando el primer movimiento ya puede lanzar la partida. */
+  UI.prototype.puedeArrancar = function () {
+    return this.portadaLista;
+  };
+
+  /* Portada: la cara entra desde el centro y, al terminar, se enciende la
+     invitacion a mover. Se marca en el <body> para que el control de abajo
+     empiece a parpadear a la vez. */
+  UI.prototype.mostrarPortada = function () {
+    var cara = this.capas.menu ? this.capas.menu.querySelector('#intro-cara') : null;
+    document.body.classList.remove('portada-lista');
     if (cara) {                       // reinicia la animacion de entrada
       cara.style.animation = 'none';
       void cara.offsetWidth;
       cara.style.animation = '';
     }
-    global.setTimeout(function () { capa.classList.add('saliendo'); }, Math.max(0, ms - 300));
-    global.setTimeout(function () {
-      capa.hidden = true;
-      capa.classList.remove('saliendo');
-      alTerminar();
-    }, ms);
+    var self = this;
+    global.clearTimeout(this.temporizadorPortada);
+    this.temporizadorPortada = global.setTimeout(function () {
+      document.body.classList.add('portada-lista');
+      if (self.invitacion) { self.invitacion.hidden = false; }
+    }, ESPERA_INVITACION);
   };
 
   UI.prototype.ocultarTodo = function () {
@@ -188,8 +189,7 @@
     this.ocultarTodo();
     if (estado === ESTADOS.CARGANDO || estado === ESTADOS.MENU) {
       this.capas.menu.hidden = false;
-      if (this.recordMenu) { this.recordMenu.textContent = Util.formatearPuntos(datos.record); }
-      this.enfocar('btn-jugar');
+      this.mostrarPortada();
     } else if (estado === ESTADOS.PAUSA) {
       this.capas.pausa.hidden = false;
       this.enfocar('btn-reanudar');

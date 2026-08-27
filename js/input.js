@@ -37,8 +37,8 @@
       emitir('depurar');
       return;
     }
-    if (TECLAS_IZQ[c]) { estado.izquierda = true; ev.preventDefault(); }
-    else if (TECLAS_DER[c]) { estado.derecha = true; ev.preventDefault(); }
+    if (TECLAS_IZQ[c]) { estado.izquierda = true; ev.preventDefault(); emitir('mover'); }
+    else if (TECLAS_DER[c]) { estado.derecha = true; ev.preventDefault(); emitir('mover'); }
     else if (TECLAS_DISPARO[c]) { estado.disparo = true; ev.preventDefault(); }
     else if (c === 'KeyP' || c === 'Escape') { ev.preventDefault(); emitir('pausa'); }
     else if (c === 'Enter' || c === 'NumpadEnter') { ev.preventDefault(); emitir('aceptar'); }
@@ -61,8 +61,8 @@
     function activar(ev) {
       ev.preventDefault();
       tactil = true;
-      if (accion === 'izquierda') { estado.izquierda = true; }
-      else if (accion === 'derecha') { estado.derecha = true; }
+      if (accion === 'izquierda') { estado.izquierda = true; emitir('mover'); }
+      else if (accion === 'derecha') { estado.derecha = true; emitir('mover'); }
       else if (accion === 'disparo') { estado.disparo = true; }
       else if (accion === 'pausa') { emitir('pausa'); }
       el.classList.add('pulsado');
@@ -127,6 +127,10 @@
         try { el.setPointerCapture(ev.pointerId); } catch (e) { /* ignorado */ }
       }
       mover(ev.clientX);
+      // El primer contacto con la palanca es lo que lanza la partida desde la
+      // portada: se avisa ANTES de 'cualquiera' para que la posicion del dedo
+      // ya este puesta cuando el jugador aparezca.
+      emitir('mover');
       emitir('cualquiera');
     });
     el.addEventListener('pointermove', function (ev) {
@@ -192,10 +196,31 @@
       return !!activa;
     },
 
-    /* callback(accion) con: pausa | aceptar | silencio | depurar | cualquiera |
-       foco-perdido */
+    /* callback(accion) con: pausa | aceptar | silencio | depurar | mover |
+       cualquiera | foco-perdido */
     alAccion: function (cb) {
       if (typeof cb === 'function') { suscriptores.push(cb); }
+    },
+
+    /* El arranque del juego limpia la entrada (para no arrastrar teclas de un
+       nivel al siguiente), pero el dedo o la tecla que ACABA de lanzar la
+       partida siguen puestos. Con estas dos se guarda ese gesto y se vuelve a
+       poner, para que el jugador no tenga que soltar y repetir. */
+    instantanea: function () {
+      return {
+        izquierda: estado.izquierda,
+        derecha: estado.derecha,
+        disparo: estado.disparo,
+        absoluto: estado.absoluto
+      };
+    },
+
+    restaurar: function (s) {
+      if (!s) { return; }
+      estado.izquierda = !!s.izquierda;
+      estado.derecha = !!s.derecha;
+      estado.disparo = !!s.disparo;
+      estado.absoluto = typeof s.absoluto === 'number' ? s.absoluto : null;
     },
 
     limpiar: function () {

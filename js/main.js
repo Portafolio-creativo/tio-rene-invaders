@@ -18,22 +18,37 @@
   var renderer = new TRI.Renderer(canvas);
   var juego = new TRI.Juego(renderer);
 
+  /* Empieza una partida conservando el gesto en curso: nuevaPartida limpia la
+     entrada (para no arrastrar teclas de un nivel a otro), pero el dedo o la
+     tecla que acaban de lanzarla siguen puestos, asi que se reponen. De ese
+     modo el Tio Rene sale ya moviendose hacia donde apunta el dedo. */
+  function empezarPartida() {
+    Audio.desbloquear();
+    Audio.reproducir('intro');
+    var gesto = Input.instantanea();
+    juego.nuevaPartida(false, true);
+    Input.restaurar(gesto);
+  }
+
+  /* Arranque de un solo gesto desde la portada: el primer movimiento del
+     jugador lanza la voz y mete de lleno en la partida. Ese gesto es ademas lo
+     que autoriza el audio en el navegador, asi que la frase de bienvenida sale
+     sin pelear con la politica de reproduccion. */
+  function arrancarDesdePortada() {
+    if (juego.estado !== ESTADOS.MENU || !ui.puedeArrancar()) { return; }
+    empezarPartida();
+  }
+
   var ui = new TRI.UI({
-    /* JUGAR: la voz arranca EN EL MISMO INSTANTE que la cara empieza a crecer
-       (el clic es lo que habilita el audio), y cuando termina la entrada
-       empieza la partida. */
-    jugar: function () {
-      Audio.desbloquear();
-      Audio.reproducir('intro');
-      ui.mostrarEntrada(2400, function () { juego.nuevaPartida(false, true); });
-    },
+    // "OTRA VEZ" tras perder: empieza sin exigir estar en la portada.
+    jugar: empezarPartida,
     menu: function () { juego.irAlMenu(); },
     reanudar: function () { juego.alternarPausa(); },
     seguir: function () { juego.continuarTrasVictoria(); }
   });
 
-  // ENTER en el menu hace lo mismo que pulsar JUGAR.
-  juego.alPulsarJugar = function () { ui.acciones.jugar(); };
+  // ENTER en la portada tambien arranca, para quien juegue con teclado.
+  juego.alPulsarJugar = arrancarDesdePortada;
 
   juego.alCambiarEstado = function (estado, datos) {
     ui.mostrar(estado, datos);
@@ -81,6 +96,7 @@
   if (conTacto) { document.body.classList.add('tactil'); }
 
   Input.alAccion(function (accion) {
+    if (accion === 'mover') { arrancarDesdePortada(); return; }
     if (accion === 'cualquiera') { Audio.desbloquear(); return; }
     if (accion === 'pausa') {
       if (juego.estado === ESTADOS.JUGANDO || juego.estado === ESTADOS.PAUSA) { juego.alternarPausa(); }

@@ -483,6 +483,30 @@ body.control-palanca [data-accion="derecha"] { display: none; }
 
 #palanca.pulsado { cursor: grabbing; border-color: #7cf29a; }
 
+/* ---------- La palanca como lanzadera ----------
+   Mientras se ve la portada, el control late y su mando va y viene de lado a
+   lado: es la unica pista de que hay que deslizar para empezar. Se apaga en
+   cuanto arranca la partida (.en-partida) para no distraer jugando. */
+body.portada-lista:not(.en-partida) #palanca {
+  animation: latir-palanca 1.9s ease-in-out infinite;
+}
+
+body.portada-lista:not(.en-partida) #palanca-mando {
+  animation: vaiven-mando 1.9s ease-in-out infinite;
+}
+
+@keyframes latir-palanca {
+  0%, 100% { border-color: var(--borde); box-shadow: none; }
+  50% { border-color: #7cf29a; box-shadow: 0 0 16px rgba(70, 209, 106, 0.55); }
+}
+
+/* Recorre el ancho real de la palanca, no una distancia fija, para que la
+   pista coincida con el recorrido que de verdad tiene el dedo. */
+@keyframes vaiven-mando {
+  0%, 100% { left: 16%; opacity: 0.55; }
+  50% { left: 84%; opacity: 1; }
+}
+
 .palanca-flecha {
   position: absolute;
   top: 50%;
@@ -579,31 +603,13 @@ body.tactil .controles { display: none; }
     radial-gradient(circle at 50% 42%, #0f7f3f 0%, #0b6b36 55%, #084d27 100%);
 }
 
-/* Sobre el verde, el boton verde de siempre desapareceria: aqui se invierte
-   a crema sobre verde oscuro, que es el par de mayor contraste disponible. */
-#capa-menu .boton.principal {
-  color: #06210f;
-  background: #fff4d6;
-  border-color: #fffdf5;
-  font-size: clamp(20px, 6.5vw, 34px);
-  letter-spacing: 4px;
-  padding: 16px 54px;
-  box-shadow: 0 6px 0 #0b5c2f, 0 10px 22px rgba(0, 0, 0, 0.35);
-}
-
-#capa-menu .boton.principal:hover { background: #fff; }
-
 /* El resto de la portada. Blanco con una sombra suave: sobre el verde claro
    del centro un tono verdoso no llegaba al contraste minimo legible. */
-#capa-menu .marcador-menu,
-#capa-menu .controles,
 #capa-menu .tenue {
   color: #fff;
   text-shadow: 0 1px 2px rgba(0, 40, 16, 0.65);
 }
 
-#capa-menu .marcador-menu strong { color: #fff4d6; }
-#capa-menu .controles b { color: #fff4d6; }
 
 #capa-menu .boton.secundario {
   color: #fff4d6;
@@ -612,16 +618,30 @@ body.tactil .controles { display: none; }
 
 #capa-menu .boton.secundario:hover { background: rgba(255, 244, 214, 0.16); }
 
-/* ---------- Entrada: la cara crece desde el centro ----------
-   Aparece al pulsar JUGAR, a la vez que arranca la voz. */
-#capa-entrada {
-  justify-content: center;
-  background: var(--fondo);
+/* Todo lo que no es la cara entra despues, desvanecido, para no competir con
+   la entrada. El <body> recibe .portada-lista cuando termina la animacion. */
+#invitacion,
+#capa-menu #fila-opciones {
+  opacity: 0;
+  transition: opacity 0.45s ease;
 }
 
-#capa-entrada[hidden] { display: none; }
+body.portada-lista #invitacion,
+body.portada-lista #capa-menu #fila-opciones { opacity: 1; }
 
-#capa-entrada.saliendo { opacity: 0; transition: opacity 0.3s ease; }
+#invitacion {
+  margin: 0;
+  font-size: clamp(13px, 3.6vw, 16px);
+  letter-spacing: 1px;
+}
+
+/* El mensaje se adapta a como se juega: con el dedo o con el teclado. */
+.solo-tacto, .solo-teclado { display: none; }
+body.tactil .solo-tacto { display: inline; }
+body:not(.tactil) .solo-teclado { display: inline; }
+
+/* ---------- La cara crece desde el centro ----------
+   Es lo primero que se ve al abrir; ya no hay boton de por medio. */
 
 #intro-cara {
   /* Medida por ALTURA del panel, no por ancho: asi se encoge sola cuando la
@@ -671,26 +691,11 @@ body.tactil .controles { display: none; }
   62%, 80% { padding-top: 13%; }
 }
 
-/* El boton tambien late, para que la vista vaya de la cara al boton. */
-.boton.palpita {
-  animation: latir-boton 1.5s ease-in-out infinite;
-}
-
-@keyframes latir-boton {
-  0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(124, 242, 154, 0.55); }
-  50% { transform: scale(1.06); box-shadow: 0 0 0 12px rgba(124, 242, 154, 0); }
-}
-
-.boton.palpita:disabled {
-  animation: none;
-  opacity: 0.45;
-  cursor: default;
-}
-
 #texto-carga[hidden] { display: none; }
 
 @media (prefers-reduced-motion: reduce) {
-  #intro-boca, .boton.palpita { animation: none; }
+  #intro-boca { animation: none; }
+  #palanca, #palanca-mando { animation: none !important; }
   #intro-cara { animation: entrar-cara 0.01s both; }
 }
 

@@ -64,40 +64,30 @@
     <div id="marco">
       <canvas id="lienzo" width="600" height="800" aria-label="Zona de juego de Tío René Invaders" role="img"></canvas>
 
-      <!-- MENÚ: es lo PRIMERO y lo UNICO que se ve antes de jugar. Una
-           pantalla verde con un solo boton; al pulsarlo arranca la voz junto
-           con la cara creciendo, y de ahi entra directo a la partida: no hay
-           ningun segundo boton de por medio. Va sin "hidden" a proposito,
-           para que el marco nunca aparezca vacio mientras arranca el
-           JavaScript. El titulo no se repite aqui porque ya esta en la barra
-           de arriba, ni el credito porque ya esta en el pie. -->
+      <!-- PORTADA: no hay boton de JUGAR. Al abrir, la cara entra desde el
+           centro; en cuanto termina esa animacion aparece, desvanecido, el
+           control de movimiento parpadeando para invitar a deslizar. El
+           PRIMER movimiento del jugador es el que lanza la voz y arranca la
+           partida: un solo gesto, sin pasos intermedios.
+           Va sin "hidden" a proposito, para que el marco nunca se vea vacio
+           mientras arranca el JavaScript. -->
       <section class="capa" id="capa-menu">
-        <button type="button" id="btn-jugar" class="boton principal palpita">JUGAR</button>
-        <p class="marcador-menu">RÉCORD <strong id="record-menu">00000</strong></p>
+        <div id="intro-cara">
+          <img id="intro-cabeza" src="assets/sprites/player-head.png" alt="" width="360" height="249">
+          <div id="intro-boca"></div>
+          <img id="intro-mandibula" src="assets/sprites/player-jaw.png" alt="" width="360" height="147">
+        </div>
+        <p id="invitacion" class="tenue">
+          <span class="solo-tacto">Desliza el control para empezar</span>
+          <span class="solo-teclado">Pulsa ← o → para empezar</span>
+        </p>
         <div id="fila-opciones">
           <button type="button" id="btn-instalar" class="boton secundario" hidden>
             📲 INSTALAR
           </button>
         </div>
         <p id="ayuda-instalar" class="tenue" hidden></p>
-        <ul class="controles">
-          <li><b>← →</b> mover</li>
-          <li><b>ESPACIO</b> disparar</li>
-          <li><b>P</b> pausa</li>
-          <li><b>M</b> silenciar</li>
-        </ul>
         <p id="texto-carga" class="tenue">CARGANDO…</p>
-      </section>
-
-      <!-- ENTRADA: al pulsar JUGAR, la cara crece desde el centro AL MISMO
-           tiempo que arranca la voz. El clic es lo que habilita el audio, asi
-           que imagen y sonido entran juntos. -->
-      <section class="capa" id="capa-entrada" hidden>
-        <div id="intro-cara">
-          <img id="intro-cabeza" src="assets/sprites/player-head.png" alt="" width="360" height="249">
-          <div id="intro-boca"></div>
-          <img id="intro-mandibula" src="assets/sprites/player-jaw.png" alt="" width="360" height="147">
-        </div>
       </section>
 
       <!-- PAUSA -->
