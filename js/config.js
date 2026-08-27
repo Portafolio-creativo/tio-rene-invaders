@@ -11,7 +11,9 @@
        suenan en el juego), no estan inventadas. Se dejan fuera a proposito las
        mas subidas de tono y los insultos: el mensaje se manda a terceros que no
        eligieron recibirlo. Los audios crudos siguen sonando dentro del juego,
-       que es donde el jugador si eligio estar. */
+       que es donde el jugador si eligio estar.
+       'Zapa Mariteh' y 'Señor doh mio' las aporto el propio Eduardo, que
+       conoce al personaje; van escritas como el las escribio. */
     FRASES_COMPARTIR: [
       'Ya llegamos ya',
       'Me río toa la noche',
@@ -27,7 +29,9 @@
       'Se hace el interesante',
       'Te estay picando a vío',
       'Me disculpai, amorcito',
-      'Miau'
+      'Miau',
+      'Zapa Mariteh',
+      'Señor doh mío'
     ],
 
     /* Donde vive el juego. Se usa al compartir el resultado; si algun dia
