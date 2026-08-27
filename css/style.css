@@ -142,12 +142,12 @@ body {
 #btn-pausa-barra { display: none; }
 body.tactil #btn-pausa-barra { display: inline-block; }
 
-/* Instalar late una vez al aparecer, para que se note sin dar la lata. */
-#btn-instalar { animation: asomar-instalar 0.5s ease-out both; }
+/* Instalar asoma con un pequeno gesto, para que se note sin dar la lata. */
+#btn-instalar { animation: asomar-instalar 0.45s ease-out both; }
 
 @keyframes asomar-instalar {
-  from { opacity: 0; transform: scale(0.7); }
-  to { opacity: 1; transform: scale(1); }
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: none; }
 }
 
 /* ---------- Zona de juego ---------- */
@@ -627,6 +627,60 @@ body.tactil .controles { display: none; }
 }
 
 body.portada-lista #invitacion { opacity: 1; }
+
+/* Las dos maneras de jugar, en la portada. Aparecen con la invitacion. */
+#opciones-inicio {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  opacity: 0;
+  transition: opacity 0.45s ease;
+}
+
+body.portada-lista #opciones-inicio { opacity: 1; }
+
+/* Pastillas con icono + dos lineas, al estilo de las insignias de tienda:
+   se leen de un vistazo y dejan claro que son dos caminos distintos. */
+.opcion {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 52px;
+  padding: 8px 16px;
+  font-family: var(--fuente);
+  text-align: left;
+  color: #06210f;
+  background: #fff4d6;
+  border: 2px solid #fffdf5;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.opcion:hover { background: #fff; }
+.opcion[hidden] { display: none; }
+.opcion:focus-visible { outline: 3px solid var(--acento); outline-offset: 2px; }
+
+.opcion-icono { display: flex; font-size: 20px; line-height: 1; }
+
+.opcion-texto { display: flex; flex-direction: column; line-height: 1.15; }
+.opcion-texto b { font-size: 14px; letter-spacing: 1px; }
+.opcion-texto small { font-size: 10px; letter-spacing: 1px; opacity: 0.75; }
+
+/* La de instalar va oscura, para que se distinga de la de jugar y no parezca
+   el mismo boton dos veces. */
+.opcion.insignia {
+  color: #eafff1;
+  background: #0a2a16;
+  border-color: #46d16a;
+}
+
+.opcion.insignia:hover { background: #0e3a1f; }
+
+@media (max-width: 430px) {
+  .opcion { padding: 7px 12px; min-height: 48px; }
+  .opcion-texto b { font-size: 13px; }
+}
 
 #invitacion {
   margin: 0;

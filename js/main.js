@@ -50,6 +50,13 @@
   // ENTER en la portada tambien arranca, para quien juegue con teclado.
   juego.alPulsarJugar = arrancarDesdePortada;
 
+  // "JUGAR ONLINE": el mismo arranque que deslizar el control, para quien
+  // prefiera pulsar antes que descubrir el gesto.
+  var botonOnline = document.getElementById('btn-jugar-online');
+  if (botonOnline) {
+    botonOnline.addEventListener('click', arrancarDesdePortada);
+  }
+
   juego.alCambiarEstado = function (estado, datos) {
     ui.mostrar(estado, datos);
     document.body.classList.toggle('en-partida', estado === ESTADOS.JUGANDO);
