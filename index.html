@@ -76,21 +76,10 @@
         <p class="marcador-menu">RÉCORD <strong id="record-menu">00000</strong></p>
         <button type="button" id="btn-jugar" class="boton principal palpita">JUGAR</button>
 
-        <!-- Una sola fila para no comerse alto: instalar a la izquierda (solo
-             si el navegador lo ofrece y no está ya instalada) y el interruptor
-             de disparo pegado a la derecha. -->
         <div id="fila-opciones">
           <button type="button" id="btn-instalar" class="boton secundario" hidden>
             📲 INSTALAR
           </button>
-          <label id="opcion-palanca" for="chk-palanca" hidden>
-            <input type="checkbox" id="chk-palanca" checked>
-            <span>PALANCA</span>
-          </label>
-          <label id="opcion-auto" for="chk-auto">
-            <input type="checkbox" id="chk-auto">
-            <span>TIRO AUTO</span>
-          </label>
         </div>
         <p id="ayuda-instalar" class="tenue" hidden></p>
 
@@ -135,19 +124,36 @@
   <!-- Controles tactiles. En vertical: fila 1 = izquierda + derecha (pegados,
        mitad y mitad); fila 2 = disparo a todo el ancho. La pausa vive en la
        barra de arriba. En horizontal se reacomodan a los lados (ver CSS). -->
+  <!-- Controles tactiles. Cada zona lleva DENTRO su interruptor de modo, para
+       poder cambiarlo en plena partida sin ir al menu:
+         fila 1: palanca (o las dos flechas) + boton para alternar entre ambas
+         fila 2: DISPARO + boton AUTO para fijar el disparo -->
   <div id="botonera" aria-label="Controles táctiles">
-    <!-- Palanca: se arrastra el dedo sin levantarlo. Lleva las flechas
-         dibujadas para que se entienda que mueve a los lados. Es la opción
-         por defecto en el teléfono; se puede cambiar por las dos flechas
-         sueltas desde el menú. -->
-    <div id="palanca" role="group" aria-label="Palanca de movimiento">
-      <span class="palanca-flecha izq" aria-hidden="true">◀</span>
-      <span class="palanca-flecha der" aria-hidden="true">▶</span>
-      <span id="palanca-mando" aria-hidden="true"></span>
+
+    <div id="zona-mover">
+      <div id="control-mover">
+        <!-- Palanca posicional: el recorrido del dedo se corresponde con el
+             recorrido de la cabeza, asi el movimiento se siente directo. -->
+        <div id="palanca" role="group" aria-label="Palanca de movimiento">
+          <span class="palanca-flecha izq" aria-hidden="true">◀</span>
+          <span class="palanca-flecha der" aria-hidden="true">▶</span>
+          <span id="palanca-mando" aria-hidden="true"></span>
+        </div>
+        <button type="button" class="tacto" data-accion="izquierda" aria-label="Mover a la izquierda">◀</button>
+        <button type="button" class="tacto" data-accion="derecha" aria-label="Mover a la derecha">▶</button>
+      </div>
+      <button type="button" id="btn-modo-control" class="tacto-mini"
+              aria-pressed="true" aria-label="Cambiar entre palanca y flechas">
+        <span id="icono-modo">⇹</span>
+      </button>
     </div>
-    <button type="button" class="tacto" data-accion="izquierda" aria-label="Mover a la izquierda">◀</button>
-    <button type="button" class="tacto" data-accion="derecha" aria-label="Mover a la derecha">▶</button>
-    <button type="button" class="tacto disparo" data-accion="disparo" aria-label="Disparar">DISPARO</button>
+
+    <div id="zona-disparo">
+      <button type="button" class="tacto disparo" data-accion="disparo" aria-label="Disparar">DISPARO</button>
+      <button type="button" id="btn-modo-auto" class="tacto-mini"
+              aria-pressed="false" aria-label="Disparo automático">AUTO</button>
+    </div>
+
   </div>
 
   <p id="aviso-almacenamiento" class="aviso" hidden></p>

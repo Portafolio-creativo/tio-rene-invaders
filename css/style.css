@@ -354,86 +354,35 @@ body.auto-disparo .tacto.disparo {
 
 /* ---------- Botonera tactil ---------- */
 
-/* Distribucion en DOS filas (celular vertical):
-     fila 1  [ izquierda | derecha ]   pegados, mitad y mitad
-     fila 2  [      disparo       ]     todo el ancho
-   El disparo mide exactamente lo que suman los dos de arriba porque las
-   columnas no llevan separacion horizontal. */
+/* ---------- Controles tactiles ----------
+   Dos filas, y cada una lleva DENTRO su interruptor de modo:
+     fila 1  [ palanca  o  ◀ | ▶ ]  [⇹]
+     fila 2  [       DISPARO      ]  [AUTO]
+   Asi se cambia de modalidad en plena partida, sin ir al menu. */
+
 #botonera {
   display: none;
   flex: 0 0 auto;
-  grid-template-columns: 1fr 1fr;
-  grid-template-areas:
-    "izquierda derecha"
-    "disparo   disparo";
-  column-gap: 0;
-  row-gap: 7px;
+  flex-direction: column;
+  gap: 7px;
   padding: 8px calc(10px + env(safe-area-inset-right)) 10px calc(10px + env(safe-area-inset-left));
 }
 
-body.tactil #botonera { display: grid; }
+body.tactil #botonera { display: flex; }
 
-/* ---------- Palanca de movimiento ----------
-   Redonda, se arrastra el dedo sin levantarlo. Lleva las flechas dibujadas
-   para que se lea de un vistazo que mueve a los lados. Ocupa la fila de
-   arriba entera, en el lugar de las dos flechas sueltas. */
-#palanca {
-  display: none;
-  grid-column: 1 / -1;
-  position: relative;
-  justify-self: center;
-  width: 132px;
-  height: 78px;
-  border-radius: 999px;
-  background: #16203a;
-  border: 2px solid var(--borde);
-  touch-action: none;
-  user-select: none;
-  cursor: grab;
+#zona-mover,
+#zona-disparo {
+  display: flex;
+  align-items: stretch;
+  gap: 6px;
 }
 
-body.control-palanca #palanca { display: block; }
-/* Con palanca, las flechas sueltas desaparecen (y al reves). */
-body.control-palanca [data-accion="izquierda"],
-body.control-palanca [data-accion="derecha"] { display: none; }
-
-#palanca.pulsado { cursor: grabbing; border-color: #7cf29a; }
-
-.palanca-flecha {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 19px;
-  font-weight: bold;
-  color: var(--tinta-tenue);
-  pointer-events: none;
+#control-mover {
+  flex: 1 1 auto;
+  display: flex;
+  gap: 0;
+  min-width: 0;
 }
-
-.palanca-flecha.izq { left: 13px; }
-.palanca-flecha.der { right: 13px; }
-
-/* El mando que sigue al dedo */
-#palanca-mando {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 54px;
-  height: 54px;
-  margin: 0;
-  transform: translate(-50%, -50%);
-  border-radius: 50%;
-  background: var(--verde);
-  border: 2px solid #7cf29a;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.45);
-  pointer-events: none;
-  transition: transform 0.08s ease-out;
-}
-
-#palanca.pulsado #palanca-mando { transition: none; }
-
-/* En el telefono, la lista de teclas no sirve de nada y ocupa alto. */
-body.tactil .controles { display: none; }
-body.tactil #opcion-palanca[hidden] { display: flex; }
 
 .tacto {
   min-height: 66px;
@@ -449,13 +398,15 @@ body.tactil #opcion-palanca[hidden] { display: flex; }
   cursor: pointer;
 }
 
-/* Esquinas: la fila de arriba forma una pildora partida al medio; el disparo,
-   otra pildora completa debajo. */
-[data-accion="izquierda"] { grid-area: izquierda; border-radius: 12px 0 0 12px; }
-[data-accion="derecha"] { grid-area: derecha; border-radius: 0 12px 12px 0; border-left-width: 1px; }
+/* Flechas sueltas: media y media, pegadas. */
+[data-accion="izquierda"],
+[data-accion="derecha"] { flex: 1 1 0; min-width: 0; }
+[data-accion="izquierda"] { border-radius: 12px 0 0 12px; }
+[data-accion="derecha"] { border-radius: 0 12px 12px 0; border-left-width: 1px; }
 
 .tacto.disparo {
-  grid-area: disparo;
+  flex: 1 1 auto;
+  min-width: 0;
   min-height: 74px;
   font-size: 18px;
   border-radius: 12px;
@@ -465,6 +416,87 @@ body.tactil #opcion-palanca[hidden] { display: flex; }
 }
 
 .tacto.pulsado { filter: brightness(1.4); }
+
+/* Interruptores incrustados: estrechos, al borde de cada zona. */
+.tacto-mini {
+  flex: 0 0 auto;
+  width: 58px;
+  font-family: var(--fuente);
+  font-size: 12px;
+  font-weight: bold;
+  letter-spacing: 1px;
+  color: var(--tinta-tenue);
+  background: #131c33;
+  border: 2px solid var(--borde);
+  border-radius: 12px;
+  touch-action: manipulation;
+  user-select: none;
+  cursor: pointer;
+}
+
+#icono-modo { font-size: 20px; line-height: 1; }
+
+/* Encendido = verde, para que se vea de un vistazo que esta activo. */
+.tacto-mini[aria-pressed="true"] {
+  color: #06210f;
+  background: var(--verde);
+  border-color: #7cf29a;
+}
+
+/* ---------- Palanca posicional ----------
+   Ocupa todo el ancho de la fila: el recorrido del dedo se corresponde con el
+   recorrido de la cabeza en el tablero, asi el movimiento se siente directo. */
+#palanca {
+  display: none;
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 66px;
+  border-radius: 999px;
+  background: #16203a;
+  border: 2px solid var(--borde);
+  touch-action: none;
+  user-select: none;
+  cursor: grab;
+}
+
+body.control-palanca #palanca { display: block; }
+body.control-palanca [data-accion="izquierda"],
+body.control-palanca [data-accion="derecha"] { display: none; }
+
+#palanca.pulsado { cursor: grabbing; border-color: #7cf29a; }
+
+.palanca-flecha {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 18px;
+  font-weight: bold;
+  color: var(--tinta-tenue);
+  pointer-events: none;
+}
+
+.palanca-flecha.izq { left: 14px; }
+.palanca-flecha.der { right: 14px; }
+
+/* El mando sigue al dedo. Su posicion la fija el JavaScript en px. */
+#palanca-mando {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 52px;
+  height: 52px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: var(--verde);
+  border: 2px solid #7cf29a;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.45);
+  pointer-events: none;
+}
+
+/* En el telefono, la lista de teclas no sirve y ocupa alto. */
+body.tactil .controles { display: none; }
+body.tactil #intro-credito { display: none; }
 
 /* ---------- Pie y avisos ---------- */
 
@@ -659,49 +691,64 @@ body.tactil #opcion-palanca[hidden] { display: flex; }
   .controles { font-size: 10px; gap: 2px 8px; }
   .boton { min-height: 42px; padding: 8px 20px; }
 
-  /* Las dos filas de vertical no sirven en apaisado: los botones vuelven a
-     flotar a los lados (redondos) sobre el margen que sobra junto al tablero.
-     La pausa sigue en la barra de arriba. */
+  /* En apaisado las dos filas no caben: cada zona flota a un lado, sobre el
+     margen que sobra junto al tablero. Los interruptores de modo viajan con
+     su zona, asi siguen a mano. */
   body.tactil #botonera {
     position: fixed;
     inset: 0;
     display: block;
-    grid-template-columns: none;
-    grid-template-areas: none;
     padding: 0;
-    pointer-events: none;   /* solo los botones responden al tacto */
+    pointer-events: none;   /* solo los controles responden al tacto */
     z-index: 2;
   }
 
+  body.tactil #zona-mover,
+  body.tactil #zona-disparo {
+    position: absolute;
+    bottom: 12px;
+    align-items: center;
+    gap: 6px;
+    pointer-events: auto;
+  }
+
+  body.tactil #zona-mover { left: calc(10px + env(safe-area-inset-left)); }
+  body.tactil #zona-disparo { right: calc(10px + env(safe-area-inset-right)); }
+
   body.tactil #botonera .tacto {
-    position: absolute;
-    bottom: 14px;
-    width: 82px;
-    height: 82px;
     min-height: 0;
+    height: 76px;
+    font-size: 20px;
+  }
+
+  body.tactil #botonera [data-accion="izquierda"],
+  body.tactil #botonera [data-accion="derecha"] {
+    width: 76px;
+    flex: 0 0 auto;
     border-radius: 50%;
-    font-size: 22px;
-    pointer-events: auto;
   }
 
-  /* En apaisado la palanca tambien flota abajo a la izquierda. */
+  body.tactil #botonera [data-accion="derecha"] { border-left-width: 2px; }
+
   body.tactil.control-palanca #palanca {
-    position: absolute;
-    left: calc(12px + env(safe-area-inset-left));
-    bottom: 14px;
-    width: 150px;
-    height: 82px;
-    pointer-events: auto;
+    flex: 0 0 auto;
+    width: 168px;
+    min-height: 0;
+    height: 76px;
   }
 
-  body.tactil #botonera [data-accion="izquierda"] { left: calc(12px + env(safe-area-inset-left)); border-radius: 50%; }
-  body.tactil #botonera [data-accion="derecha"] { left: calc(102px + env(safe-area-inset-left)); border-radius: 50%; border-left-width: 2px; }
-
-  body.tactil #botonera [data-accion="disparo"] {
-    right: calc(12px + env(safe-area-inset-right));
-    width: 100px;
-    height: 100px;
+  body.tactil #botonera .tacto.disparo {
+    flex: 0 0 auto;
+    width: 96px;
+    height: 96px;
+    border-radius: 50%;
     font-size: 13px;
+  }
+
+  body.tactil #botonera .tacto-mini {
+    width: 46px;
+    height: 62px;
+    font-size: 11px;
   }
 }
 

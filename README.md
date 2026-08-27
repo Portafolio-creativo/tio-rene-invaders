@@ -58,30 +58,28 @@ sirviendo el juego desde `/proyectos/tio-rene-invaders/`.
 | Silenciar | `M` | botón SONIDO |
 | Modo depuración | `Ctrl` + `Shift` + `D` | — |
 
-**Palanca (por defecto en el teléfono):** en vez de dos flechas sueltas, un
-mando redondo con las flechas dibujadas que se maneja **arrastrando el dedo sin
-levantarlo**. Tiene zona muerta al centro para que el personaje no tiemble, y
-usa captura del puntero: aunque el dedo se salga del círculo, sigue mandando.
-Desde el menú (interruptor **PALANCA**) se puede volver a las dos flechas. La
-elección se recuerda y solo se ofrece si hay pantalla táctil.
+### Controles táctiles
 
-**Disparo automático:** en el menú, a la derecha, hay un interruptor
-**DISPARO AUTO**. Encendido, el Tío René dispara solo y el jugador únicamente
-se preocupa de moverse. La preferencia se recuerda entre partidas, y el botón
-táctil de disparo pasa a decir AUTO y se atenúa.
+Cada zona lleva **dentro su propio interruptor**, para cambiar de modalidad en
+plena partida sin volver al menú:
 
-En el teléfono los botones aparecen solos:
+```
+ [   palanca  ◀ ●———— ▶   ] [⇹]     ⇹ alterna palanca / flechas
+ [        DISPARO         ] [AUTO]  AUTO fija el disparo
+```
 
-- **En vertical**, en dos filas bajo el tablero: arriba **izquierda y derecha**
-  pegados (mitad y mitad), y abajo **DISPARO** a todo el ancho. La **pausa** va
-  en la barra de arriba (el botón ❚❚).
-- **En horizontal**, flotan a los lados sobre el margen que sobra junto al
-  tablero (izquierda/derecha abajo a la izquierda, disparo abajo a la derecha),
-  para no comerle altura al juego.
+- **Palanca (por defecto).** Es **posicional**: el ancho útil de la palanca se
+  reparte sobre todo el recorrido de la cabeza, así que **el dedo y el personaje
+  avanzan la misma fracción**. Se arrastra sin levantar el dedo y al soltar la
+  cabeza se queda donde está. Verificado: dedo al 0 / 25 / 50 / 75 / 100 % →
+  cabeza al 0 / 25 / 50 / 75 / 100 %.
+- **Flechas.** El modo clásico, media pantalla cada una. Se mueve mientras se
+  mantiene pulsado.
+- **AUTO.** Dispara solo; el jugador solo se preocupa de moverse. El botón de
+  disparo pasa a decir DISPARANDO.
 
-En ninguna orientación un botón tapa la zona de juego. El reparto de los botones
-está en `css/style.css`: la rejilla de dos filas en `#botonera` (vertical) y el
-bloque `@media (orientation: landscape)` (horizontal).
+Las dos preferencias se recuerdan entre partidas. En horizontal, cada zona
+flota a un lado del tablero con su interruptor al lado.
 
 ## 4. Estructura
 

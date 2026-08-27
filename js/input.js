@@ -6,7 +6,10 @@
 (function (global) {
   'use strict';
 
-  var estado = { izquierda: false, derecha: false, disparo: false };
+  /* 'absoluto' es la posicion pedida por la palanca, de 0 (izquierda del todo)
+     a 1 (derecha del todo), o null si no se esta arrastrando. Con eso el
+     recorrido del dedo se corresponde con el de la cabeza. */
+  var estado = { izquierda: false, derecha: false, disparo: false, absoluto: null };
   var suscriptores = [];
   var tactil = false;
   var autoDisparo = false;   // dispara solo; el jugador solo se mueve
@@ -90,23 +93,29 @@
     var mando = el.querySelector('#palanca-mando');
     var arrastrando = false;
 
+    /* Reparte el recorrido: el ancho util de la palanca (descontando el mando,
+       que no puede salirse) se corresponde con TODO el recorrido de la cabeza.
+       Asi el dedo y el personaje avanzan lo mismo. */
     function mover(clienteX) {
       var caja = el.getBoundingClientRect();
-      var radio = caja.width / 2;
-      if (radio <= 0) { return; }
-      var dx = (clienteX - (caja.left + radio)) / radio;
-      dx = Math.max(-1, Math.min(1, dx));
-      estado.izquierda = dx < -ZONA_MUERTA;
-      estado.derecha = dx > ZONA_MUERTA;
-      if (mando) { mando.style.transform = 'translate(-50%, -50%) translateX(' + (dx * radio * 0.52) + 'px)'; }
+      var anchoMando = mando ? mando.getBoundingClientRect().width : 0;
+      var util = caja.width - anchoMando;
+      if (util <= 0) { return; }
+      var t = (clienteX - caja.left - anchoMando / 2) / util;
+      t = Math.max(0, Math.min(1, t));
+      estado.absoluto = t;
+      // Las banderas se mantienen por si algo las consulta (depuracion).
+      estado.izquierda = false;
+      estado.derecha = false;
+      if (mando) { mando.style.left = (anchoMando / 2 + t * util) + 'px'; }
     }
 
     function soltar() {
       arrastrando = false;
+      estado.absoluto = null;      // deja de mandar: la cabeza se queda quieta
       estado.izquierda = false;
       estado.derecha = false;
       el.classList.remove('pulsado');
-      if (mando) { mando.style.transform = 'translate(-50%, -50%)'; }
     }
 
     el.addEventListener('pointerdown', function (ev) {
@@ -139,6 +148,7 @@
       global.addEventListener('keyup', alSoltarTecla);
       global.addEventListener('blur', function () {
         estado.izquierda = false; estado.derecha = false; estado.disparo = false;
+        estado.absoluto = null;
         emitir('foco-perdido');
       });
       // Se conectan TODOS los [data-accion] del documento, no solo los de un
@@ -159,6 +169,11 @@
        boton pulsado y el modo automatico. */
     disparando: function () {
       return autoDisparo || estado.disparo;
+    },
+
+    /* Posicion pedida por la palanca (0 a 1) o null si no se arrastra. */
+    posicionAbsoluta: function () {
+      return estado.absoluto;
     },
 
     autoDisparoActivo: function () { return autoDisparo; },
@@ -187,6 +202,7 @@
       estado.izquierda = false;
       estado.derecha = false;
       estado.disparo = false;
+      estado.absoluto = null;
     }
   };
 

@@ -110,12 +110,24 @@
     if (this.invulnerable > 0) { this.invulnerable -= dt; }
 
     if (this.estado === 'normal') {
-      this.direccion = 0;
-      if (entrada.izquierda) { this.direccion -= 1; }
-      if (entrada.derecha) { this.direccion += 1; }
-      this.x += this.direccion * J.VELOCIDAD * dt;
       var mitad = ANCHO_CABEZA / 2;
-      this.x = Util.limitar(this.x, J.MARGEN_LATERAL + mitad, CONFIG.ANCHO - J.MARGEN_LATERAL - mitad);
+      var minX = J.MARGEN_LATERAL + mitad;
+      var maxX = CONFIG.ANCHO - J.MARGEN_LATERAL - mitad;
+
+      if (typeof entrada.absoluto === 'number') {
+        // Palanca: el recorrido del dedo manda la posicion directamente, de
+        // extremo a extremo. Se guarda el sentido solo para la animacion.
+        var destino = minX + entrada.absoluto * (maxX - minX);
+        this.direccion = destino > this.x + 0.5 ? 1 : (destino < this.x - 0.5 ? -1 : 0);
+        this.x = destino;
+      } else {
+        this.direccion = 0;
+        if (entrada.izquierda) { this.direccion -= 1; }
+        if (entrada.derecha) { this.direccion += 1; }
+        this.x += this.direccion * J.VELOCIDAD * dt;
+      }
+
+      this.x = Util.limitar(this.x, minX, maxX);
       this.balanceo += dt;
     } else {
       this.direccion = 0;

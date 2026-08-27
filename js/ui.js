@@ -33,8 +33,6 @@
     this.avisoAlmacenamiento = $('aviso-almacenamiento');
     this.botonSonido = $('btn-sonido');
     this.control = $('control-volumen');
-    this.chkAuto = $('chk-auto');
-    this.chkPalanca = $('chk-palanca');
     this.conectar();
   }
 
@@ -77,45 +75,53 @@
         Audio.reproducir('menu');
       });
     }
-    if (this.chkAuto) {
-      var autoGuardado = TRI.Storage.leerAutoDisparo();
-      TRI.Input.fijarAutoDisparo(autoGuardado);
-      this.chkAuto.checked = autoGuardado;
-      this.pintarAutoDisparo(autoGuardado);
-      this.chkAuto.addEventListener('change', function () {
-        var activo = TRI.Input.fijarAutoDisparo(self.chkAuto.checked);
+    /* Los dos interruptores viven DENTRO de los controles, no en el menu:
+       se pueden cambiar en plena partida. */
+    var botonModo = $('btn-modo-control');
+    if (botonModo) {
+      botonModo.addEventListener('click', function () {
+        var activa = !TRI.Storage.leerPalanca();
+        TRI.Storage.guardarPalanca(activa);
+        self.pintarModoControl(activa);
+        Audio.desbloquear();
+        Audio.reproducir('menu');
+      });
+    }
+
+    var botonAuto = $('btn-modo-auto');
+    if (botonAuto) {
+      botonAuto.addEventListener('click', function () {
+        var activo = !TRI.Input.autoDisparoActivo();
         TRI.Storage.guardarAutoDisparo(activo);
         self.pintarAutoDisparo(activo);
         Audio.desbloquear();
         Audio.reproducir('menu');
       });
     }
-    if (this.chkPalanca) {
-      var conPalanca = TRI.Storage.leerPalanca();
-      TRI.Input.fijarPalanca(conPalanca);
-      this.chkPalanca.checked = conPalanca;
-      this.chkPalanca.addEventListener('change', function () {
-        var activa = TRI.Input.fijarPalanca(self.chkPalanca.checked);
-        TRI.Storage.guardarPalanca(activa);
-        Audio.desbloquear();
-        Audio.reproducir('menu');
-      });
-    }
-    this.pintarBotonSonido(Audio.estaActivo());
-  };
 
-  /* La eleccion palanca/flechas solo tiene sentido con pantalla tactil. */
-  UI.prototype.mostrarOpcionPalanca = function (mostrar) {
-    var op = $('opcion-palanca');
-    if (op) { op.hidden = !mostrar; }
+    this.pintarModoControl(TRI.Storage.leerPalanca());
+    this.pintarAutoDisparo(TRI.Storage.leerAutoDisparo());
+    this.pintarBotonSonido(Audio.estaActivo());
   };
 
   /* Con el disparo automatico encendido, el boton de disparo pasa a decir
      AUTO y se atenua: sigue funcionando, pero ya no hace falta apretarlo. */
   UI.prototype.pintarAutoDisparo = function (activo) {
+    TRI.Input.fijarAutoDisparo(activo);
     document.body.classList.toggle('auto-disparo', activo);
     var boton = document.querySelector('.tacto.disparo');
-    if (boton) { boton.textContent = activo ? 'AUTO' : 'DISPARO'; }
+    if (boton) { boton.textContent = activo ? 'DISPARANDO' : 'DISPARO'; }
+    var mini = $('btn-modo-auto');
+    if (mini) { mini.setAttribute('aria-pressed', activo ? 'true' : 'false'); }
+  };
+
+  /* Palanca o flechas. El icono del interruptor muestra a que se cambia. */
+  UI.prototype.pintarModoControl = function (conPalanca) {
+    TRI.Input.fijarPalanca(conPalanca);
+    var mini = $('btn-modo-control');
+    if (mini) { mini.setAttribute('aria-pressed', conPalanca ? 'true' : 'false'); }
+    var icono = $('icono-modo');
+    if (icono) { icono.textContent = conPalanca ? '⇹' : '◀▶'; }
   };
 
   UI.prototype.pintarBotonSonido = function (activo) {

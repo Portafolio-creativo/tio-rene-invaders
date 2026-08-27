@@ -66,8 +66,6 @@
   var esTactil = Input.iniciar(botonera);
   var conTacto = esTactil || (global.matchMedia && global.matchMedia('(pointer: coarse)').matches);
   if (conTacto) { document.body.classList.add('tactil'); }
-  // La eleccion palanca/flechas solo se ofrece si hay pantalla tactil.
-  ui.mostrarOpcionPalanca(conTacto);
 
   Input.alAccion(function (accion) {
     if (accion === 'cualquiera') { Audio.desbloquear(); return; }
