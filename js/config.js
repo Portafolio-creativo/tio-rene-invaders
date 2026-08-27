@@ -8,12 +8,11 @@
   var CONFIG = {
     /* Frases del Tio Rene para encabezar el mensaje al compartir el puntaje.
        Salen de los titulos de sus propios clips en myinstants (los mismos que
-       suenan en el juego), no estan inventadas. Se dejan fuera a proposito las
-       mas subidas de tono y los insultos: el mensaje se manda a terceros que no
-       eligieron recibirlo. Los audios crudos siguen sonando dentro del juego,
-       que es donde el jugador si eligio estar.
-       'Zapa Mariteh' y 'Señor dioh mio' las aporto el propio Eduardo, que
-       conoce al personaje; van escritas como el las escribio. */
+       suenan en el juego) y de correcciones del propio Eduardo, que conoce al
+       personaje: van escritas como el las escribio.
+       DECISION: yo habia dejado fuera los garabatos, por ir el mensaje a gente
+       que no eligio recibirlo; Eduardo pidio incluirlos y mandan sus reglas.
+       El repertorio es el del personaje tal cual. */
     FRASES_COMPARTIR: [
       'Ya llegamos ya',
       'Me río toa la noche',
@@ -31,7 +30,18 @@
       'Me disculpai, amorcito',
       'Miau',
       'Zapa Mariteh',
-      'Señor dioh mío'
+      'Señor dioh mío',
+      '¿Por qué cierran?',
+      'No tení permiso pa salil',
+      'Cállate, René Puente',
+      'Te tengo pura mala',
+      'Chaaa… Tío René',
+      'Coxino ctm',
+      'Perro chuchetumare',
+      'Te paso por el pendejo',
+      'Querí weárme',
+      'Hácete caca',
+      'Te gusta esa weá, primo'
     ],
 
     /* Donde vive el juego. Se usa al compartir el resultado; si algun dia
