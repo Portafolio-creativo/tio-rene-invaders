@@ -195,6 +195,10 @@
          va deteriorando, y al llegar a esta cuenta estalla. */
       IMPACTOS_OBJETIVO: 15,
       PUNTOS: 750,
+      /* Al caer revienta por partes: una tanda de estallidos encadenados
+         mientras la pantalla tiembla. */
+      ESTALLIDOS: 9,
+      ESTALLIDO_CADA: 0.07,
       INTERVALO_DISPARO_BASE: 1.25,
       INTERVALO_DISPARO_MIN: 0.45,
       /* En el orden que pidio Eduardo. */

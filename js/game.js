@@ -50,6 +50,7 @@
     this.ovnisDerribados = 0;    // para alternar las dos mitades de "te paso por"
     this.muertes = 0;            // para turnar las frases de "se murio"
     this.veniaDeSuperarNivel = false;
+    this.explosionJefe = null;
     this.nivelesSuperados = 0;   // para turnar las frases de fin de etapa
     this.acumulado = 0;
     this.ultimoTiempo = 0;
@@ -206,6 +207,11 @@
 
   Juego.prototype.actualizar = function (dt) {
     this.renderer.actualizarFondo(dt);
+    /* La explosion del jefe y la sacudida siguen corriendo aunque el nivel ya
+       haya cambiado de estado: si no, al morir el jefe se pasaba a
+       ENTRE_NIVELES en el acto y la explosion no llegaba a verse. */
+    this.renderer.avanzarSacudida(dt);
+    this.actualizarExplosionJefe(dt);
 
     if (this.estado === ESTADOS.MENU || this.estado === ESTADOS.CARGANDO) {
       this.animarMenu(dt);
@@ -295,6 +301,22 @@
       : 2;                                    // ocupado: se reintenta pronto
   };
 
+  /* Los estallidos que quedan de la explosion del jefe. Van saliendo uno tras
+     otro para que la cabezota reviente por partes, no de golpe. */
+  Juego.prototype.actualizarExplosionJefe = function (dt) {
+    var ex = this.explosionJefe;
+    if (!ex || ex.restan <= 0) { return; }
+    ex.t -= dt;
+    if (ex.t > 0) { return; }
+    ex.t = CONFIG.JEFES.ESTALLIDO_CADA;
+    ex.restan--;
+    var x = ex.caja.x + ex.caja.w * (0.15 + 0.7 * Math.random());
+    var y = ex.caja.y + ex.caja.h * (0.15 + 0.7 * Math.random());
+    this.efectos.destello(x, y, 80 + Math.random() * 70);
+    this.efectos.chispas(x, y, 16, ex.restan % 2 ? '#ffd0a0' : '#ff7a4a');
+    Audio.reproducir('enemigoMuere');
+  };
+
   Juego.prototype.actualizarJefe = function (dt) {
     if (!this.jefe.activo) { return; }
     if (this.jefe.actualizar(dt) && this.proyectiles.contar(false) < 4) {
@@ -348,17 +370,12 @@
           jefe.activo = false;
           var cx = caja.x + caja.w / 2;
           var cy = caja.y + caja.h / 2;
-          /* Estalla y desaparece: en vez de un solo fogonazo en el centro, se
-             revienta por toda la cara para que se lea como que salta en
-             pedazos, no como que se apaga. */
-          self.efectos.destello(cx, cy, 200);
-          for (var e = 0; e < 7; e++) {
-            var ex = caja.x + caja.w * (0.2 + 0.6 * Math.random());
-            var ey = caja.y + caja.h * (0.2 + 0.6 * Math.random());
-            self.efectos.destello(ex, ey, 70 + Math.random() * 50);
-            self.efectos.chispas(ex, ey, 14, e % 2 ? '#ffd0a0' : '#ff7a4a');
-          }
-          self.efectos.chispas(cx, cy, 40, '#ffd0a0');
+          /* Estalla: no un fogonazo y ya, sino una tanda de estallidos que se
+             van encadenando por toda la cara mientras la pantalla tiembla. */
+          self.explosionJefe = { caja: caja, restan: CONFIG.JEFES.ESTALLIDOS, t: 0 };
+          self.renderer.sacudir(0.55, 16);
+          self.efectos.destello(cx, cy, 210);
+          self.efectos.chispas(cx, cy, 44, '#ffd0a0');
           self.efectos.texto(cx, cy, String(CONFIG.JEFES.PUNTOS), '#7cf29a');
           if (self.puntuacion.sumar(CONFIG.JEFES.PUNTOS)) { Audio.reproducir('vidaExtra'); }
           Audio.reproducir('victoria');
@@ -445,6 +462,8 @@
   Juego.prototype.comprobarFinDeNivel = function () {
     if (this.esNivelDeJefe) {
       if (this.jefe.activo) { return; }
+      // Que termine de reventar antes de pasar de nivel.
+      if (this.explosionJefe && this.explosionJefe.restan > 0) { return; }
     } else if (this.enemigos.vivos > 0) { return; }
     this.proyectiles.limpiar();
     this.ovni.activo = false;
@@ -486,6 +505,7 @@
       r.dibujarEfectos(this.efectos);
       r.dibujarSuelo();
       r.dibujarHUD(this.datosHUD());
+      r.cerrar();
     } else {
       // En el menu el Tio Rene se queda abajo, masticando, como aperitivo.
       r.dibujarJugador(this.jugador);
@@ -510,6 +530,7 @@
         assetsFallidos: this.assetsFallidos
       });
     }
+    r.cerrar();
   };
 
   /* En el menu el Tio Rene pasea y abre la mandibula cada cierto rato, para

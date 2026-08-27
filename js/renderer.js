@@ -18,6 +18,9 @@
     // juego se ve igual, solo sin el tinte de dano.
     this.soportaFiltro = (typeof this.ctx.filter === 'string');
     this.estrellas = [];
+    this.sacudidaT = 0;         // segundos que queda de sacudida
+    this.sacudidaTotal = 1;
+    this.sacudidaFuerza = 0;
     this.crearEstrellas(70);
   }
 
@@ -52,8 +55,27 @@
     }
   };
 
+  /* Sacudida de pantalla. La pide el juego cuando algo revienta fuerte; se
+     aplica a TODO el cuadro, asi que se abre aqui y se cierra en cerrar(). */
+  Renderer.prototype.sacudir = function (segundos, fuerza) {
+    this.sacudidaT = segundos;
+    this.sacudidaTotal = segundos;
+    this.sacudidaFuerza = fuerza;
+  };
+
+  Renderer.prototype.avanzarSacudida = function (dt) {
+    if (this.sacudidaT > 0) { this.sacudidaT -= dt; }
+  };
+
   Renderer.prototype.limpiar = function () {
     var ctx = this.ctx;
+    ctx.save();
+    if (this.sacudidaT > 0) {
+      // Se va apagando: al principio zarandea fuerte y termina suave.
+      var q = this.sacudidaT / this.sacudidaTotal;
+      var f = this.sacudidaFuerza * q * q;
+      ctx.translate((Math.random() - 0.5) * f, (Math.random() - 0.5) * f);
+    }
     ctx.fillStyle = C.FONDO;
     ctx.fillRect(0, 0, CONFIG.ANCHO, CONFIG.ALTO);
     ctx.fillStyle = C.ESTRELLA;
@@ -63,6 +85,12 @@
       ctx.fillRect(e.x, e.y, e.r, e.r);
     }
     ctx.globalAlpha = 1;
+  };
+
+  /* Cierra la transformacion que abrio limpiar(). Se llama al final de cada
+     cuadro; si no, las traslaciones se irian acumulando. */
+  Renderer.prototype.cerrar = function () {
+    this.ctx.restore();
   };
 
   function dibujarSprite(ctx, nombre, x, y, w, h) {
