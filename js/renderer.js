@@ -140,7 +140,7 @@
       ctx.restore();
     }
     // Barra de lo que le queda de cara.
-    var w = CONFIG.JEFES.ANCHO, resto = Math.max(0, jefe.vivas / jefe.total);
+    var w = CONFIG.JEFES.ANCHO, resto = jefe.resto();
     ctx.fillStyle = 'rgba(0,0,0,0.45)';
     ctx.fillRect(jefe.x, jefe.y - 14, w, 8);
     ctx.fillStyle = resto > 0.4 ? '#46d16a' : '#ff7a6b';

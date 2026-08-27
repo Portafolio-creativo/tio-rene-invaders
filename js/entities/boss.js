@@ -33,6 +33,7 @@
      no hay imagen (o el navegador no deja leerla), se toma la cabeza entera. */
   Jefe.prototype.calcularCeldas = function (img) {
     this.celdas.length = 0;
+    this.base = [];
     var datos = null;
     if (img) {
       try {
@@ -57,6 +58,7 @@
         fila.push(solida);
       }
       this.celdas.push(fila);
+      this.base.push(fila.slice());   // silueta original, para saber que se rompio
     }
     this.total = this.contarVivas();
     this.vivas = this.total;
@@ -87,6 +89,16 @@
     this.temporizadorDisparo = this.intervaloDisparo;
     this.destello = 0;
     this.calcularCeldas(Assets.obtener(this.sprite));
+    /* Lo que cuesta tumbarlo se cuenta en IMPACTOS, no en celdas: cada foto
+       recorta una silueta distinta, y midiendo por celdas una cara angosta
+       caia en cuatro tiros y otra costaba veintisiete.
+       El radio solo decide como de rapido se ve comida la cara. El factor 0.6
+       compensa que junto al borde y sobre huecos ya abiertos el mordisco se
+       lleva bastante menos de lo que dice su area. */
+    this.impactos = 0;
+    var aDestruir = this.total * (1 - J.RESTO_PARA_MORIR);
+    var radio = Math.sqrt(aDestruir / (Math.PI * J.IMPACTOS_OBJETIVO * 0.6));
+    this.radio = Math.max(J.RADIO_MIN, Math.min(J.RADIO_MAX, Math.round(radio)));
     this.repintar();
   };
 
@@ -110,6 +122,61 @@
                       c * aw, f * ah, aw + 1, ah + 1);
       }
     }
+    this.dibujarDesgaste();
+  };
+
+  /* El desgaste: se tizna el BORDE de los boquetes, no se dibujan rayas
+     sueltas. Recorriendo las celdas y mirando a sus vecinas se sabe donde
+     acaba la carne y empieza el agujero, y ahi va la quemadura. Asi la marca
+     sigue siempre la forma real del destrozo.
+     source-atop recorta todo contra lo que queda de cara, para que nada
+     flote sobre el vacio. */
+  Jefe.prototype.dibujarDesgaste = function () {
+    var ctx = this.ctx;
+    var aw = this.anchoCelda(), ah = this.altoCelda();
+    var borde = [], self = this;
+
+    for (var f = 0; f < J.FILAS; f++) {
+      for (var c = 0; c < J.COLUMNAS; c++) {
+        if (!this.celdas[f][c]) { continue; }
+        /* Solo cuenta como boquete lo que ANTES era cara y ahora no. El
+           contorno natural de la cabeza no se tizna: si no, el jefe aparecia
+           chamuscado de entrada, sin haberle disparado. */
+        var roto = function (ff, cc) {
+          return self.base[ff][cc] === 1 && self.celdas[ff][cc] === 0;
+        };
+        var hueco = (f > 0 && roto(f - 1, c)) ||
+                    (f < J.FILAS - 1 && roto(f + 1, c)) ||
+                    (c > 0 && roto(f, c - 1)) ||
+                    (c < J.COLUMNAS - 1 && roto(f, c + 1));
+        if (hueco) { borde.push([c * aw, f * ah]); }
+      }
+    }
+    if (!borde.length) { return; }
+
+    ctx.save();
+    ctx.globalCompositeOperation = 'source-atop';
+
+    // Chamuscado: una mancha oscura pegada a cada celda del borde.
+    for (var i = 0; i < borde.length; i++) {
+      var x = borde[i][0] + aw / 2, y = borde[i][1] + ah / 2;
+      var g = ctx.createRadialGradient(x, y, 0, x, y, aw * 1.15);
+      g.addColorStop(0, 'rgba(24, 10, 4, 0.7)');
+      g.addColorStop(0.6, 'rgba(24, 10, 4, 0.25)');
+      g.addColorStop(1, 'rgba(24, 10, 4, 0)');
+      ctx.fillStyle = g;
+      ctx.beginPath();
+      ctx.arc(x, y, aw * 1.15, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // Brasa: un hilo naranja justo en el filo, como metal recien roto.
+    ctx.globalCompositeOperation = 'lighter';
+    for (i = 0; i < borde.length; i++) {
+      ctx.fillStyle = 'rgba(255, 120, 40, 0.22)';
+      ctx.fillRect(borde[i][0], borde[i][1], aw, ah);
+    }
+    ctx.restore();
   };
 
   Jefe.prototype.hitbox = function () {
@@ -122,7 +189,7 @@
     var col = Math.floor((px - this.x) / this.anchoCelda());
     var fil = Math.floor((py - this.y) / this.altoCelda());
     var quitadas = 0;
-    var r = J.RADIO_IMPACTO;
+    var r = this.radio;
     for (var f = fil - r; f <= fil + r; f++) {
       for (var c = col - r; c <= col + r; c++) {
         if (f < 0 || f >= J.FILAS || c < 0 || c >= J.COLUMNAS) { continue; }
@@ -131,7 +198,10 @@
         if (this.celdas[f][c]) { this.celdas[f][c] = 0; quitadas++; }
       }
     }
-    if (!quitadas) { return false; }
+    // Aunque el disparo caiga en un hueco ya abierto cuenta como impacto: lo
+    // que no puede es no hacer nada y dejar al jefe inmortal por los bordes.
+    this.impactos++;
+    if (!quitadas) { this.repintar(); return true; }
     this.vivas -= quitadas;
     this.destello = 0.12;
     this.repintar();
@@ -139,7 +209,12 @@
   };
 
   Jefe.prototype.derrotado = function () {
-    return this.vivas <= this.total * J.RESTO_PARA_MORIR;
+    return this.impactos >= J.IMPACTOS_OBJETIVO;
+  };
+
+  /* Lo que le queda, de 1 a 0. Es lo que pinta la barra de vida. */
+  Jefe.prototype.resto = function () {
+    return Math.max(0, 1 - this.impactos / J.IMPACTOS_OBJETIVO);
   };
 
   /* Punto por donde escupe: la boca, mas o menos al centro y abajo. */

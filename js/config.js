@@ -182,9 +182,15 @@
       Y_INICIAL: 96,
       VELOCIDAD_BASE: 52,       // px/s de vaiven; sube con el nivel
       DESCENSO: 10,             // px que baja al tocar un borde
-      COLUMNAS: 18,             // rejilla de destruccion
-      FILAS: 18,
-      RADIO_IMPACTO: 3,         // celdas que se lleva cada disparo
+      COLUMNAS: 26,             // rejilla de destruccion (mas fina = menos cuadriculado)
+      FILAS: 26,
+      /* Cuantos impactos deberia costar tumbarlo. El radio del mordisco se
+         calcula a partir de esto y del tamano real de la silueta, porque cada
+         foto recorta una cantidad distinta de celdas: con un radio fijo, una
+         cara angosta caia en cuatro tiros y una ancha se hacia eterna. */
+      IMPACTOS_OBJETIVO: 15,
+      RADIO_MIN: 2,
+      RADIO_MAX: 6,
       RESTO_PARA_MORIR: 0.22,   // muere al quedarle este trozo de cara
       PUNTOS: 750,
       INTERVALO_DISPARO_BASE: 1.25,

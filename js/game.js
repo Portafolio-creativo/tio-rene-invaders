@@ -322,7 +322,16 @@
           jefe.activo = false;
           var cx = jefe.x + CONFIG.JEFES.ANCHO / 2;
           var cy = jefe.y + CONFIG.JEFES.ALTO / 2;
-          self.efectos.destello(cx, cy, 160);
+          /* Estalla y desaparece: en vez de un solo fogonazo en el centro, se
+             revienta por toda la cara para que se lea como que salta en
+             pedazos, no como que se apaga. */
+          self.efectos.destello(cx, cy, 200);
+          for (var e = 0; e < 7; e++) {
+            var ex = jefe.x + CONFIG.JEFES.ANCHO * (0.2 + 0.6 * Math.random());
+            var ey = jefe.y + CONFIG.JEFES.ALTO * (0.2 + 0.6 * Math.random());
+            self.efectos.destello(ex, ey, 70 + Math.random() * 50);
+            self.efectos.chispas(ex, ey, 14, e % 2 ? '#ffd0a0' : '#ff7a4a');
+          }
           self.efectos.chispas(cx, cy, 40, '#ffd0a0');
           self.efectos.texto(cx, cy, String(CONFIG.JEFES.PUNTOS), '#7cf29a');
           if (self.puntuacion.sumar(CONFIG.JEFES.PUNTOS)) { Audio.reproducir('vidaExtra'); }
