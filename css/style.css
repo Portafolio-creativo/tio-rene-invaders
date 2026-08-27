@@ -184,17 +184,6 @@ body.tactil #btn-pausa-barra { display: inline-block; }
 
 .capa[hidden] { display: none; }
 
-.titulo-juego {
-  margin: 0;
-  font-size: clamp(24px, 7vw, 46px);
-  line-height: 1.05;
-  letter-spacing: 3px;
-  color: var(--acento);
-  text-shadow: 3px 3px 0 #1c7a3a, 6px 6px 0 rgba(0, 0, 0, 0.5);
-}
-
-.titulo-juego span { color: var(--verde); }
-
 .titulo-capa {
   margin: 0;
   font-size: clamp(22px, 6vw, 40px);
@@ -323,7 +312,6 @@ body.tactil #btn-pausa-barra { display: inline-block; }
 
 /* En el telefono el credito ya sale en el pie de la pagina: en el menu solo
    ocuparia alto. */
-body.tactil #intro-credito { display: none; }
 
 /* Con el disparo automatico, su boton se atenua: sigue ahi pero ya no hace
    falta apretarlo. */
@@ -537,7 +525,6 @@ body.tactil #btn-modo-control { display: inline-block; }
 
 /* En el telefono, la lista de teclas no sirve y ocupa alto. */
 body.tactil .controles { display: none; }
-body.tactil #intro-credito { display: none; }
 
 /* ---------- Pie y avisos ---------- */
 
@@ -580,14 +567,50 @@ body.tactil #intro-credito { display: none; }
 
 /* ---------- Menu de entrada ---------- */
 
+/* La portada: verde y un solo boton. Opaca a proposito (en las otras capas
+   conviene ver la partida detras, aqui no) y sin titulo ni credito, que ya
+   viven en la barra de arriba y en el pie. */
 #capa-menu {
-  gap: 6px;
+  gap: 14px;
   justify-content: center;
-  /* Opaco a proposito: en las otras capas conviene ver la partida detras,
-     pero aqui la cara grande es la protagonista y el Tio Rene del tablero se
-     transparentaba debajo, ensuciando la pantalla. */
-  background: var(--fondo);
+  /* Verde profundo a proposito: con el verde claro que traia, el texto
+     pequeno se quedaba en 2,4:1 y no se leia. Asi el blanco pasa AA. */
+  background:
+    radial-gradient(circle at 50% 42%, #0f7f3f 0%, #0b6b36 55%, #084d27 100%);
 }
+
+/* Sobre el verde, el boton verde de siempre desapareceria: aqui se invierte
+   a crema sobre verde oscuro, que es el par de mayor contraste disponible. */
+#capa-menu .boton.principal {
+  color: #06210f;
+  background: #fff4d6;
+  border-color: #fffdf5;
+  font-size: clamp(20px, 6.5vw, 34px);
+  letter-spacing: 4px;
+  padding: 16px 54px;
+  box-shadow: 0 6px 0 #0b5c2f, 0 10px 22px rgba(0, 0, 0, 0.35);
+}
+
+#capa-menu .boton.principal:hover { background: #fff; }
+
+/* El resto de la portada. Blanco con una sombra suave: sobre el verde claro
+   del centro un tono verdoso no llegaba al contraste minimo legible. */
+#capa-menu .marcador-menu,
+#capa-menu .controles,
+#capa-menu .tenue {
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0, 40, 16, 0.65);
+}
+
+#capa-menu .marcador-menu strong { color: #fff4d6; }
+#capa-menu .controles b { color: #fff4d6; }
+
+#capa-menu .boton.secundario {
+  color: #fff4d6;
+  border-color: rgba(255, 244, 214, 0.5);
+}
+
+#capa-menu .boton.secundario:hover { background: rgba(255, 244, 214, 0.16); }
 
 /* ---------- Entrada: la cara crece desde el centro ----------
    Aparece al pulsar JUGAR, a la vez que arranca la voz. */
@@ -664,18 +687,6 @@ body.tactil #intro-credito { display: none; }
   cursor: default;
 }
 
-.titulo-juego.intro {
-  font-size: clamp(20px, 5.5vh, 34px);
-  letter-spacing: 2px;
-}
-
-#intro-credito {
-  margin: 0;
-  font-size: 11px;
-  letter-spacing: 1px;
-  color: var(--tinta-tenue);
-}
-
 #texto-carga[hidden] { display: none; }
 
 @media (prefers-reduced-motion: reduce) {
@@ -734,9 +745,7 @@ body.tactil #intro-credito { display: none; }
      estan los botones en pantalla) y la cara se lleva el espacio ganado. */
   #intro-cara { width: min(46%, 150px); }
   .controles { display: none; }
-  #intro-credito { font-size: 10px; }
   .capa { gap: 5px; padding: 3% 6%; }
-  .titulo-juego { font-size: clamp(20px, 5vh, 30px); }
   .titulo-capa { font-size: clamp(18px, 5vh, 28px); }
   .controles { font-size: 10px; gap: 2px 8px; }
   .boton { min-height: 42px; padding: 8px 20px; }
@@ -812,7 +821,6 @@ body.tactil #intro-credito { display: none; }
   #btn-pausa-barra { font-size: 11px; padding: 5px 9px; }
   #cabecera { gap: 6px; }
   .controles { font-size: 11px; }
-  .titulo-juego.intro { font-size: clamp(18px, 4.6vh, 28px); letter-spacing: 1px; }
   .marcador-menu { font-size: 12px; }
   .boton.principal { font-size: 15px; min-height: 44px; padding: 10px 20px; }
 }
