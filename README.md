@@ -404,7 +404,7 @@ Open Graph del `<head>` de `index.html` y la imagen `assets/ui/og-cover.jpg`
 (1200×630, ~93 KB).
 
 **Importante:** `og:image` y `og:url` son URLs **absolutas** que apuntan a
-`https://cotizadora.github.io/tio-rene-invaders/`. Si mueves el juego a otro
+`https://portafolio-creativo.github.io/tio-rene-invaders/`. Si mueves el juego a otro
 dominio o carpeta, hay que actualizar esas líneas en `index.html`, o la
 miniatura no cargará.
 
