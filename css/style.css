@@ -484,27 +484,29 @@ body.control-palanca [data-accion="derecha"] { display: none; }
 #palanca.pulsado { cursor: grabbing; border-color: #7cf29a; }
 
 /* ---------- La palanca como lanzadera ----------
-   Mientras se ve la portada, el control late y su mando va y viene de lado a
-   lado: es la unica pista de que hay que deslizar para empezar. Se apaga en
-   cuanto arranca la partida (.en-partida) para no distraer jugando. */
+   Una SENAL breve, no un baile: dos vaivenes cortos y de poco recorrido, los
+   justos para que se vea que eso se mueve y se ponga el dedo. Despues se queda
+   quieto; quien mire mas tarde tiene igual el texto de arriba explicandolo.
+   Se apaga tambien al arrancar la partida (.en-partida). */
 body.portada-lista:not(.en-partida) #palanca {
-  animation: latir-palanca 1.9s ease-in-out infinite;
+  animation: latir-palanca 0.75s ease-in-out 2 both;
 }
 
 body.portada-lista:not(.en-partida) #palanca-mando {
-  animation: vaiven-mando 1.9s ease-in-out infinite;
+  animation: vaiven-mando 0.75s ease-in-out 2 both;
 }
 
 @keyframes latir-palanca {
   0%, 100% { border-color: var(--borde); box-shadow: none; }
-  50% { border-color: #7cf29a; box-shadow: 0 0 16px rgba(70, 209, 106, 0.55); }
+  50% { border-color: #7cf29a; box-shadow: 0 0 12px rgba(70, 209, 106, 0.4); }
 }
 
-/* Recorre el ancho real de la palanca, no una distancia fija, para que la
-   pista coincida con el recorrido que de verdad tiene el dedo. */
+/* Empieza y termina en el centro, para que el mando no se quede descolocado
+   cuando el jugador ponga el dedo. */
 @keyframes vaiven-mando {
-  0%, 100% { left: 16%; opacity: 0.55; }
-  50% { left: 84%; opacity: 1; }
+  0%, 100% { left: 50%; }
+  28% { left: 41%; }
+  72% { left: 59%; }
 }
 
 .palanca-flecha {
