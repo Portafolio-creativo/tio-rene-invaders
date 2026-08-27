@@ -49,6 +49,7 @@
     this.ovnisDerribados = 0;    // para alternar las dos mitades de "te paso por"
     this.muertes = 0;            // para turnar las frases de "se murio"
     this.veniaDeSuperarNivel = false;
+    this.nivelesSuperados = 0;   // para turnar las frases de fin de etapa
     this.acumulado = 0;
     this.ultimoTiempo = 0;
     this.fps = 0;
@@ -98,6 +99,7 @@
     this.rachasLogradas = 0;
     this.ovnisDerribados = 0;
     this.muertes = 0;
+    this.nivelesSuperados = 0;
     this.prepararNivel();
     if (!sinSonido) { Audio.reproducir(conBienvenida ? 'intro' : 'nivel'); }
     this.cambiarEstado(ESTADOS.JUGANDO);
@@ -365,7 +367,9 @@
       this.cambiarEstado(ESTADOS.VICTORIA);
       return;
     }
-    Audio.reproducir('nivelCompleto');
+    var clipsNivel = CONFIG.AUDIO.NIVEL_CLIPS;
+    Audio.reproducir(clipsNivel[this.nivelesSuperados % clipsNivel.length]);
+    this.nivelesSuperados++;
     this.veniaDeSuperarNivel = true;
     this.niveles.avanzar();
     this.prepararNivel();

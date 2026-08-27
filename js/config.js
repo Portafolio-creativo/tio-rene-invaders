@@ -150,7 +150,9 @@
         victoria: 'victoria-me-rio.mp3',   // "me rio toa la noche", entera
         ovniAparece: 'ovni-miau.mp3',      // el "miau" cuando cruza la nave
         nivel: 'level-start.mp3',
-        nivelCompleto: 'nivel-completo-me-rio.mp3',   // "me rio toa la noche"
+        /* Fin de etapa: se turnan, para no oir siempre la misma. */
+        nivelCompleto1: 'nivel-completo-me-rio.mp3',   // "me rio toa la noche"
+        nivelCompleto2: 'nivel-completo-tio-rene.mp3',
         vidaExtra: 'extra-life.mp3',
         /* Al derribar la nave grande: la frase "te paso por" partida en dos,
            que se van alternando (primer ovni la primera mitad, segundo la
@@ -195,7 +197,11 @@
         ambiente34: 'amb-34.mp3',
         ambiente35: 'amb-35.mp3',
         /* Frases de RACHA: cada 5 naves derribadas. */
-        racha1: 'racha-queri-too.mp3',     // "queri too", cada 8 bajas
+        /* Racha: tres frases que se turnan, asi cada una vuelve a salir
+           mucho mas espaciada. */
+        racha1: 'racha-queri-too.mp3',     // "queri too"
+        racha2: 'racha-tio-rene.mp3',
+        racha3: 'racha-miau.mp3',          // el "nau" cortito
         /* Sintetizados a proposito (muy repetitivos):
            disparo, marcha1..4, enemigoMuere, barrera, descenso, menu, ovni */
       },
@@ -203,9 +209,10 @@
       /* Charla de fondo durante la partida. */
       AMBIENTE: {
         ACTIVO: true,
-        VOLUMEN: 0.34,     // proporcion del volumen general (0 a 1)
-        ESPERA_MIN: 11,    // segundos entre frase y frase
-        ESPERA_MAX: 24,
+        VOLUMEN: 0.55,     // proporcion del volumen general (0 a 1)
+        ATENUACION: 0.35,  // cuanto se agacha mientras habla el Tio Rene
+        ESPERA_MIN: 9,     // segundos entre frase y frase
+        ESPERA_MAX: 18,
         PRIMERA_ESPERA: 6, // cuanto tarda la primera al empezar el nivel
         CLIPS: [
           'ambiente1', 'ambiente2', 'ambiente3', 'ambiente4', 'ambiente5', 'ambiente6', 'ambiente7', 'ambiente8', 'ambiente9', 'ambiente10', 'ambiente11', 'ambiente12', 'ambiente13', 'ambiente14', 'ambiente15', 'ambiente16', 'ambiente17', 'ambiente18', 'ambiente19', 'ambiente20', 'ambiente21', 'ambiente22', 'ambiente23', 'ambiente24', 'ambiente25', 'ambiente26', 'ambiente27', 'ambiente28', 'ambiente29', 'ambiente30', 'ambiente31', 'ambiente32', 'ambiente33', 'ambiente34', 'ambiente35'
@@ -218,12 +225,16 @@
       /* Frases de "se murio", una por cada vida perdida. */
       MUERTE_CLIPS: ['muerte1', 'muerte2', 'muerte3'],
 
-      /* Cada 8 naves derribadas suena "queri too". */
+      /* Cada 8 naves derribadas suena una felicitacion, turnandose entre las
+         tres: asi cada frase concreta vuelve cada 24 bajas y no cansa. */
       RACHA: {
         ACTIVO: true,
         CADA: 8,
-        CLIPS: ['racha1']
-      }
+        CLIPS: ['racha1', 'racha2', 'racha3']
+      },
+
+      /* Frases de fin de etapa, en orden. */
+      NIVEL_CLIPS: ['nivelCompleto1', 'nivelCompleto2']
     },
 
     COLORES: {

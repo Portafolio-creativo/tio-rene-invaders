@@ -186,10 +186,17 @@
       if (vozActual) {
         try { vozActual.stop(); } catch (e) { /* ya habia terminado */ }
       }
-      // Una frase importante manda: calla la charla de fondo para que se oiga.
-      Audio.detenerAmbiente();
+      // La charla de fondo NO se corta: solo se agacha mientras habla el Tio
+      // Rene y vuelve al terminar. Antes se cortaba, y como hay frases a cada
+      // rato el ambiente no llegaba a oirse nunca.
+      agacharAmbiente(true);
       vozActual = src;
-      src.onended = function () { if (vozActual === src) { vozActual = null; } };
+      src.onended = function () {
+        if (vozActual === src) {
+          vozActual = null;
+          agacharAmbiente(false);
+        }
+      };
     }
     src.start(ahora());
     return true;
@@ -225,6 +232,20 @@
 
   var ultimaAmbiente = null;
 
+  /* Baja o restaura el volumen del ambiente. Con rampa corta para que no
+     suene a corte seco. */
+  function agacharAmbiente(agachar) {
+    if (!ambienteGain || !ctx) { return; }
+    var base = CONFIG.AUDIO.AMBIENTE.VOLUMEN;
+    var destino = agachar ? base * CONFIG.AUDIO.AMBIENTE.ATENUACION : base;
+    try {
+      ambienteGain.gain.cancelScheduledValues(ctx.currentTime);
+      ambienteGain.gain.setTargetAtTime(destino, ctx.currentTime, 0.08);
+    } catch (e) {
+      ambienteGain.gain.value = destino;
+    }
+  }
+
   /* Suelta la frase que quedo esperando a que hubiera permiso y archivo. */
   function soltarPendiente() {
     if (!pendiente || !activo || !ctx || ctx.state !== 'running') { return; }
@@ -247,7 +268,11 @@
     if (!CONFIG.AUDIO.USAR_ARCHIVOS || !ctx || typeof global.fetch !== 'function') {
       return Promise.resolve();
     }
-    var claves = Object.keys(CONFIG.AUDIO.ARCHIVOS);
+    // La bienvenida se pide primero y aparte: es la que tiene que estar lista
+    // en cuanto el jugador pulse JUGAR, sin esperar a las otras cincuenta.
+    var claves = Object.keys(CONFIG.AUDIO.ARCHIVOS).sort(function (a, b) {
+      return (a === 'intro' ? -1 : 0) - (b === 'intro' ? -1 : 0);
+    });
     return Promise.all(claves.map(function (clave) {
       var url = CONFIG.AUDIO.RUTA + CONFIG.AUDIO.ARCHIVOS[clave];
       return global.fetch(url).then(function (res) {
@@ -367,6 +392,7 @@
       src.buffer = buffers[nombre];
       src.connect(ambienteGain);
       ambienteActual = src;
+      agacharAmbiente(!!vozActual);     // si ya habia voz, entra agachado
       src.onended = function () { if (ambienteActual === src) { ambienteActual = null; } };
       src.start(ahora());
       return true;
