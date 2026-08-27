@@ -355,37 +355,31 @@ body.auto-disparo .tacto.disparo {
 /* ---------- Botonera tactil ---------- */
 
 /* ---------- Controles tactiles ----------
-   Dos filas, y cada una lleva DENTRO su interruptor de modo:
-     fila 1  [ palanca  o  ◀ | ▶ ]  [⇹]
-     fila 2  [       DISPARO      ]  [AUTO]
-   Asi se cambia de modalidad en plena partida, sin ir al menu. */
+   Las dos zonas miden EXACTAMENTE lo que el tablero (--ancho-tablero lo fija
+   main.js), asi el recorrido del dedo sobre la palanca coincide con el del
+   personaje. Nada las flanquea: cualquier boton al lado les robaria ancho y
+   rompería esa correspondencia. */
 
 #botonera {
   display: none;
   flex: 0 0 auto;
   flex-direction: column;
+  align-items: center;
   gap: 7px;
-  padding: 8px calc(10px + env(safe-area-inset-right)) 10px calc(10px + env(safe-area-inset-left));
+  padding: 8px calc(6px + env(safe-area-inset-right)) 10px calc(6px + env(safe-area-inset-left));
 }
 
 body.tactil #botonera { display: flex; }
 
 #zona-mover,
 #zona-disparo {
+  position: relative;
   display: flex;
-  align-items: stretch;
-  gap: 6px;
-}
-
-#control-mover {
-  flex: 1 1 auto;
-  display: flex;
-  gap: 0;
-  min-width: 0;
+  width: var(--ancho-tablero, 100%);
+  max-width: 100%;
 }
 
 .tacto {
-  min-height: 66px;
   font-family: var(--fuente);
   font-size: 22px;
   font-weight: bold;
@@ -400,52 +394,87 @@ body.tactil #botonera { display: flex; }
 
 /* Flechas sueltas: media y media, pegadas. */
 [data-accion="izquierda"],
-[data-accion="derecha"] { flex: 1 1 0; min-width: 0; }
+[data-accion="derecha"] { flex: 1 1 0; min-width: 0; min-height: 66px; }
 [data-accion="izquierda"] { border-radius: 12px 0 0 12px; }
 [data-accion="derecha"] { border-radius: 0 12px 12px 0; border-left-width: 1px; }
 
 .tacto.disparo {
   flex: 1 1 auto;
   min-width: 0;
-  min-height: 74px;
+  min-height: 76px;
   font-size: 18px;
   border-radius: 12px;
   color: #06210f;
   background: var(--verde);
   border-color: #7cf29a;
+  /* Deja sitio a la casilla para que el texto no se le meta debajo. */
+  padding-right: 78px;
+  padding-left: 12px;
 }
 
 .tacto.pulsado { filter: brightness(1.4); }
 
-/* Interruptores incrustados: estrechos, al borde de cada zona. */
-.tacto-mini {
-  flex: 0 0 auto;
-  width: 58px;
+/* ---------- Casilla de disparo automatico ----------
+   Va DENTRO del boton grande. Marcada = dispara solo; sin marcar = a mano.
+   Es un boton aparte por encima (no se pueden anidar botones), pero se ve y
+   se usa como parte del mismo control. */
+.casilla-auto {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  width: 60px;
+  height: 56px;
+  padding: 0;
   font-family: var(--fuente);
-  font-size: 12px;
+  background: rgba(6, 33, 15, 0.22);
+  border: 2px solid #06210f;
+  border-radius: 9px;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.casilla-auto .marca {
+  display: block;
+  width: 24px;
+  height: 24px;
+  line-height: 22px;
+  font-size: 17px;
+  font-weight: bold;
+  color: transparent;             /* el tilde aparece al marcarla */
+  background: rgba(255, 255, 255, 0.22);
+  border: 2px solid #06210f;
+  border-radius: 5px;
+}
+
+.casilla-auto .rotulo {
+  font-size: 9px;
   font-weight: bold;
   letter-spacing: 1px;
-  color: var(--tinta-tenue);
-  background: #131c33;
-  border: 2px solid var(--borde);
-  border-radius: 12px;
-  touch-action: manipulation;
-  user-select: none;
-  cursor: pointer;
-}
-
-#icono-modo { font-size: 20px; line-height: 1; }
-
-/* Encendido = verde, para que se vea de un vistazo que esta activo. */
-.tacto-mini[aria-pressed="true"] {
   color: #06210f;
-  background: var(--verde);
-  border-color: #7cf29a;
 }
+
+.casilla-auto[aria-pressed="true"] {
+  background: #06210f;
+  border-color: #06210f;
+}
+
+.casilla-auto[aria-pressed="true"] .marca {
+  color: #06210f;
+  background: var(--acento);
+  border-color: var(--acento);
+}
+
+.casilla-auto[aria-pressed="true"] .rotulo { color: var(--acento); }
 
 /* ---------- Palanca posicional ----------
-   Ocupa todo el ancho de la fila: el recorrido del dedo se corresponde con el
-   recorrido de la cabeza en el tablero, asi el movimiento se siente directo. */
+   Ocupa todo el ancho del tablero: el recorrido del dedo se corresponde con el
+   recorrido de la cabeza. */
 #palanca {
   display: none;
   position: relative;
@@ -492,6 +521,18 @@ body.control-palanca [data-accion="derecha"] { display: none; }
   border: 2px solid #7cf29a;
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.45);
   pointer-events: none;
+}
+
+/* El cambio palanca/flechas vive en la barra de arriba: ahi no le quita ancho
+   a la palanca. Solo aparece en pantallas tactiles. */
+#btn-modo-control { display: none; }
+body.tactil #btn-modo-control { display: inline-block; }
+#icono-modo { font-size: 15px; line-height: 1; }
+
+#btn-modo-control[aria-pressed="true"] {
+  color: #06210f;
+  background: var(--verde);
+  border-color: #7cf29a;
 }
 
 /* En el telefono, la lista de teclas no sirve y ocupa alto. */
@@ -548,24 +589,33 @@ body.tactil #intro-credito { display: none; }
   background: var(--fondo);
 }
 
-/* La cara entra desde el centro al abrir la pagina y luego late suave,
-   invitando a pulsar JUGAR. */
+/* ---------- Entrada: la cara crece desde el centro ----------
+   Aparece al pulsar JUGAR, a la vez que arranca la voz. */
+#capa-entrada {
+  justify-content: center;
+  background: var(--fondo);
+}
+
+#capa-entrada[hidden] { display: none; }
+
+#capa-entrada.saliendo { opacity: 0; transition: opacity 0.3s ease; }
+
 #intro-cara {
   /* Medida por ALTURA del panel, no por ancho: asi se encoge sola cuando la
      pantalla es baja (o cuando la fuente del telefono ocupa mas de lo que
      ocupa en el escritorio) en vez de desbordar y salir cortada. */
-  height: 30%;
+  height: 62%;
   aspect-ratio: 360 / 396;      /* cabeza 249 + mandibula 147 */
   width: auto;
-  max-width: min(52%, 215px);
+  max-width: 86%;
   /* CLAVE: puede encogerse. Si el texto ocupa mas de lo previsto (otra fuente,
      pantalla mas baja), la cara cede espacio en vez de que el panel desborde
      y salga cortada. */
   flex: 0 1 auto;
   min-height: 44px;
   filter: drop-shadow(0 10px 22px rgba(0, 0, 0, 0.55));
-  animation: entrar-cara 0.55s cubic-bezier(0.2, 1.3, 0.4, 1) both,
-             latir-cara 2.6s ease-in-out 0.6s infinite;
+  animation: entrar-cara 0.6s cubic-bezier(0.2, 1.35, 0.4, 1) both,
+             latir-cara 2.2s ease-in-out 0.6s infinite;
 }
 
 #intro-cara img {
@@ -575,7 +625,7 @@ body.tactil #intro-credito { display: none; }
 }
 
 @keyframes entrar-cara {
-  from { opacity: 0; transform: scale(0.35); }
+  from { opacity: 0; transform: scale(0.12); }
   to { opacity: 1; transform: scale(1); }
 }
 
@@ -691,9 +741,10 @@ body.tactil #intro-credito { display: none; }
   .controles { font-size: 10px; gap: 2px 8px; }
   .boton { min-height: 42px; padding: 8px 20px; }
 
-  /* En apaisado las dos filas no caben: cada zona flota a un lado, sobre el
-     margen que sobra junto al tablero. Los interruptores de modo viajan con
-     su zona, asi siguen a mano. */
+  /* En apaisado no caben dos filas del ancho del tablero: cada zona flota a
+     un lado, sobre el margen que sobra. Ahi la palanca deja de medir lo mismo
+     que el tablero (no cabria), asi que el recorrido es proporcional pero no
+     identico; en vertical, que es como se juega de verdad, si coincide. */
   body.tactil #botonera {
     position: fixed;
     inset: 0;
@@ -707,23 +758,18 @@ body.tactil #intro-credito { display: none; }
   body.tactil #zona-disparo {
     position: absolute;
     bottom: 12px;
-    align-items: center;
-    gap: 6px;
+    width: auto;
     pointer-events: auto;
   }
 
   body.tactil #zona-mover { left: calc(10px + env(safe-area-inset-left)); }
   body.tactil #zona-disparo { right: calc(10px + env(safe-area-inset-right)); }
 
-  body.tactil #botonera .tacto {
-    min-height: 0;
-    height: 76px;
-    font-size: 20px;
-  }
-
   body.tactil #botonera [data-accion="izquierda"],
   body.tactil #botonera [data-accion="derecha"] {
     width: 76px;
+    height: 76px;
+    min-height: 0;
     flex: 0 0 auto;
     border-radius: 50%;
   }
@@ -732,24 +778,23 @@ body.tactil #intro-credito { display: none; }
 
   body.tactil.control-palanca #palanca {
     flex: 0 0 auto;
-    width: 168px;
+    width: 180px;
     min-height: 0;
     height: 76px;
   }
 
   body.tactil #botonera .tacto.disparo {
     flex: 0 0 auto;
-    width: 96px;
-    height: 96px;
-    border-radius: 50%;
-    font-size: 13px;
+    width: 168px;
+    min-height: 0;
+    height: 84px;
+    border-radius: 999px;
+    font-size: 15px;
+    padding-right: 70px;
+    padding-left: 14px;
   }
 
-  body.tactil #botonera .tacto-mini {
-    width: 46px;
-    height: 62px;
-    font-size: 11px;
-  }
+  body.tactil .casilla-auto { width: 54px; height: 50px; right: 8px; }
 }
 
 /* En pantallas estrechas la barra no debe empujar la pagina a lo ancho: se

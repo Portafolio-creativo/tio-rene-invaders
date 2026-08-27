@@ -147,7 +147,8 @@
         muerte2: 'muerte-2.mp3',
         muerte3: 'muerte-3.mp3',
         gameOver: 'game-over.mp3',
-        victoria: 'victory.mp3',
+        victoria: 'victoria-me-rio.mp3',   // "me rio toa la noche", entera
+        ovniAparece: 'ovni-miau.mp3',      // el "miau" cuando cruza la nave
         nivel: 'level-start.mp3',
         nivelCompleto: 'level-complete.mp3',
         vidaExtra: 'extra-life.mp3',
@@ -194,9 +195,10 @@
         ambiente34: 'amb-34.mp3',
         ambiente35: 'amb-35.mp3',
         /* Frases de RACHA: cada 5 naves derribadas. */
-        racha1: 'tio-rene-racha-1.mp3',
-        racha2: 'tio-rene-racha-2.mp3',
-        racha3: 'tio-rene-racha-3.mp3'
+        racha1: 'racha-queri-too.mp3',     // "queri too"
+        racha2: 'racha-me-rio.mp3',        // "me rio toa la noche"
+        racha3: 'tio-rene-racha-2.mp3',
+        racha4: 'tio-rene-racha-3.mp3'
         /* Sintetizados a proposito (muy repetitivos):
            disparo, marcha1..4, enemigoMuere, barrera, descenso, menu, ovni */
       },
@@ -224,7 +226,7 @@
       RACHA: {
         ACTIVO: true,
         CADA: 5,           // naves derribadas entre felicitacion y felicitacion
-        CLIPS: ['racha1', 'racha2', 'racha3']
+        CLIPS: ['racha1', 'racha2', 'racha3', 'racha4']
       }
     },
 

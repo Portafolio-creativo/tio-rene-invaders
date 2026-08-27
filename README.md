@@ -60,26 +60,26 @@ sirviendo el juego desde `/proyectos/tio-rene-invaders/`.
 
 ### Controles táctiles
 
-Cada zona lleva **dentro su propio interruptor**, para cambiar de modalidad en
-plena partida sin volver al menú:
-
 ```
- [   palanca  ◀ ●———— ▶   ] [⇹]     ⇹ alterna palanca / flechas
- [        DISPARO         ] [AUTO]  AUTO fija el disparo
+ [  ◀ ————●———— ▶  ]        ← mide EXACTAMENTE lo que el tablero
+ [   DISPARO   [✓AUTO] ]    ← la casilla va dentro del propio botón
 ```
 
-- **Palanca (por defecto).** Es **posicional**: el ancho útil de la palanca se
-  reparte sobre todo el recorrido de la cabeza, así que **el dedo y el personaje
-  avanzan la misma fracción**. Se arrastra sin levantar el dedo y al soltar la
-  cabeza se queda donde está. Verificado: dedo al 0 / 25 / 50 / 75 / 100 % →
-  cabeza al 0 / 25 / 50 / 75 / 100 %.
-- **Flechas.** El modo clásico, media pantalla cada una. Se mueve mientras se
-  mantiene pulsado.
-- **AUTO.** Dispara solo; el jugador solo se preocupa de moverse. El botón de
-  disparo pasa a decir DISPARANDO.
+- **Palanca (por defecto), posicional.** Mide lo mismo que el tablero (el ancho
+  lo fija `main.js` en la variable `--ancho-tablero`), así que **el dedo y el
+  personaje recorren la misma distancia en pantalla**. Nada la flanquea: un
+  botón al costado le robaría ancho y rompería esa correspondencia. Verificado:
+  dedo al 0 / 25 / 50 / 75 / 100 % → cabeza al 0 / 25 / 50 / 75 / 100 %.
+- **Casilla AUTO,** dentro del botón de disparo. Marcada, dispara solo; sin
+  marcar, se dispara pulsando el botón como siempre. Verificado: 6 disparos en
+  3 s marcada, 0 sin marcar, y el botón grande sigue disparando a mano.
+- **Cambio palanca / flechas:** el botón ⇹ de la barra de arriba. Está ahí
+  justamente para no quitarle ancho a la palanca. Siempre disponible, también
+  en plena partida.
 
-Las dos preferencias se recuerdan entre partidas. En horizontal, cada zona
-flota a un lado del tablero con su interruptor al lado.
+Las dos preferencias se recuerdan. En horizontal cada control flota a un lado
+del tablero; ahí la palanca no puede medir lo mismo que el tablero (no cabría),
+así que el recorrido es proporcional pero no idéntico.
 
 ## 4. Estructura
 
@@ -116,27 +116,18 @@ tio-rene-invaders/
 
 ## 5. Pantalla de entrada
 
-Al abrir la página **lo primero y único que se ve es el menú**: la cara del Tío
-René entrando desde el centro, el título, el récord y el botón **JUGAR**. La
-cara y el botón laten para invitar a pulsar, y la mandíbula bosteza sola. No hay
-pantalla de carga previa ni marco vacío: el menú va sin `hidden` en el HTML, así
-que está ahí desde antes de que arranque el JavaScript.
+Al abrir se ve una **portada mínima**: título, récord y el botón **JUGAR**
+latiendo. Al pulsarlo, la cara del Tío René **crece desde el centro al mismo
+tiempo que arranca la voz** ("ya llegamos ya"), y a los 2,4 s empieza la
+partida.
 
-Mientras cargan los dibujos (un pestañeo), JUGAR está apagado y debajo se ve el
-avance. Al pulsarlo suena **"ya llegamos ya"** y empieza la partida.
+El orden importa: el clic en JUGAR es lo que el navegador exige para habilitar
+el audio, así que imagen y sonido entran juntos y sin esperas. Ningún navegador
+permite sonar antes de esa primera interacción.
 
-- Tamaño de la cara: `#intro-cara` en `css/style.css`.
-- Entrada y latido: `@keyframes entrar-cara`, `latir-cara`, `latir-boton`.
-- Cuánto abre la boca: `@keyframes bostezo`.
-- Con "movimiento reducido" activado, nada late ni bosteza (la cara aparece
-  igual, sin animación).
-
-**Por qué la voz sale al pulsar y no antes:** ningún navegador deja sonar audio
-hasta que el usuario interactúa. Es política de Chrome, Firefox y Safari, y no
-hay forma legítima de saltársela. Por eso la bienvenida se dispara justo con el
-botón: **el gesto de pulsar JUGAR es lo que habilita el sonido**. Si el
-navegador ya lo autoriza (segunda visita, o la app instalada según §6), suena
-igual de inmediato.
+- Duración de la entrada: el `2400` de `ui.mostrarEntrada(...)` en `js/main.js`.
+- Cómo crece la cara: `@keyframes entrar-cara` en `css/style.css`.
+- Con "movimiento reducido" activado, la cara aparece sin animación.
 
 ## 6. Instalar como app (y que suene al abrir)
 

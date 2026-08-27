@@ -19,6 +19,7 @@
     this.acciones = acciones;
     this.capas = {
       menu: $('capa-menu'),
+      entrada: $('capa-entrada'),
       pausa: $('capa-pausa'),
       gameOver: $('capa-game-over'),
       victoria: $('capa-victoria')
@@ -109,8 +110,8 @@
   UI.prototype.pintarAutoDisparo = function (activo) {
     TRI.Input.fijarAutoDisparo(activo);
     document.body.classList.toggle('auto-disparo', activo);
-    var boton = document.querySelector('.tacto.disparo');
-    if (boton) { boton.textContent = activo ? 'DISPARANDO' : 'DISPARO'; }
+    var texto = $('texto-disparo');
+    if (texto) { texto.textContent = activo ? 'DISPARANDO' : 'DISPARO'; }
     var mini = $('btn-modo-auto');
     if (mini) { mini.setAttribute('aria-pressed', activo ? 'true' : 'false'); }
   };
@@ -144,6 +145,29 @@
   UI.prototype.listoParaJugar = function () {
     if (this.botonJugar) { this.botonJugar.disabled = false; }
     if (this.textoCarga) { this.textoCarga.hidden = true; }
+  };
+
+  /* La cara crece desde el centro mientras suena la voz, y al terminar avisa
+     para que empiece la partida. La animacion se reinicia cada vez quitando y
+     volviendo a poner el elemento en pantalla. */
+  UI.prototype.mostrarEntrada = function (ms, alTerminar) {
+    var capa = this.capas.entrada;
+    if (!capa) { alTerminar(); return; }
+    this.ocultarTodo();
+    capa.classList.remove('saliendo');
+    capa.hidden = false;
+    var cara = capa.querySelector('#intro-cara');
+    if (cara) {                       // reinicia la animacion de entrada
+      cara.style.animation = 'none';
+      void cara.offsetWidth;
+      cara.style.animation = '';
+    }
+    global.setTimeout(function () { capa.classList.add('saliendo'); }, Math.max(0, ms - 300));
+    global.setTimeout(function () {
+      capa.hidden = true;
+      capa.classList.remove('saliendo');
+      alTerminar();
+    }, ms);
   };
 
   UI.prototype.ocultarTodo = function () {

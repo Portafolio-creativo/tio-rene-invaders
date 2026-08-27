@@ -19,11 +19,21 @@
   var juego = new TRI.Juego(renderer);
 
   var ui = new TRI.UI({
-    jugar: function () { juego.nuevaPartida(true); },
+    /* JUGAR: la voz arranca EN EL MISMO INSTANTE que la cara empieza a crecer
+       (el clic es lo que habilita el audio), y cuando termina la entrada
+       empieza la partida. */
+    jugar: function () {
+      Audio.desbloquear();
+      Audio.reproducir('intro');
+      ui.mostrarEntrada(2400, function () { juego.nuevaPartida(false, true); });
+    },
     menu: function () { juego.irAlMenu(); },
     reanudar: function () { juego.alternarPausa(); },
     seguir: function () { juego.continuarTrasVictoria(); }
   });
+
+  // ENTER en el menu hace lo mismo que pulsar JUGAR.
+  juego.alPulsarJugar = function () { ui.acciones.jugar(); };
 
   juego.alCambiarEstado = function (estado, datos) {
     ui.mostrar(estado, datos);
@@ -45,6 +55,9 @@
     var alto = Math.max(213, Math.floor(CONFIG.ALTO * escala));
     marco.style.width = ancho + 'px';
     marco.style.height = alto + 'px';
+    // Los controles tactiles miden lo MISMO que el tablero: asi el recorrido
+    // del dedo sobre la palanca coincide con el del personaje en pantalla.
+    if (botonera) { botonera.style.setProperty('--ancho-tablero', ancho + 'px'); }
     renderer.ajustar(ancho, alto);
   }
 

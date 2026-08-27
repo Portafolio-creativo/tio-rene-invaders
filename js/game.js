@@ -88,7 +88,9 @@
   /* conBienvenida: al pulsar JUGAR desde el menu suena "ya llegamos" en vez
      del aviso de nivel. Las dos frases juntas se pisarian (van por el mismo
      canal de voz), asi que se elige una. */
-  Juego.prototype.nuevaPartida = function (conBienvenida) {
+  /* conBienvenida: suena "ya llegamos" en vez del aviso de nivel.
+     sinSonido: la entrada ya lo hizo sonar, no hay que repetirlo. */
+  Juego.prototype.nuevaPartida = function (conBienvenida, sinSonido) {
     this.puntuacion.reiniciar();
     this.niveles.reiniciar();
     this.bajasSeguidas = 0;
@@ -96,7 +98,7 @@
     this.ovnisDerribados = 0;
     this.muertes = 0;
     this.prepararNivel();
-    Audio.reproducir(conBienvenida ? 'intro' : 'nivel');
+    if (!sinSonido) { Audio.reproducir(conBienvenida ? 'intro' : 'nivel'); }
     this.cambiarEstado(ESTADOS.JUGANDO);
   };
 
@@ -124,7 +126,7 @@
   /* Tecla Enter / boton principal segun el estado actual. */
   Juego.prototype.aceptar = function () {
     Audio.desbloquear();
-    if (this.estado === ESTADOS.MENU) { this.nuevaPartida(true); }
+    if (this.estado === ESTADOS.MENU) { this.alPulsarJugar(); }
     else if (this.estado === ESTADOS.PAUSA) { this.alternarPausa(); }
     else if (this.estado === ESTADOS.GAME_OVER) { Audio.reproducir('menu'); this.nuevaPartida(); }
     else if (this.estado === ESTADOS.VICTORIA) { this.continuarTrasVictoria(); }
@@ -138,6 +140,9 @@
     this.temporizador = CONFIG.NIVELES.ESPERA_ENTRE_NIVELES;
     this.cambiarEstado(ESTADOS.ENTRE_NIVELES);
   };
+
+  /* Lo asigna main.js: la entrada (cara + voz) y luego la partida. */
+  Juego.prototype.alPulsarJugar = function () { this.nuevaPartida(true); };
 
   Juego.prototype.alternarDepuracion = function () {
     this.debug = !this.debug;
@@ -233,7 +238,10 @@
   Juego.prototype.actualizarOvni = function (dt) {
     var puedeAparecer = this.enemigos.vivos > 2 && this.jugador.estado === 'normal';
     var evento = this.ovni.actualizar(dt, puedeAparecer);
-    if (evento === 'aparece') { Audio.iniciarSirena(); }
+    if (evento === 'aparece') {
+      Audio.reproducir('ovniAparece');   // el "miau": avisa que llego la nave
+      Audio.iniciarSirena();
+    }
     else if (evento === 'sale') { Audio.detenerSirena(); }
   };
 
