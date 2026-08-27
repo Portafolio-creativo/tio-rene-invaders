@@ -25,6 +25,13 @@
     'player-jaw': { w: 360, h: 147, carpeta: 'sprites', ext: ['png', 'svg'] },
     'player-mouth': { w: 360, h: 2, carpeta: 'sprites', ext: ['png', 'svg'] },
     'player-body': { w: 56, h: 34, carpeta: 'sprites' },
+    /* Jefes: fotos recortadas como la de Rene. Si el archivo no esta, se usa
+       la cabeza generada de fallback-art y el jefe se juega igual. */
+    'boss-1': { w: 250, h: 250, carpeta: 'sprites', ext: ['png'] },
+    'boss-2': { w: 250, h: 250, carpeta: 'sprites', ext: ['png'] },
+    'boss-3': { w: 250, h: 250, carpeta: 'sprites', ext: ['png'] },
+    'boss-4': { w: 250, h: 250, carpeta: 'sprites', ext: ['png'] },
+    'boss-5': { w: 250, h: 250, carpeta: 'sprites', ext: ['png'] },
     'enemy-01-a': { w: 36, h: 30, carpeta: 'sprites' },
     'enemy-01-b': { w: 36, h: 30, carpeta: 'sprites' },
     'enemy-02-a': { w: 36, h: 30, carpeta: 'sprites' },

@@ -24,10 +24,19 @@
     this.params = CONFIG.nivelParams(1);
   }
 
+  /* Deja la formacion vacia: los niveles de jefe no llevan naves. */
+  GestorEnemigos.prototype.vaciar = function (nivel) {
+    this.params = CONFIG.nivelParams(nivel || 1);
+    this.enemigos.length = 0;
+    this.total = 0;
+    this.vivos = 0;
+  };
+
   GestorEnemigos.prototype.preparar = function (nivel) {
     this.params = CONFIG.nivelParams(nivel);
     this.enemigos.length = 0;
-    var anchoFormacion = (E.COLUMNAS - 1) * E.SEPARACION_X + E.ANCHO;
+    var filas = this.params.filas, columnas = this.params.columnas;
+    var anchoFormacion = (columnas - 1) * E.SEPARACION_X + E.ANCHO;
     this.offsetX = Math.round((CONFIG.ANCHO - anchoFormacion) / 2);
     this.offsetY = this.params.yInicial;
     this.direccion = 1;
@@ -35,9 +44,9 @@
     this.indicePaso = 0;
     this.temporizadorDisparo = this.params.intervaloDisparo * 0.6;
 
-    for (var f = 0; f < E.FILAS; f++) {
+    for (var f = 0; f < filas; f++) {
       var tipo = E.TIPOS[Math.min(f, E.TIPOS.length - 1)];
-      for (var c = 0; c < E.COLUMNAS; c++) {
+      for (var c = 0; c < columnas; c++) {
         this.enemigos.push({
           fila: f, columna: c,
           sprite: tipo.sprite,

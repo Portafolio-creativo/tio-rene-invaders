@@ -221,6 +221,66 @@
     return c;
   }
 
+  /* Cabeza de jefe generada. Es un MARCADOR DE SITIO a proposito: sirve para
+     que el jefe se pueda jugar aunque todavia no exista assets/sprites/
+     boss-N.png. En cuanto se ponga ese archivo, manda la imagen de verdad.
+     Cada jefe tiene su color y su gesto para distinguirlos de un vistazo. */
+  function cabezaJefe(indice) {
+    var paleta = [
+      { piel: '#f0b48a', pelo: '#2b1d16', detalle: '#ffd166' },
+      { piel: '#d99a6c', pelo: '#101010', detalle: '#7cc6ff' },
+      { piel: '#bfe3a8', pelo: '#1f5c2e', detalle: '#46d16a' },
+      { piel: '#eab08c', pelo: '#5a3212', detalle: '#ff9f5a' },
+      { piel: '#f6e3b0', pelo: '#c99a20', detalle: '#ffe36b' }
+    ][indice % 5];
+
+    var c = lienzo(250, 250), ctx = c.getContext('2d');
+    ctx.strokeStyle = '#1a0f08';
+    ctx.lineWidth = 6;
+
+    // craneo
+    ctx.fillStyle = paleta.piel;
+    ctx.beginPath();
+    ctx.ellipse(125, 132, 92, 108, 0, 0, Math.PI * 2);
+    ctx.fill(); ctx.stroke();
+
+    // pelo
+    ctx.fillStyle = paleta.pelo;
+    ctx.beginPath();
+    ctx.ellipse(125, 66, 94, 52, 0, Math.PI, Math.PI * 2);
+    ctx.fill(); ctx.stroke();
+
+    // ojos
+    ctx.fillStyle = '#fff';
+    [90, 160].forEach(function (x) {
+      ctx.beginPath(); ctx.ellipse(x, 122, 24, 18, 0, 0, Math.PI * 2);
+      ctx.fill(); ctx.stroke();
+    });
+    ctx.fillStyle = '#1a0f08';
+    [95, 155].forEach(function (x) {
+      ctx.beginPath(); ctx.arc(x, 124, 9, 0, Math.PI * 2); ctx.fill();
+    });
+
+    // boca abierta: por ahi escupe
+    ctx.fillStyle = '#3d1414';
+    ctx.beginPath();
+    ctx.ellipse(125, 190, 46, 28, 0, 0, Math.PI * 2);
+    ctx.fill(); ctx.stroke();
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(96, 168, 58, 10);
+
+    // banda de color, para diferenciarlos aunque falten las fotos
+    ctx.fillStyle = paleta.detalle;
+    ctx.fillRect(33, 88, 184, 12);
+
+    // el numero del jefe, para no perderse mientras son marcadores
+    ctx.fillStyle = '#1a0f08';
+    ctx.font = 'bold 26px "Trebuchet MS", Verdana, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('#' + (indice + 1), 125, 99);
+    return c;
+  }
+
   var GENERADORES = {
     'player-head': cabeza,
     'player-jaw': mandibula,
@@ -237,7 +297,12 @@
     'projectile-enemy': function () { return proyectil(false); },
     'barrier-block': bloqueBarrera,
     'explosion': explosion,
-    'logo': logo
+    'logo': logo,
+    'boss-1': function () { return cabezaJefe(0); },
+    'boss-2': function () { return cabezaJefe(1); },
+    'boss-3': function () { return cabezaJefe(2); },
+    'boss-4': function () { return cabezaJefe(3); },
+    'boss-5': function () { return cabezaJefe(4); }
   };
 
   global.TRI = global.TRI || {};

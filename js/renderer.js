@@ -126,6 +126,27 @@
     dibujarSprite(this.ctx, 'enemy-special', ovni.x, ovni.y, ovni.w, ovni.h);
   };
 
+  /* El jefe se pinta desde su propio lienzo, que ya trae los mordiscos hechos.
+     El destello es el fogonazo blanco del impacto. */
+  Renderer.prototype.dibujarJefe = function (jefe) {
+    if (!jefe.activo) { return; }
+    var ctx = this.ctx;
+    ctx.drawImage(jefe.lienzo, Math.round(jefe.x), Math.round(jefe.y));
+    if (jefe.destello > 0) {
+      ctx.save();
+      ctx.globalAlpha = Math.min(0.55, jefe.destello * 4);
+      ctx.globalCompositeOperation = 'lighter';
+      ctx.drawImage(jefe.lienzo, Math.round(jefe.x), Math.round(jefe.y));
+      ctx.restore();
+    }
+    // Barra de lo que le queda de cara.
+    var w = CONFIG.JEFES.ANCHO, resto = Math.max(0, jefe.vivas / jefe.total);
+    ctx.fillStyle = 'rgba(0,0,0,0.45)';
+    ctx.fillRect(jefe.x, jefe.y - 14, w, 8);
+    ctx.fillStyle = resto > 0.4 ? '#46d16a' : '#ff7a6b';
+    ctx.fillRect(jefe.x, jefe.y - 14, w * resto, 8);
+  };
+
   Renderer.prototype.dibujarProyectiles = function (gestor) {
     var ctx = this.ctx;
     var lista = gestor.lista;

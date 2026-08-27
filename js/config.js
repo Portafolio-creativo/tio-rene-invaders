@@ -100,8 +100,10 @@
     PROYECTIL_ENEMIGO: { ANCHO: 12, ALTO: 22, VELOCIDAD_BASE: 240 },
 
     ENEMIGOS: {
-      FILAS: 5,
-      COLUMNAS: 9,
+      FILAS: 4,
+      FILAS_MAX: 6,
+      COLUMNAS: 8,
+      COLUMNAS_MAX: 11,
       ANCHO: 36,
       ALTO: 30,
       SEPARACION_X: 46,
@@ -161,8 +163,40 @@
     },
 
     NIVELES: {
-      TOTAL: 5,                 // al superar este nivel: VICTORIA
+      TOTAL: 15,                // al superar este nivel: VICTORIA
       ESPERA_ENTRE_NIVELES: 3.2 // segundos del cartel "NIVEL N"
+    },
+
+    /* Jefes: cada tres niveles, en vez de la formacion aparece una cabezota
+       que hay que ir deshaciendo a tiros. Se destruye por celdas, igual que
+       las barreras, asi que se le van comiendo pedazos de verdad.
+
+       El dibujo de cada uno es assets/sprites/boss-N.png, con el mismo formato
+       que player-head.png (cabeza recortada, fondo transparente). Si el
+       archivo no esta, se dibuja una cabeza generada para que el jefe funcione
+       igual: asi se puede reemplazar uno por uno sin tocar codigo. */
+    JEFES: {
+      CADA: 3,                  // nivel de jefe cada N niveles
+      ANCHO: 250,
+      ALTO: 250,
+      Y_INICIAL: 96,
+      VELOCIDAD_BASE: 52,       // px/s de vaiven; sube con el nivel
+      DESCENSO: 10,             // px que baja al tocar un borde
+      COLUMNAS: 18,             // rejilla de destruccion
+      FILAS: 18,
+      RADIO_IMPACTO: 3,         // celdas que se lleva cada disparo
+      RESTO_PARA_MORIR: 0.22,   // muere al quedarle este trozo de cara
+      PUNTOS: 750,
+      INTERVALO_DISPARO_BASE: 1.25,
+      INTERVALO_DISPARO_MIN: 0.45,
+      /* En el orden que pidio Eduardo. */
+      LISTA: [
+        { sprite: 'boss-1', nombre: 'PAPI MICKY' },
+        { sprite: 'boss-2', nombre: 'JB THE VOICE' },
+        { sprite: 'boss-3', nombre: 'PÁJARO VERDE' },
+        { sprite: 'boss-4', nombre: 'WASON KING' },
+        { sprite: 'boss-5', nombre: 'HUEVITO REY' }
+      ]
     },
 
     AUDIO: {
@@ -333,12 +367,16 @@
     var n = Math.max(1, nivel);
     var extraY = Math.min(n - 1, e.Y_INICIAL_MAX_NIVELES) * e.Y_INICIAL_POR_NIVEL;
     return {
-      intervaloPaso: Math.max(e.INTERVALO_PASO_MIN, e.INTERVALO_PASO_BASE * Math.pow(0.87, n - 1)),
+      intervaloPaso: Math.max(e.INTERVALO_PASO_MIN, e.INTERVALO_PASO_BASE * Math.pow(0.93, n - 1)),
       descenso: Math.min(e.DESCENSO_MAX, e.DESCENSO_BASE + 2 * (n - 1)),
       yInicial: e.Y_INICIAL + extraY,
-      intervaloDisparo: Math.max(e.INTERVALO_DISPARO_MIN, e.INTERVALO_DISPARO_BASE * Math.pow(0.86, n - 1)),
-      velocidadDisparo: Math.min(430, CONFIG.PROYECTIL_ENEMIGO.VELOCIDAD_BASE + 24 * (n - 1)),
-      maxProyectiles: Math.min(e.MAX_PROYECTILES_TOPE, e.MAX_PROYECTILES_BASE + Math.floor((n - 1) / 2))
+      intervaloDisparo: Math.max(e.INTERVALO_DISPARO_MIN, e.INTERVALO_DISPARO_BASE * Math.pow(0.93, n - 1)),
+      velocidadDisparo: Math.min(430, CONFIG.PROYECTIL_ENEMIGO.VELOCIDAD_BASE + 11 * (n - 1)),
+      maxProyectiles: Math.min(e.MAX_PROYECTILES_TOPE, e.MAX_PROYECTILES_BASE + Math.floor((n - 1) / 2)),
+      /* La formacion tambien crece: con solo acelerar, todos los niveles se
+         sentian iguales. Ahora ademas hay mas naves y ocupan mas ancho. */
+      filas: Math.min(e.FILAS_MAX, e.FILAS + Math.floor((n - 1) / 4)),
+      columnas: Math.min(e.COLUMNAS_MAX, e.COLUMNAS + Math.floor((n - 1) / 3))
     };
   };
 

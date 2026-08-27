@@ -37,6 +37,7 @@
     this.proyectiles = new TRI.GestorProyectiles();
     this.barreras = TRI.crearBarreras();
     this.ovni = new TRI.Ovni();
+    this.jefe = new TRI.Jefe();
     this.efectos = new TRI.GestorEfectos();
     this.puntuacion = new TRI.SistemaPuntuacion();
     this.niveles = new TRI.SistemaNiveles();
@@ -106,7 +107,16 @@
   };
 
   Juego.prototype.prepararNivel = function () {
-    this.enemigos.preparar(this.niveles.nivel);
+    /* En los niveles de jefe no hay formacion: toda la pantalla es la cabezota.
+       Asi el nivel se siente distinto de verdad, no solo mas rapido. */
+    this.esNivelDeJefe = this.niveles.esNivelDeJefe();
+    if (this.esNivelDeJefe) {
+      this.jefe.preparar(this.niveles.nivel);
+      this.enemigos.vaciar();
+    } else {
+      this.jefe.reiniciar();
+      this.enemigos.preparar(this.niveles.nivel);
+    }
     this.proyectiles.limpiar();
     this.efectos.limpiar();
     this.ovni.reiniciar();
@@ -210,7 +220,8 @@
     }
 
     this.actualizarDisparoJugador();
-    this.actualizarEnemigos(dt);
+    if (this.esNivelDeJefe) { this.actualizarJefe(dt); }
+    else { this.actualizarEnemigos(dt); }
     this.actualizarOvni(dt);
     this.actualizarAmbiente(dt);
     this.resolverColisiones();
@@ -266,6 +277,19 @@
       : 2;                                    // ocupado: se reintenta pronto
   };
 
+  Juego.prototype.actualizarJefe = function (dt) {
+    if (!this.jefe.activo) { return; }
+    if (this.jefe.actualizar(dt) && this.proyectiles.contar(false) < 4) {
+      var boca = this.jefe.bocaDeFuego();
+      this.proyectiles.lanzar(boca.x, boca.y, false, this.enemigos.params.velocidadDisparo);
+    }
+    // Si la cabezota llega abajo, se acabo: igual que la invasion clasica.
+    if (this.jefe.y + CONFIG.JEFES.ALTO >= CONFIG.ENEMIGOS.LINEA_INVASION) {
+      this.puntuacion.vidas = 0;
+      this.golpearJugador();
+    }
+  };
+
   Juego.prototype.resolverColisiones = function () {
     var self = this;
 
@@ -280,6 +304,32 @@
       Audio.reproducir('enemigoMuere');
       self.contarBaja();
     });
+
+    if (this.jefe.activo) {
+      var jefe = this.jefe;
+      var caja = jefe.hitbox();
+      this.proyectiles.lista.forEach(function (p) {
+        if (!p.vivo || !p.deJugador) { return; }
+        var px = p.x + p.w / 2, py = p.y;
+        if (px < caja.x || px > caja.x + caja.w) { return; }
+        if (py < caja.y || py > caja.y + caja.h) { return; }
+        if (!jefe.impactar(px, py)) { return; }   // cayo en un hueco ya abierto
+        p.vivo = false;
+        self.efectos.chispas(px, py, 7, '#ffd0a0');
+        if (self.puntuacion.sumar(10)) { Audio.reproducir('vidaExtra'); }
+        Audio.reproducir('enemigoMuere');
+        if (jefe.derrotado()) {
+          jefe.activo = false;
+          var cx = jefe.x + CONFIG.JEFES.ANCHO / 2;
+          var cy = jefe.y + CONFIG.JEFES.ALTO / 2;
+          self.efectos.destello(cx, cy, 160);
+          self.efectos.chispas(cx, cy, 40, '#ffd0a0');
+          self.efectos.texto(cx, cy, String(CONFIG.JEFES.PUNTOS), '#7cf29a');
+          if (self.puntuacion.sumar(CONFIG.JEFES.PUNTOS)) { Audio.reproducir('vidaExtra'); }
+          Audio.reproducir('victoria');
+        }
+      });
+    }
 
     Colisiones.jugadorContraOvni(this.proyectiles, this.ovni, function (ovni) {
       var puntos = ovni.puntos();
@@ -358,7 +408,9 @@
   };
 
   Juego.prototype.comprobarFinDeNivel = function () {
-    if (this.enemigos.vivos > 0) { return; }
+    if (this.esNivelDeJefe) {
+      if (this.jefe.activo) { return; }
+    } else if (this.enemigos.vivos > 0) { return; }
     this.proyectiles.limpiar();
     this.ovni.activo = false;
     Audio.detenerSirena();
@@ -393,6 +445,7 @@
       r.dibujarBarreras(this.barreras);
       r.dibujarOvni(this.ovni);
       r.dibujarEnemigos(this.enemigos);
+      r.dibujarJefe(this.jefe);
       r.dibujarProyectiles(this.proyectiles);
       r.dibujarJugador(this.jugador);
       r.dibujarEfectos(this.efectos);

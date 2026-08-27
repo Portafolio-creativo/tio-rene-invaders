@@ -20,6 +20,17 @@
     return CONFIG.nivelParams(this.nivel);
   };
 
+  /* Cada N niveles toca jefe en vez de formacion. */
+  SistemaNiveles.prototype.esNivelDeJefe = function () {
+    return this.nivel % CONFIG.JEFES.CADA === 0;
+  };
+
+  /* Nombre del jefe de este nivel, para el cartel. */
+  SistemaNiveles.prototype.nombreDelJefe = function () {
+    var lista = CONFIG.JEFES.LISTA;
+    return lista[Math.floor((this.nivel - 1) / CONFIG.JEFES.CADA) % lista.length].nombre;
+  };
+
   /* Tras limpiar la formacion: true si toca pantalla de VICTORIA. */
   SistemaNiveles.prototype.esFinalDelJuego = function () {
     return !this.modoInfinito && this.nivel >= CONFIG.NIVELES.TOTAL;
@@ -35,6 +46,7 @@
   };
 
   SistemaNiveles.prototype.etiqueta = function () {
+    if (this.esNivelDeJefe()) { return 'JEFE: ' + this.nombreDelJefe(); }
     if (this.modoInfinito) { return 'NIVEL ' + this.nivel + ' (SIN FIN)'; }
     return 'NIVEL ' + this.nivel + ' / ' + CONFIG.NIVELES.TOTAL;
   };
