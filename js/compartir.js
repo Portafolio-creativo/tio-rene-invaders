@@ -137,9 +137,10 @@
        Devuelve una promesa con un mensaje corto para enseñar al jugador, o
        null si el propio jugador cancelo (ahi no hay nada que decir). */
     resultado: function (datos) {
-      /* El enlace va DENTRO del texto, no solo en el campo url: cuando se
-         manda una imagen, WhatsApp y compania se quedan con el archivo y el
-         texto, y descartan el url. Asi el juego viaja siempre con la foto. */
+      /* El enlace va SOLO dentro del texto. Pasarlo ademas en el campo url
+         lo duplicaba: WhatsApp no lo descarta, lo pega al final del texto y
+         el enlace salia dos veces seguidas. El texto viaja siempre; el url
+         no, asi que el texto es el sitio seguro. */
       var texto = 'Hice ' + Util.formatearPuntos(datos.puntos)
         + ' puntos en Tío René Invaders. ¿Le ganai?' + '\n' + CONFIG.ENLACE;
       var nav = global.navigator;
@@ -152,12 +153,12 @@
 
         var conArchivo = archivo && nav.canShare && nav.canShare({ files: [archivo] });
         if (conArchivo) {
-          return nav.share({ files: [archivo], text: texto, url: CONFIG.ENLACE,
+          return nav.share({ files: [archivo], text: texto,
                              title: 'TÍO RENÉ INVADERS' })
             .then(function () { return 'Compartido'; });
         }
         if (nav.share) {
-          return nav.share({ title: 'TÍO RENÉ INVADERS', text: texto, url: CONFIG.ENLACE })
+          return nav.share({ title: 'TÍO RENÉ INVADERS', text: texto })
             .then(function () { return 'Compartido'; });
         }
         return salidaDeEmergencia(blob, texto);
