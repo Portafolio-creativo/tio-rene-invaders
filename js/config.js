@@ -180,18 +180,20 @@
       ANCHO: 250,
       ALTO: 250,
       Y_INICIAL: 96,
-      VELOCIDAD_BASE: 52,       // px/s de vaiven; sube con el nivel
-      DESCENSO: 10,             // px que baja al tocar un borde
-      COLUMNAS: 26,             // rejilla de destruccion (mas fina = menos cuadriculado)
-      FILAS: 26,
-      /* Cuantos impactos deberia costar tumbarlo. El radio del mordisco se
-         calcula a partir de esto y del tamano real de la silueta, porque cada
-         foto recorta una cantidad distinta de celdas: con un radio fijo, una
-         cara angosta caia en cuatro tiros y una ancha se hacia eterna. */
+      /* Zona por la que ronda. No baja de MAX_Y para que al jugador le quede
+         siempre sitio para maniobrar. */
+      MIN_Y: 70,
+      MAX_Y: 430,
+      VELOCIDAD_BASE: 96,       // px/s hacia su punto de destino
+      /* Se acerca y se aleja: de cerca tapa media pantalla, de lejos cuesta
+         acertarle. Cambia de tamano cada pocos segundos, al azar. */
+      ESCALA_MIN: 0.62,
+      ESCALA_MAX: 1.30,
+      ZOOM_CADA_MIN: 1.6,
+      ZOOM_CADA_MAX: 3.4,
+      /* Cuantos impactos cuesta tumbarlo. La cara no se borra a pedazos: se
+         va deteriorando, y al llegar a esta cuenta estalla. */
       IMPACTOS_OBJETIVO: 15,
-      RADIO_MIN: 2,
-      RADIO_MAX: 6,
-      RESTO_PARA_MORIR: 0.22,   // muere al quedarle este trozo de cara
       PUNTOS: 750,
       INTERVALO_DISPARO_BASE: 1.25,
       INTERVALO_DISPARO_MIN: 0.45,

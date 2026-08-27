@@ -126,25 +126,30 @@
     dibujarSprite(this.ctx, 'enemy-special', ovni.x, ovni.y, ovni.w, ovni.h);
   };
 
-  /* El jefe se pinta desde su propio lienzo, que ya trae los mordiscos hechos.
-     El destello es el fogonazo blanco del impacto. */
+  /* El jefe se pinta desde su propio lienzo, que ya trae el deterioro. Se
+     escala segun lo cerca que este; el destello es el fogonazo del impacto. */
   Renderer.prototype.dibujarJefe = function (jefe) {
     if (!jefe.activo) { return; }
     var ctx = this.ctx;
-    ctx.drawImage(jefe.lienzo, Math.round(jefe.x), Math.round(jefe.y));
+    var c = jefe.hitbox();
+    ctx.drawImage(jefe.lienzo, Math.round(c.x), Math.round(c.y),
+                  Math.round(c.w), Math.round(c.h));
     if (jefe.destello > 0) {
       ctx.save();
-      ctx.globalAlpha = Math.min(0.55, jefe.destello * 4);
+      ctx.globalAlpha = Math.min(0.5, jefe.destello * 4);
       ctx.globalCompositeOperation = 'lighter';
-      ctx.drawImage(jefe.lienzo, Math.round(jefe.x), Math.round(jefe.y));
+      ctx.drawImage(jefe.lienzo, Math.round(c.x), Math.round(c.y),
+                    Math.round(c.w), Math.round(c.h));
       ctx.restore();
     }
-    // Barra de lo que le queda de cara.
-    var w = CONFIG.JEFES.ANCHO, resto = jefe.resto();
+    // Barra de vida, siempre del mismo ancho y arriba del todo: si siguiera al
+    // jefe se saldria de la pantalla cuando se acerca.
+    var ancho = CONFIG.ANCHO - 120;
+    var resto = jefe.resto();
     ctx.fillStyle = 'rgba(0,0,0,0.45)';
-    ctx.fillRect(jefe.x, jefe.y - 14, w, 8);
+    ctx.fillRect(60, CONFIG.HUD_ALTO + 6, ancho, 9);
     ctx.fillStyle = resto > 0.4 ? '#46d16a' : '#ff7a6b';
-    ctx.fillRect(jefe.x, jefe.y - 14, w * resto, 8);
+    ctx.fillRect(60, CONFIG.HUD_ALTO + 6, ancho * resto, 9);
   };
 
   Renderer.prototype.dibujarProyectiles = function (gestor) {

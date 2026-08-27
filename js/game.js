@@ -301,9 +301,15 @@
       var boca = this.jefe.bocaDeFuego();
       this.proyectiles.lanzar(boca.x, boca.y, false, this.enemigos.params.velocidadDisparo);
     }
-    // Si la cabezota llega abajo, se acabo: igual que la invasion clasica.
-    if (this.jefe.y + CONFIG.JEFES.ALTO >= CONFIG.ENEMIGOS.LINEA_INVASION) {
-      this.puntuacion.vidas = 0;
+    /* El jefe ya no baja sin freno: se mueve dentro de su zona, asi que no
+       hay linea de invasion que valga. Lo que si puede es aplastar al jugador
+       si se le echa encima. */
+    var caja = this.jefe.hitbox();
+    var h = this.jugador.hitbox();
+    if (this.jugador.esVulnerable() &&
+        caja.x < h.x + h.w && caja.x + caja.w > h.x &&
+        caja.y < h.y + h.h && caja.y + caja.h > h.y) {
+      this.puntuacion.perderVida();
       this.golpearJugador();
     }
   };
@@ -325,28 +331,30 @@
 
     if (this.jefe.activo) {
       var jefe = this.jefe;
-      var caja = jefe.hitbox();
       this.proyectiles.lista.forEach(function (p) {
         if (!p.vivo || !p.deJugador) { return; }
+        // La caja se pide dentro del bucle: el jefe cambia de tamano.
+        var caja = jefe.hitbox();
         var px = p.x + p.w / 2, py = p.y;
         if (px < caja.x || px > caja.x + caja.w) { return; }
         if (py < caja.y || py > caja.y + caja.h) { return; }
-        if (!jefe.impactar(px, py)) { return; }   // cayo en un hueco ya abierto
+        jefe.impactar(px, py);
         p.vivo = false;
         self.efectos.chispas(px, py, 7, '#ffd0a0');
         if (self.puntuacion.sumar(10)) { Audio.reproducir('vidaExtra'); }
         Audio.reproducir('enemigoMuere');
         if (jefe.derrotado()) {
+          var caja = jefe.hitbox();
           jefe.activo = false;
-          var cx = jefe.x + CONFIG.JEFES.ANCHO / 2;
-          var cy = jefe.y + CONFIG.JEFES.ALTO / 2;
+          var cx = caja.x + caja.w / 2;
+          var cy = caja.y + caja.h / 2;
           /* Estalla y desaparece: en vez de un solo fogonazo en el centro, se
              revienta por toda la cara para que se lea como que salta en
              pedazos, no como que se apaga. */
           self.efectos.destello(cx, cy, 200);
           for (var e = 0; e < 7; e++) {
-            var ex = jefe.x + CONFIG.JEFES.ANCHO * (0.2 + 0.6 * Math.random());
-            var ey = jefe.y + CONFIG.JEFES.ALTO * (0.2 + 0.6 * Math.random());
+            var ex = caja.x + caja.w * (0.2 + 0.6 * Math.random());
+            var ey = caja.y + caja.h * (0.2 + 0.6 * Math.random());
             self.efectos.destello(ex, ey, 70 + Math.random() * 50);
             self.efectos.chispas(ex, ey, 14, e % 2 ? '#ffd0a0' : '#ff7a4a');
           }

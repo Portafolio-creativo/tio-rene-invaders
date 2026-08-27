@@ -1,13 +1,16 @@
-/* Jefe: una cabezota que hay que deshacer a tiros.
+/* Jefe: una cabezota que se va deteriorando a tiros.
  *
- * Se destruye por CELDAS, igual que las barreras: cada impacto se lleva un
- * pequeno radio, asi que la cara se va comiendo de a poco y se nota en
- * pantalla. Las celdas solidas se sacan de la propia imagen leyendo su
- * transparencia, de modo que la destruccion sigue la silueta de la cabeza y no
- * un rectangulo.
+ * La cara NO se borra a pedazos: se mantiene entera y reconocible hasta el
+ * final, que es lo que la hace temible. Lo que cambia es su estado: se llena
+ * de magulladuras y quemaduras donde recibe los impactos, pierde color y se
+ * va oscureciendo. Al completar los golpes necesarios, estalla.
  *
- * La cara se pinta en un lienzo aparte y solo se vuelve a pintar cuando le
- * quitan un trozo: dibujar 324 celdas en cada fotograma seria un derroche.
+ * Se mueve por puntos al azar con trayectorias curvas y ademas se acerca y se
+ * aleja (zoom), asi que no basta con seguirlo de lado a lado: hay que
+ * anticiparlo.
+ *
+ * La cara se pinta en un lienzo aparte y solo se repinta cuando recibe un
+ * golpe nuevo; el movimiento no obliga a redibujarla.
  */
 (function (global) {
   'use strict';
@@ -19,86 +22,35 @@
 
   function Jefe() {
     this.activo = false;
-    this.celdas = [];
+    this.marcas = [];
     this.lienzo = document.createElement('canvas');
     this.lienzo.width = J.ANCHO;
     this.lienzo.height = J.ALTO;
     this.ctx = this.lienzo.getContext('2d');
   }
 
-  Jefe.prototype.anchoCelda = function () { return J.ANCHO / J.COLUMNAS; };
-  Jefe.prototype.altoCelda = function () { return J.ALTO / J.FILAS; };
-
-  /* Marca como solidas solo las celdas donde la imagen tiene algo pintado. Si
-     no hay imagen (o el navegador no deja leerla), se toma la cabeza entera. */
-  Jefe.prototype.calcularCeldas = function (img) {
-    this.celdas.length = 0;
-    this.base = [];
-    var datos = null;
-    if (img) {
-      try {
-        var muestra = document.createElement('canvas');
-        muestra.width = J.COLUMNAS;
-        muestra.height = J.FILAS;
-        var mctx = muestra.getContext('2d');
-        mctx.drawImage(img, 0, 0, J.COLUMNAS, J.FILAS);
-        datos = mctx.getImageData(0, 0, J.COLUMNAS, J.FILAS).data;
-      } catch (e) {
-        datos = null;          // lienzo "manchado": se sigue sin la muestra
-      }
-    }
-    for (var f = 0; f < J.FILAS; f++) {
-      var fila = [];
-      for (var c = 0; c < J.COLUMNAS; c++) {
-        var solida = 1;
-        if (datos) {
-          var alfa = datos[(f * J.COLUMNAS + c) * 4 + 3];
-          solida = alfa > 40 ? 1 : 0;
-        }
-        fila.push(solida);
-      }
-      this.celdas.push(fila);
-      this.base.push(fila.slice());   // silueta original, para saber que se rompio
-    }
-    this.total = this.contarVivas();
-    this.vivas = this.total;
-  };
-
-  Jefe.prototype.contarVivas = function () {
-    var n = 0;
-    for (var f = 0; f < this.celdas.length; f++) {
-      for (var c = 0; c < this.celdas[f].length; c++) { n += this.celdas[f][c]; }
-    }
-    return n;
-  };
-
-  /* nivel decide cual de los cinco jefes toca y lo rapido que se mueve. */
+  /* nivel decide cual de los cinco jefes toca y lo agresivo que se mueve. */
   Jefe.prototype.preparar = function (nivel) {
-    var indice = Math.floor((nivel - 1) / J.CADA) % J.LISTA.length;
-    this.datos = J.LISTA[indice];
+    var vuelta = Math.floor((nivel - 1) / J.CADA);
+    this.datos = J.LISTA[vuelta % J.LISTA.length];
     this.sprite = this.datos.sprite;
     this.nombre = this.datos.nombre;
     this.activo = true;
-    this.x = (CONFIG.ANCHO - J.ANCHO) / 2;
-    this.y = J.Y_INICIAL;
-    this.direccion = 1;
-    this.velocidad = J.VELOCIDAD_BASE + 6 * Math.floor((nivel - 1) / J.CADA);
+
+    this.cx = CONFIG.ANCHO / 2;
+    this.cy = J.Y_INICIAL + J.ALTO / 2;
+    this.escala = 1;
+    this.escalaObjetivo = 1;
+    this.velocidad = J.VELOCIDAD_BASE + 14 * vuelta;
     this.intervaloDisparo = Math.max(
       J.INTERVALO_DISPARO_MIN,
-      J.INTERVALO_DISPARO_BASE - 0.16 * Math.floor((nivel - 1) / J.CADA));
+      J.INTERVALO_DISPARO_BASE - 0.16 * vuelta);
     this.temporizadorDisparo = this.intervaloDisparo;
+    this.temporizadorZoom = 0;
     this.destello = 0;
-    this.calcularCeldas(Assets.obtener(this.sprite));
-    /* Lo que cuesta tumbarlo se cuenta en IMPACTOS, no en celdas: cada foto
-       recorta una silueta distinta, y midiendo por celdas una cara angosta
-       caia en cuatro tiros y otra costaba veintisiete.
-       El radio solo decide como de rapido se ve comida la cara. El factor 0.6
-       compensa que junto al borde y sobre huecos ya abiertos el mordisco se
-       lleva bastante menos de lo que dice su area. */
     this.impactos = 0;
-    var aDestruir = this.total * (1 - J.RESTO_PARA_MORIR);
-    var radio = Math.sqrt(aDestruir / (Math.PI * J.IMPACTOS_OBJETIVO * 0.6));
-    this.radio = Math.max(J.RADIO_MIN, Math.min(J.RADIO_MAX, Math.round(radio)));
+    this.marcas.length = 0;
+    this.nuevoDestino();
     this.repintar();
   };
 
@@ -106,103 +58,98 @@
     this.activo = false;
   };
 
-  /* Vuelve a pintar la cara con los agujeros que tenga ahora. */
-  Jefe.prototype.repintar = function () {
-    var ctx = this.ctx;
-    var img = Assets.obtener(this.sprite);
-    ctx.clearRect(0, 0, J.ANCHO, J.ALTO);
-    if (!img) { return; }
-    var aw = this.anchoCelda(), ah = this.altoCelda();
-    var sx = img.width / J.COLUMNAS, sy = img.height / J.FILAS;
-    for (var f = 0; f < J.FILAS; f++) {
-      for (var c = 0; c < J.COLUMNAS; c++) {
-        if (!this.celdas[f][c]) { continue; }
-        // +1 al recortar: evita las costuras claras entre celda y celda.
-        ctx.drawImage(img, c * sx, f * sy, sx, sy,
-                      c * aw, f * ah, aw + 1, ah + 1);
-      }
-    }
-    this.dibujarDesgaste();
+  /* ---- Movimiento ---- */
+
+  Jefe.prototype.limites = function () {
+    var mitadX = (J.ANCHO * this.escala) / 2;
+    var mitadY = (J.ALTO * this.escala) / 2;
+    return {
+      minX: mitadX + 8,
+      maxX: CONFIG.ANCHO - mitadX - 8,
+      minY: J.MIN_Y + mitadY,
+      maxY: J.MAX_Y - mitadY
+    };
   };
 
-  /* El desgaste: se tizna el BORDE de los boquetes, no se dibujan rayas
-     sueltas. Recorriendo las celdas y mirando a sus vecinas se sabe donde
-     acaba la carne y empieza el agujero, y ahi va la quemadura. Asi la marca
-     sigue siempre la forma real del destrozo.
-     source-atop recorta todo contra lo que queda de cara, para que nada
-     flote sobre el vacio. */
-  Jefe.prototype.dibujarDesgaste = function () {
-    var ctx = this.ctx;
-    var aw = this.anchoCelda(), ah = this.altoCelda();
-    var borde = [], self = this;
-
-    for (var f = 0; f < J.FILAS; f++) {
-      for (var c = 0; c < J.COLUMNAS; c++) {
-        if (!this.celdas[f][c]) { continue; }
-        /* Solo cuenta como boquete lo que ANTES era cara y ahora no. El
-           contorno natural de la cabeza no se tizna: si no, el jefe aparecia
-           chamuscado de entrada, sin haberle disparado. */
-        var roto = function (ff, cc) {
-          return self.base[ff][cc] === 1 && self.celdas[ff][cc] === 0;
-        };
-        var hueco = (f > 0 && roto(f - 1, c)) ||
-                    (f < J.FILAS - 1 && roto(f + 1, c)) ||
-                    (c > 0 && roto(f, c - 1)) ||
-                    (c < J.COLUMNAS - 1 && roto(f, c + 1));
-        if (hueco) { borde.push([c * aw, f * ah]); }
-      }
-    }
-    if (!borde.length) { return; }
-
-    ctx.save();
-    ctx.globalCompositeOperation = 'source-atop';
-
-    // Chamuscado: una mancha oscura pegada a cada celda del borde.
-    for (var i = 0; i < borde.length; i++) {
-      var x = borde[i][0] + aw / 2, y = borde[i][1] + ah / 2;
-      var g = ctx.createRadialGradient(x, y, 0, x, y, aw * 1.15);
-      g.addColorStop(0, 'rgba(24, 10, 4, 0.7)');
-      g.addColorStop(0.6, 'rgba(24, 10, 4, 0.25)');
-      g.addColorStop(1, 'rgba(24, 10, 4, 0)');
-      ctx.fillStyle = g;
-      ctx.beginPath();
-      ctx.arc(x, y, aw * 1.15, 0, Math.PI * 2);
-      ctx.fill();
-    }
-
-    // Brasa: un hilo naranja justo en el filo, como metal recien roto.
-    ctx.globalCompositeOperation = 'lighter';
-    for (i = 0; i < borde.length; i++) {
-      ctx.fillStyle = 'rgba(255, 120, 40, 0.22)';
-      ctx.fillRect(borde[i][0], borde[i][1], aw, ah);
-    }
-    ctx.restore();
+  /* Un punto cualquiera de la zona por la que puede rondar. Se busca en la
+     mitad contraria a donde esta, para que no se quede tiritando en una
+     esquina y de verdad cruce la pantalla. */
+  Jefe.prototype.nuevoDestino = function () {
+    var l = this.limites();
+    var vaALaIzquierda = this.cx > CONFIG.ANCHO / 2;
+    var a = vaALaIzquierda ? l.minX : CONFIG.ANCHO / 2;
+    var b = vaALaIzquierda ? CONFIG.ANCHO / 2 : l.maxX;
+    this.destino = {
+      x: Util.limitar(a + Math.random() * (b - a), l.minX, l.maxX),
+      y: Util.limitar(l.minY + Math.random() * (l.maxY - l.minY), l.minY, l.maxY)
+    };
   };
+
+  Jefe.prototype.actualizar = function (dt) {
+    if (!this.activo) { return false; }
+    if (this.destello > 0) { this.destello -= dt; }
+
+    /* Avance hacia el destino. Como se cambia de destino antes de llegar del
+       todo y el eje vertical va mas lento, la trayectoria sale curva en vez
+       de en linea recta de un lado a otro. */
+    var dx = this.destino.x - this.cx;
+    var dy = this.destino.y - this.cy;
+    var distancia = Math.sqrt(dx * dx + dy * dy);
+    if (distancia < 14) {
+      this.nuevoDestino();
+    } else {
+      var paso = Math.min(distancia, this.velocidad * dt);
+      this.cx += (dx / distancia) * paso;
+      this.cy += (dy / distancia) * paso * 0.7;
+    }
+
+    /* Zoom: cada cierto rato decide acercarse o alejarse. De cerca es un
+       blanco mas facil pero tapa media pantalla; de lejos cuesta acertarle. */
+    this.temporizadorZoom -= dt;
+    if (this.temporizadorZoom <= 0) {
+      this.temporizadorZoom = J.ZOOM_CADA_MIN +
+        Math.random() * (J.ZOOM_CADA_MAX - J.ZOOM_CADA_MIN);
+      this.escalaObjetivo = J.ESCALA_MIN + Math.random() * (J.ESCALA_MAX - J.ESCALA_MIN);
+    }
+    this.escala += (this.escalaObjetivo - this.escala) * Math.min(1, dt * 1.6);
+
+    // Que el zoom no lo deje medio fuera de la pantalla.
+    var l = this.limites();
+    this.cx = Util.limitar(this.cx, l.minX, l.maxX);
+    this.cy = Util.limitar(this.cy, l.minY, l.maxY);
+
+    this.temporizadorDisparo -= dt;
+    if (this.temporizadorDisparo <= 0) {
+      this.temporizadorDisparo = this.intervaloDisparo;
+      return true;
+    }
+    return false;
+  };
+
+  /* ---- Geometria ---- */
 
   Jefe.prototype.hitbox = function () {
-    return { x: this.x, y: this.y, w: J.ANCHO, h: J.ALTO };
+    var w = J.ANCHO * this.escala, h = J.ALTO * this.escala;
+    return { x: this.cx - w / 2, y: this.cy - h / 2, w: w, h: h };
   };
 
-  /* Devuelve true si el impacto le quito algo (para no gastar el disparo en
-     un hueco ya abierto). */
+  Jefe.prototype.bocaDeFuego = function () {
+    var c = this.hitbox();
+    return { x: c.x + c.w / 2, y: c.y + c.h * 0.78 };
+  };
+
+  /* ---- Dano ---- */
+
+  /* La marca se guarda en coordenadas de 0 a 1 dentro de la cara, para que
+     siga en su sitio aunque el jefe cambie de tamano. */
   Jefe.prototype.impactar = function (px, py) {
-    var col = Math.floor((px - this.x) / this.anchoCelda());
-    var fil = Math.floor((py - this.y) / this.altoCelda());
-    var quitadas = 0;
-    var r = this.radio;
-    for (var f = fil - r; f <= fil + r; f++) {
-      for (var c = col - r; c <= col + r; c++) {
-        if (f < 0 || f >= J.FILAS || c < 0 || c >= J.COLUMNAS) { continue; }
-        // Circulo, no cuadrado: el mordisco queda mas natural.
-        if ((f - fil) * (f - fil) + (c - col) * (c - col) > r * r + 1) { continue; }
-        if (this.celdas[f][c]) { this.celdas[f][c] = 0; quitadas++; }
-      }
-    }
-    // Aunque el disparo caiga en un hueco ya abierto cuenta como impacto: lo
-    // que no puede es no hacer nada y dejar al jefe inmortal por los bordes.
+    var c = this.hitbox();
+    this.marcas.push({
+      u: Util.limitar((px - c.x) / c.w, 0.06, 0.94),
+      v: Util.limitar((py - c.y) / c.h, 0.06, 0.94),
+      semilla: Math.random()
+    });
     this.impactos++;
-    if (!quitadas) { this.repintar(); return true; }
-    this.vivas -= quitadas;
     this.destello = 0.12;
     this.repintar();
     return true;
@@ -212,35 +159,88 @@
     return this.impactos >= J.IMPACTOS_OBJETIVO;
   };
 
-  /* Lo que le queda, de 1 a 0. Es lo que pinta la barra de vida. */
+  /* Lo que le queda, de 1 a 0. Es lo que pinta la barra. */
   Jefe.prototype.resto = function () {
     return Math.max(0, 1 - this.impactos / J.IMPACTOS_OBJETIVO);
   };
 
-  /* Punto por donde escupe: la boca, mas o menos al centro y abajo. */
-  Jefe.prototype.bocaDeFuego = function () {
-    return { x: this.x + J.ANCHO / 2, y: this.y + J.ALTO * 0.78 };
+  /* ---- Pintado ---- */
+
+  Jefe.prototype.repintar = function () {
+    var ctx = this.ctx;
+    var img = Assets.obtener(this.sprite);
+    ctx.clearRect(0, 0, J.ANCHO, J.ALTO);
+    if (!img) { return; }
+    ctx.drawImage(img, 0, 0, J.ANCHO, J.ALTO);
+
+    var dano = Math.min(1, this.impactos / J.IMPACTOS_OBJETIVO);
+    ctx.save();
+    // Todo el deterioro se recorta contra la cara: nada mancha el vacio.
+    ctx.globalCompositeOperation = 'source-atop';
+    this.pintarHeridas();
+
+    /* Pierde color y se apaga segun va cayendo: al final esta magullado y
+       tiznado, pero sigue siendo su cara.
+       OJO: nada de globalCompositeOperation 'saturation' aqui. Ese modo pinta
+       el lienzo ENTERO, tambien donde no hay cara, y dejaba un cuadrado rojo
+       de fondo. 'source-atop' es el unico que respeta la silueta. */
+    if (dano > 0) {
+      ctx.globalCompositeOperation = 'source-atop';
+      // Lavado gris: le quita viveza al color sin apagar los rasgos.
+      ctx.fillStyle = 'rgba(126, 118, 112, ' + (0.30 * dano).toFixed(3) + ')';
+      ctx.fillRect(0, 0, J.ANCHO, J.ALTO);
+      // Tizne: sombra sucia, cargada hacia el marron quemado.
+      ctx.fillStyle = 'rgba(48, 22, 12, ' + (0.26 * dano).toFixed(3) + ')';
+      ctx.fillRect(0, 0, J.ANCHO, J.ALTO);
+    }
+    ctx.restore();
   };
 
-  Jefe.prototype.actualizar = function (dt) {
-    if (!this.activo) { return false; }
-    if (this.destello > 0) { this.destello -= dt; }
+  /* Cada impacto deja un moraton irregular con el centro quemado y unas
+     grietas cortas. Se redibujan todos en cada repintado, asi que el dano se
+     acumula a la vista, golpe a golpe. */
+  Jefe.prototype.pintarHeridas = function () {
+    var ctx = this.ctx;
+    for (var i = 0; i < this.marcas.length; i++) {
+      var m = this.marcas[i];
+      var x = m.u * J.ANCHO, y = m.v * J.ALTO;
+      var radio = J.ANCHO * (0.085 + 0.045 * m.semilla);
 
-    this.x += this.direccion * this.velocidad * dt;
-    var minX = J.ANCHO * 0.06;
-    var maxX = CONFIG.ANCHO - J.ANCHO - J.ANCHO * 0.06;
-    if (this.x <= minX || this.x >= maxX) {
-      this.x = Util.limitar(this.x, minX, maxX);
-      this.direccion *= -1;
-      this.y += J.DESCENSO;
-    }
+      // Moraton: manchon morado difuminado.
+      var moraton = ctx.createRadialGradient(x, y, radio * 0.15, x, y, radio);
+      moraton.addColorStop(0, 'rgba(96, 26, 18, 0.62)');
+      moraton.addColorStop(0.55, 'rgba(72, 32, 28, 0.30)');
+      moraton.addColorStop(1, 'rgba(60, 34, 30, 0)');
+      ctx.fillStyle = moraton;
+      ctx.beginPath();
+      ctx.arc(x, y, radio, 0, Math.PI * 2);
+      ctx.fill();
 
-    this.temporizadorDisparo -= dt;
-    if (this.temporizadorDisparo <= 0) {
-      this.temporizadorDisparo = this.intervaloDisparo;
-      return true;              // toca disparar
+      // Quemadura del centro, con el borde irregular.
+      ctx.fillStyle = 'rgba(32, 16, 10, 0.62)';
+      ctx.beginPath();
+      for (var k = 0; k <= 10; k++) {
+        var ang = (k / 10) * Math.PI * 2;
+        var rr = radio * (0.30 + 0.12 * Math.sin(k * 2.3 + m.semilla * 9));
+        var px = x + Math.cos(ang) * rr, py = y + Math.sin(ang) * rr;
+        if (k === 0) { ctx.moveTo(px, py); } else { ctx.lineTo(px, py); }
+      }
+      ctx.closePath();
+      ctx.fill();
+
+      // Grietas cortas saliendo de la herida.
+      ctx.strokeStyle = 'rgba(30, 14, 10, 0.42)';
+      ctx.lineWidth = 1.3;
+      ctx.lineCap = 'round';
+      for (k = 0; k < 3; k++) {
+        var a = m.semilla * 6.28 + k * 2.1;
+        ctx.beginPath();
+        ctx.moveTo(x + Math.cos(a) * radio * 0.3, y + Math.sin(a) * radio * 0.3);
+        ctx.lineTo(x + Math.cos(a + 0.3) * radio * 0.95,
+                   y + Math.sin(a + 0.3) * radio * 0.95);
+        ctx.stroke();
+      }
     }
-    return false;
   };
 
   global.TRI = global.TRI || {};
