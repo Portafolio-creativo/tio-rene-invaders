@@ -35,6 +35,8 @@
     this.mensajeFinal = $('mensaje-final');
     this.puntosVictoria = $('puntos-victoria');
     this.avisoAlmacenamiento = $('aviso-almacenamiento');
+    /* Ultimo resultado, para poder compartirlo desde el final de la partida. */
+    this.ultimoResultado = { puntos: 0, record: 0, nivel: 0 };
     this.botonSonido = $('btn-sonido');
     this.control = $('control-volumen');
     this.conectar();
@@ -42,6 +44,7 @@
 
   UI.prototype.conectar = function () {
     var self = this;
+    this.conectarCompartir();
     var mapa = [
       ['btn-reanudar', 'reanudar'],
       ['btn-menu-pausa', 'menu'],
@@ -179,6 +182,39 @@
     }
   };
 
+  /* Se anota el resultado que se acaba de lograr, para la tarjeta que se
+     comparte. El remate cambia segun se haya perdido, ganado o hecho record. */
+  UI.prototype.guardarResultado = function (datos, remate) {
+    var esRecord = datos.puntos >= datos.record && datos.puntos > 0;
+    this.ultimoResultado = {
+      puntos: datos.puntos || 0,
+      record: datos.record || 0,
+      nivel: datos.nivel || 0,
+      remate: esRecord ? '¡NUEVO RÉCORD!' : remate
+    };
+  };
+
+  /* Compartir el resultado: el mismo comportamiento al perder y al ganar. */
+  UI.prototype.conectarCompartir = function () {
+    var self = this;
+    ['btn-compartir', 'btn-compartir-victoria'].forEach(function (id) {
+      var el = $(id);
+      if (!el) { return; }
+      el.addEventListener('click', function () {
+        Audio.desbloquear();
+        Audio.reproducir('menu');
+        var rotulo = el.textContent;
+        el.disabled = true;
+        el.textContent = 'PREPARANDO…';
+        TRI.Compartir.resultado(self.ultimoResultado).then(function (mensaje) {
+          el.disabled = false;
+          el.textContent = rotulo;
+          if (mensaje) { self.avisar(mensaje); }
+        });
+      });
+    });
+  };
+
   UI.prototype.avisar = function (texto) {
     if (!this.avisoAlmacenamiento) { return; }
     this.avisoAlmacenamiento.textContent = texto;
@@ -195,6 +231,7 @@
       this.enfocar('btn-reanudar');
     } else if (estado === ESTADOS.GAME_OVER) {
       this.capas.gameOver.hidden = false;
+      this.guardarResultado(datos, 'LOS MARCIANOS GANARON ESTA');
       if (this.puntosFinal) { this.puntosFinal.textContent = Util.formatearPuntos(datos.puntos); }
       if (this.recordFinal) { this.recordFinal.textContent = Util.formatearPuntos(datos.record); }
       if (this.mensajeFinal) {
@@ -205,6 +242,7 @@
       this.enfocar('btn-reintentar');
     } else if (estado === ESTADOS.VICTORIA) {
       this.capas.victoria.hidden = false;
+      this.guardarResultado(datos, '¡ME LOS GANÉ A TODOS!');
       if (this.puntosVictoria) { this.puntosVictoria.textContent = Util.formatearPuntos(datos.puntos); }
       this.enfocar('btn-seguir');
     }

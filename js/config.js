@@ -6,6 +6,10 @@
   'use strict';
 
   var CONFIG = {
+    /* Donde vive el juego. Se usa al compartir el resultado; si algun dia
+       cambia de direccion, se cambia AQUI y en las etiquetas og: del HTML. */
+    ENLACE: 'https://cotizadora.github.io/tio-rene-invaders/',
+
     /* ---- Lienzo logico. Todo el juego se dibuja en estas coordenadas y luego
        se escala al tamano real de la pantalla, asi nada se deforma. ---- */
     ANCHO: 600,

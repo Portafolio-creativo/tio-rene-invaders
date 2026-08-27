@@ -117,10 +117,9 @@ body {
   color: var(--tinta-tenue);
 }
 
-/* Boton de pausa en la barra: solo aparece en pantallas tactiles. En PC no
-   hace falta (esta la tecla P). */
-#btn-pausa-barra {
-  display: none;
+/* Los botones de icono de la barra (instalar, modo de control, pausa) comparten
+   un mismo aspecto para que la cabecera se vea ordenada. */
+.tacto-sistema {
   font-family: var(--fuente);
   font-size: 13px;
   line-height: 1;
@@ -128,13 +127,28 @@ body {
   color: var(--tinta);
   background: #16203a;
   border: 1px solid var(--borde);
-  border-radius: 4px;
+  border-radius: 6px;
   cursor: pointer;
 }
 
-#btn-pausa-barra.pulsado { filter: brightness(1.4); }
+.tacto-sistema:hover { background: #1e2b4d; }
+.tacto-sistema.pulsado { filter: brightness(1.4); }
+.tacto-sistema[hidden] { display: none; }
 
+.tacto-sistema:focus-visible { outline: 3px solid var(--acento); outline-offset: 2px; }
+
+/* Pausa y cambio de control solo tienen sentido con el dedo: en PC estan la
+   tecla P y las flechas. */
+#btn-pausa-barra { display: none; }
 body.tactil #btn-pausa-barra { display: inline-block; }
+
+/* Instalar late una vez al aparecer, para que se note sin dar la lata. */
+#btn-instalar { animation: asomar-instalar 0.5s ease-out both; }
+
+@keyframes asomar-instalar {
+  from { opacity: 0; transform: scale(0.7); }
+  to { opacity: 1; transform: scale(1); }
+}
 
 /* ---------- Zona de juego ---------- */
 
@@ -240,44 +254,35 @@ body.tactil #btn-pausa-barra { display: inline-block; }
 
 .boton.principal:hover { background: #5fe085; }
 
-/* Boton secundario: instalar. Discreto, no compite con JUGAR. */
-.boton.secundario {
-  font-size: 13px;
+/* Compartir el puntaje: destaca sobre MENU sin robarle el sitio a OTRA VEZ. */
+.boton.compartir {
+  color: var(--acento);
+  border-color: rgba(255, 227, 107, 0.55);
+  font-size: 14px;
+}
+
+.boton.compartir:hover { background: rgba(255, 227, 107, 0.14); }
+
+/* Apoyar al creador: va al final, mas discreto, y es un enlace de verdad
+   (no un boton) porque lleva fuera de la pagina. */
+.boton.apoyo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 4px;
+  font-size: 12px;
   letter-spacing: 1px;
-  min-width: 0;
-  min-height: 36px;
-  padding: 7px 14px;
+  min-height: 38px;
+  padding: 8px 16px;
   color: var(--acento);
   background: transparent;
-  border-color: rgba(255, 227, 107, 0.45);
+  border-color: rgba(255, 227, 107, 0.35);
+  text-decoration: none;
 }
 
-.boton.secundario:hover { background: rgba(255, 227, 107, 0.12); }
-.boton.secundario[hidden] { display: none; }
+.boton.apoyo:hover { background: rgba(255, 227, 107, 0.12); }
 
 /* Interruptor de disparo automatico */
-/* Instalar a la izquierda, disparo automatico a la derecha. Con flex-end +
-   margin-right:auto, el check queda a la derecha este o no el otro boton. */
-#fila-opciones {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  flex-wrap: wrap;          /* antes de recortarse, que baje de linea */
-  gap: 6px 8px;
-  width: 100%;
-  max-width: 100%;
-}
-
-/* Ninguna pieza puede ser mas ancha que el panel: si el texto no cabe, se
-   encoge en vez de empujar y crear barra de desplazamiento. */
-#fila-opciones > * {
-  max-width: 100%;
-  min-width: 0;
-  flex-shrink: 1;
-}
-
-#btn-instalar { margin-right: auto; }
-
 #opcion-auto {
   display: flex;
   align-items: center;
@@ -541,6 +546,7 @@ body.portada-lista:not(.en-partida) #palanca-mando {
    a la palanca. Solo aparece en pantallas tactiles. */
 #btn-modo-control { display: none; }
 body.tactil #btn-modo-control { display: inline-block; }
+
 #icono-modo { font-size: 15px; line-height: 1; }
 
 #btn-modo-control[aria-pressed="true"] {
@@ -613,23 +619,14 @@ body.tactil .controles { display: none; }
 }
 
 
-#capa-menu .boton.secundario {
-  color: #fff4d6;
-  border-color: rgba(255, 244, 214, 0.5);
-}
-
-#capa-menu .boton.secundario:hover { background: rgba(255, 244, 214, 0.16); }
-
 /* Todo lo que no es la cara entra despues, desvanecido, para no competir con
    la entrada. El <body> recibe .portada-lista cuando termina la animacion. */
-#invitacion,
-#capa-menu #fila-opciones {
+#invitacion {
   opacity: 0;
   transition: opacity 0.45s ease;
 }
 
-body.portada-lista #invitacion,
-body.portada-lista #capa-menu #fila-opciones { opacity: 1; }
+body.portada-lista #invitacion { opacity: 1; }
 
 #invitacion {
   margin: 0;

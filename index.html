@@ -49,6 +49,8 @@
   <header id="cabecera">
     <p id="marca">TÍO RENÉ <span>INVADERS</span></p>
     <div id="controles-audio">
+      <button type="button" id="btn-instalar" class="tacto-sistema" hidden
+              aria-label="Instalar el juego" title="Instalar el juego">📲</button>
       <button type="button" id="btn-modo-control" class="tacto-sistema"
               aria-pressed="true" aria-label="Cambiar entre palanca y flechas">
         <span id="icono-modo">⇹</span>
@@ -81,12 +83,6 @@
           <span class="solo-tacto">Desliza el control para empezar</span>
           <span class="solo-teclado">Pulsa ← o → para empezar</span>
         </p>
-        <div id="fila-opciones">
-          <button type="button" id="btn-instalar" class="boton secundario" hidden>
-            📲 INSTALAR
-          </button>
-        </div>
-        <p id="ayuda-instalar" class="tenue" hidden></p>
         <p id="texto-carga" class="tenue">CARGANDO…</p>
       </section>
 
@@ -104,7 +100,10 @@
         <p class="marcador-menu">PUNTOS <strong id="puntos-final">00000</strong></p>
         <p class="marcador-menu">RÉCORD <strong id="record-final">00000</strong></p>
         <button type="button" id="btn-reintentar" class="boton principal">OTRA VEZ</button>
+        <button type="button" id="btn-compartir" class="boton compartir">📤 COMPARTIR MI PUNTAJE</button>
         <button type="button" id="btn-menu-final" class="boton">MENÚ</button>
+        <a class="boton apoyo" href="https://maladifusion.github.io/apoyo/"
+           target="_blank" rel="noopener noreferrer">💛 Apoya al creador</a>
       </section>
 
       <!-- VICTORIA -->
@@ -113,7 +112,10 @@
         <p class="lema">El barrio quedó a salvo. Por ahora.</p>
         <p class="marcador-menu">PUNTOS <strong id="puntos-victoria">00000</strong></p>
         <button type="button" id="btn-seguir" class="boton principal">SEGUIR JUGANDO</button>
+        <button type="button" id="btn-compartir-victoria" class="boton compartir">📤 COMPARTIR MI PUNTAJE</button>
         <button type="button" id="btn-menu-victoria" class="boton">MENÚ</button>
+        <a class="boton apoyo" href="https://maladifusion.github.io/apoyo/"
+           target="_blank" rel="noopener noreferrer">💛 Apoya al creador</a>
       </section>
     </div>
   </main>
@@ -156,6 +158,7 @@
 
   </div>
 
+  <p id="ayuda-instalar" class="aviso" hidden></p>
   <p id="aviso-almacenamiento" class="aviso" hidden></p>
 
   <footer id="pie">
@@ -175,6 +178,7 @@
 <script src="js/audio.js"></script>
 <script src="js/input.js"></script>
 <script src="js/instalar.js"></script>
+<script src="js/compartir.js"></script>
 <script src="js/entities/player.js"></script>
 <script src="js/entities/enemy.js"></script>
 <script src="js/entities/projectile.js"></script>
