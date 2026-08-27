@@ -196,7 +196,25 @@
         ambiente33: 'amb-33.mp3',
         ambiente34: 'amb-34.mp3',
         ambiente35: 'amb-35.mp3',
-        /* Frases de RACHA: cada 5 naves derribadas. */
+        ambiente36: 'amb-36.mp3',
+        ambiente37: 'amb-37.mp3',
+        ambiente38: 'amb-38.mp3',
+        ambiente39: 'amb-39.mp3',
+        ambiente40: 'amb-40.mp3',
+        ambiente41: 'amb-41.mp3',
+        ambiente42: 'amb-42.mp3',
+        ambiente43: 'amb-43.mp3',
+        ambiente44: 'amb-44.mp3',
+        ambiente45: 'amb-45.mp3',
+        ambiente46: 'amb-46.mp3',
+        ambiente47: 'amb-47.mp3',
+        ambiente48: 'amb-48.mp3',
+        ambiente49: 'amb-49.mp3',
+        ambiente50: 'amb-50.mp3',
+        ambiente51: 'amb-51.mp3',
+        ambiente52: 'amb-52.mp3',
+        ambiente53: 'amb-53.mp3',
+        ambiente54: 'amb-54.mp3',
         /* Racha: tres frases que se turnan, asi cada una vuelve a salir
            mucho mas espaciada. */
         racha1: 'racha-queri-too.mp3',     // "queri too"
@@ -211,11 +229,18 @@
         ACTIVO: true,
         VOLUMEN: 0.55,     // proporcion del volumen general (0 a 1)
         ATENUACION: 0.35,  // cuanto se agacha mientras habla el Tio Rene
-        ESPERA_MIN: 9,     // segundos entre frase y frase
-        ESPERA_MAX: 18,
-        PRIMERA_ESPERA: 6, // cuanto tarda la primera al empezar el nivel
+        ESPERA_MIN: 2,     // segundos de silencio entre frase y frase
+        ESPERA_MAX: 6,
+        PRIMERA_ESPERA: 3, // cuanto tarda la primera al empezar el nivel
         CLIPS: [
-          'ambiente1', 'ambiente2', 'ambiente3', 'ambiente4', 'ambiente5', 'ambiente6', 'ambiente7', 'ambiente8', 'ambiente9', 'ambiente10', 'ambiente11', 'ambiente12', 'ambiente13', 'ambiente14', 'ambiente15', 'ambiente16', 'ambiente17', 'ambiente18', 'ambiente19', 'ambiente20', 'ambiente21', 'ambiente22', 'ambiente23', 'ambiente24', 'ambiente25', 'ambiente26', 'ambiente27', 'ambiente28', 'ambiente29', 'ambiente30', 'ambiente31', 'ambiente32', 'ambiente33', 'ambiente34', 'ambiente35'
+          'ambiente1', 'ambiente2', 'ambiente3', 'ambiente4', 'ambiente5', 'ambiente6', 'ambiente7',
+          'ambiente8', 'ambiente9', 'ambiente10', 'ambiente11', 'ambiente12', 'ambiente13', 'ambiente14',
+          'ambiente15', 'ambiente16', 'ambiente17', 'ambiente18', 'ambiente19', 'ambiente20', 'ambiente21',
+          'ambiente22', 'ambiente23', 'ambiente24', 'ambiente25', 'ambiente26', 'ambiente27', 'ambiente28',
+          'ambiente29', 'ambiente30', 'ambiente31', 'ambiente32', 'ambiente33', 'ambiente34', 'ambiente35',
+          'ambiente36', 'ambiente37', 'ambiente38', 'ambiente39', 'ambiente40', 'ambiente41', 'ambiente42',
+          'ambiente43', 'ambiente44', 'ambiente45', 'ambiente46', 'ambiente47', 'ambiente48', 'ambiente49',
+          'ambiente50', 'ambiente51', 'ambiente52', 'ambiente53', 'ambiente54'
         ]
       },
 
