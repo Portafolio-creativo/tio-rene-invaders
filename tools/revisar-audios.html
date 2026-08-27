@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; media-src 'self'; img-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta name="referrer" content="no-referrer">
+<meta name="color-scheme" content="dark">
+<meta name="robots" content="noindex">
+<title>Revisar frases · Tío René Invaders</title>
+<link rel="icon" href="../assets/ui/favicon.png" type="image/png">
+<link rel="stylesheet" href="revisar-audios.css">
+</head>
+<body>
+
+<header>
+  <h1>Revisar las frases de fondo</h1>
+  <p class="ayuda">Toca una frase para oírla. Si suena cortada o no se entiende,
+     marca <b>✕</b>. Al final copias la lista y me la pasas.</p>
+</header>
+
+<div id="barra-superior">
+  <button type="button" id="btn-todas" class="accion">▶ Oír todas</button>
+  <button type="button" id="btn-parar" class="accion" disabled>■ Parar</button>
+  <span id="contador"></span>
+</div>
+
+<ol id="lista"></ol>
+
+<section id="resultado">
+  <h2>Frases marcadas</h2>
+  <p id="marcadas">Ninguna todavía.</p>
+  <button type="button" id="btn-copiar" class="accion" disabled>Copiar la lista</button>
+  <button type="button" id="btn-limpiar" class="accion">Borrar marcas</button>
+</section>
+
+<footer>
+  <span>Un juego de <b>Eduardo Pérez</b></span>
+  <a href="https://maladifusion.github.io/apoyo/" target="_blank" rel="noopener noreferrer">💛 Apoya mi trabajo</a>
+</footer>
+
+<script src="datos-frases.js"></script>
+<script src="revisar-audios.js"></script>
+</body>
+</html>
