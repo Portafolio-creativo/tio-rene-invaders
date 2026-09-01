@@ -232,7 +232,7 @@
       INTERVALO_DISPARO_BASE: 0.95,
       INTERVALO_DISPARO_MIN: 0.34,
       /* Cada cuantos impactos suelta una frase, para que no sea un loro. */
-      VOZ_CADA: 6,
+      VOZ_CADA: 5,
       /* En el orden que pidio Eduardo. Cada uno puede traer sus propias voces
          (de myinstants, igual que las del Tio Rene). Los que aun no tienen
          sonidos propios se quedan sin voz: mejor callado que con la voz de
@@ -274,8 +274,8 @@
           balanceo: true,
           voces: {
             aparece: 'huevitoAparece', muere: 'huevitoMuere',
-            golpe: ['huevitoGolpe1', 'huevitoGolpe2', 'huevitoGolpe3', 'huevitoGolpe4',
-                    'huevitoGolpe5', 'huevitoGolpe6', 'huevitoGolpe7', 'huevitoGolpe8']
+            golpe: ['huevitoGolpe1', 'huevitoGolpe2', 'huevitoGolpe3',
+                    'huevitoGolpe4', 'huevitoGolpe5', 'huevitoGolpe6']
           }
         }
       ]
@@ -410,8 +410,6 @@
         huevitoGolpe4: 'huevito-golpe4.mp3',
         huevitoGolpe5: 'huevito-golpe5.mp3',
         huevitoGolpe6: 'huevito-golpe6.mp3',
-        huevitoGolpe7: 'huevito-golpe7.mp3',
-        huevitoGolpe8: 'huevito-golpe8.mp3',
         huevitoMuere: 'huevito-muere.mp3',
         racha1: 'racha-queri-too.mp3',     // "queri too"
         racha2: 'racha-tio-rene.mp3',
