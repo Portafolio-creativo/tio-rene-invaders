@@ -134,16 +134,28 @@
       MAX_PROYECTILES_BASE: 2,
       MAX_PROYECTILES_TOPE: 5,
       /* Si un enemigo baja de esta linea, la invasion gana */
-      LINEA_INVASION: 658
+      LINEA_INVASION: 658,
+      /* Naves que se SALEN de la formacion a atacar en picada. Empiezan en el
+         nivel 2 y se vuelven mas frecuentes y numerosas al subir de nivel. */
+      PICADA_DESDE_NIVEL: 2,
+      PICADA_CADA_BASE: 6.5,    // segundos entre picadas en el nivel 2
+      PICADA_CADA_MIN: 1.8,     // tope: no mas seguido que esto
+      PICADA_VELOCIDAD: 190,    // px/s de caida
+      PICADA_PERSECUCION: 1.6,  // cuanto persigue al jugador (0 = recto)
+      PICADA_BAMBOLEO: 90,      // amplitud del zigzag al caer
+      PICADA_DISPARA: 0.9       // prob. de que dispare durante la picada
     },
 
     OVNI: {
       ANCHO: 64,
       ALTO: 28,
       Y: 68,
-      VELOCIDAD: 115,
-      ESPERA_MIN: 14,   // segundos entre apariciones
-      ESPERA_MAX: 26,
+      VELOCIDAD: 135,
+      ESPERA_MIN: 9,    // segundos entre apariciones
+      ESPERA_MAX: 18,
+      /* No cruza y se va: hace varias PASADAS de ida y vuelta antes de irse,
+         asi da tiempo de derribarlo en vez de perderse de una. */
+      PASADAS: 3,
       PUNTOS: [50, 100, 150, 200, 300]
     },
 
@@ -414,6 +426,19 @@
       /* Frases de fin de etapa, en orden. */
       NIVEL_CLIPS: ['nivelCompleto1', 'nivelCompleto2']
     },
+
+    /* Cada nivel pinta un cielo distinto, para que no se vean todos iguales.
+       Se van turnando; los niveles de jefe usan el suyo, mas amenazante. */
+    TEMAS: [
+      { a: '#070a14', b: '#0d1b3a', estrella: '#b9c6e8', suelo: '#46d16a' },
+      { a: '#0a0618', b: '#2a1140', estrella: '#e6c9ff', suelo: '#b06bff' },
+      { a: '#04121a', b: '#0b3b3f', estrella: '#a9f0e4', suelo: '#2fd6c0' },
+      { a: '#160814', b: '#3a1030', estrella: '#ffc9e6', suelo: '#ff6bb0' },
+      { a: '#0c1204', b: '#22400f', estrella: '#d8ffb0', suelo: '#8fe04a' },
+      { a: '#180c04', b: '#402410', estrella: '#ffd9a0', suelo: '#ff9f5a' }
+    ],
+    /* Cielo de los niveles de jefe: rojizo, ominoso. */
+    TEMA_JEFE: { a: '#1a0406', b: '#420a10', estrella: '#ffb0a0', suelo: '#ff6b6b' },
 
     COLORES: {
       FONDO: '#070a14',

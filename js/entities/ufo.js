@@ -31,6 +31,7 @@
     this.y = O.Y;
     this.activo = true;
     this.bamboleo = 0;
+    this.pasadas = O.PASADAS;   // cuantas veces mas cruzara antes de irse
   };
 
   /* Devuelve 'aparece' | 'sale' | null para que el juego maneje el sonido. */
@@ -48,9 +49,13 @@
     this.x += this.direccion * O.VELOCIDAD * dt;
     this.bamboleo += dt;
     this.y = O.Y + Math.sin(this.bamboleo * 4) * 4;
-    if (this.x > CONFIG.ANCHO + 4 || this.x + this.w < -4) {
-      this.activo = false;
-      return 'sale';
+    // Al llegar a un borde: si le quedan pasadas, se da vuelta; si no, se va.
+    if (this.direccion === 1 && this.x > CONFIG.ANCHO + 4) {
+      if (--this.pasadas > 0) { this.direccion = -1; this.x = CONFIG.ANCHO + 4; }
+      else { this.activo = false; return 'sale'; }
+    } else if (this.direccion === -1 && this.x + this.w < -4) {
+      if (--this.pasadas > 0) { this.direccion = 1; this.x = -this.w - 4; }
+      else { this.activo = false; return 'sale'; }
     }
     return null;
   };

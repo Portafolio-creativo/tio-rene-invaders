@@ -111,6 +111,9 @@
     /* En los niveles de jefe no hay formacion: toda la pantalla es la cabezota.
        Asi el nivel se siente distinto de verdad, no solo mas rapido. */
     this.esNivelDeJefe = this.niveles.esNivelDeJefe();
+    // Cielo del nivel: uno distinto por nivel, el rojizo para los jefes.
+    this.renderer.fijarTema(this.esNivelDeJefe ? CONFIG.TEMA_JEFE
+      : CONFIG.TEMAS[(this.niveles.nivel - 1) % CONFIG.TEMAS.length]);
     if (this.esNivelDeJefe) {
       this.jefe.preparar(this.niveles.nivel);
       this.enemigos.vaciar();
@@ -264,12 +267,19 @@
   };
 
   Juego.prototype.actualizarEnemigos = function (dt) {
-    var evento = this.enemigos.actualizar(dt);
+    var evento = this.enemigos.actualizar(dt, this.jugador.x);
     if (evento.paso) { Audio.marcha(evento.indice); }
     if (evento.descendio) { Audio.reproducir('descenso'); }
+    var tope = this.enemigos.params.maxProyectiles + 2;   // margen para las picadas
     if (evento.disparo && this.proyectiles.contar(false) < this.enemigos.params.maxProyectiles) {
       var e = evento.disparo;
       this.proyectiles.lanzar(e.x + e.w / 2, e.y + e.h, false, this.enemigos.params.velocidadDisparo);
+    }
+    // Disparos de las naves en picada (mas rapidos, que caen sobre el jugador).
+    for (var k = 0; k < evento.picadas.length; k++) {
+      if (this.proyectiles.contar(false) >= tope) { break; }
+      var pd = evento.picadas[k];
+      this.proyectiles.lanzar(pd.x, pd.y, false, this.enemigos.params.velocidadDisparo + 60);
     }
     if (this.enemigos.hanInvadido() || Colisiones.enemigoContraJugador(this.enemigos, this.jugador)) {
       this.puntuacion.vidas = 0;

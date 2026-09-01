@@ -21,11 +21,17 @@
     this.sacudidaT = 0;         // segundos que queda de sacudida
     this.sacudidaTotal = 1;
     this.sacudidaFuerza = 0;
+    this.tema = CONFIG.TEMAS[0];
+    this.brilloEstrellas = 0;   // avanza para el parpadeo
     // Lienzo auxiliar para tintar la cara del jefe respetando su silueta.
     this.aux = document.createElement('canvas');
     this.auxCtx = this.aux.getContext('2d');
     this.crearEstrellas(70);
   }
+
+  Renderer.prototype.fijarTema = function (tema) {
+    if (tema) { this.tema = tema; }
+  };
 
   Renderer.prototype.crearEstrellas = function (n) {
     this.estrellas.length = 0;
@@ -34,7 +40,9 @@
         x: Util.azar(0, CONFIG.ANCHO),
         y: Util.azar(CONFIG.HUD_ALTO, CONFIG.ALTO),
         r: Util.azar(0.6, 1.8),
-        v: Util.azar(4, 16)
+        v: Util.azar(4, 16),
+        fase: Util.azar(0, Math.PI * 2),   // para el parpadeo
+        vel: Util.azar(1.5, 4.5)           // rapidez del parpadeo
       });
     }
   };
@@ -51,6 +59,7 @@
   };
 
   Renderer.prototype.actualizarFondo = function (dt) {
+    this.brilloEstrellas += dt;
     for (var i = 0; i < this.estrellas.length; i++) {
       var e = this.estrellas[i];
       e.y += e.v * dt;
@@ -79,12 +88,20 @@
       var f = this.sacudidaFuerza * q * q;
       ctx.translate((Math.random() - 0.5) * f, (Math.random() - 0.5) * f);
     }
-    ctx.fillStyle = C.FONDO;
+    var tema = this.tema;
+    var cielo = ctx.createLinearGradient(0, 0, 0, CONFIG.ALTO);
+    cielo.addColorStop(0, tema.a);
+    cielo.addColorStop(1, tema.b);
+    ctx.fillStyle = cielo;
     ctx.fillRect(0, 0, CONFIG.ANCHO, CONFIG.ALTO);
-    ctx.fillStyle = C.ESTRELLA;
+
+    ctx.fillStyle = tema.estrella;
     for (var i = 0; i < this.estrellas.length; i++) {
       var e = this.estrellas[i];
-      ctx.globalAlpha = 0.25 + (e.r / 2.4) * 0.5;
+      // Parpadeo: el brillo late entre casi apagado y pleno, cada estrella a
+      // su ritmo, para que el cielo se sienta vivo.
+      var titila = 0.5 + 0.5 * Math.sin(this.brilloEstrellas * e.vel + e.fase);
+      ctx.globalAlpha = 0.15 + (e.r / 2.4) * 0.55 * titila;
       ctx.fillRect(e.x, e.y, e.r, e.r);
     }
     ctx.globalAlpha = 1;
@@ -311,7 +328,7 @@
 
   Renderer.prototype.dibujarSuelo = function () {
     var ctx = this.ctx;
-    ctx.fillStyle = C.SUELO;
+    ctx.fillStyle = this.tema.suelo || C.SUELO;
     ctx.fillRect(0, CONFIG.ALTO - 10, CONFIG.ANCHO, 3);
   };
 
