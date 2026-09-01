@@ -32,6 +32,28 @@
     this.vivos = 0;
   };
 
+  /* Que celdas de la rejilla llevan nave, segun la forma del nivel. Asi la
+     silueta del enjambre cambia de nivel en nivel y no es siempre un bloque.
+     Devuelve true si en (fila f, columna c) hay nave. */
+  function enForma(forma, f, c, filas, columnas) {
+    var cf = (filas - 1) / 2, cc = (columnas - 1) / 2;
+    if (forma === 'rombo') {
+      var dist = Math.abs(f - cf) / (cf || 1) + Math.abs(c - cc) / (cc || 1);
+      return dist <= 1.05;
+    }
+    if (forma === 'flancos') {              // dos alas, hueco al medio
+      return Math.abs(c - cc) >= columnas * 0.22;
+    }
+    if (forma === 'aspa') {                 // una X
+      var t1 = c / (columnas - 1), t2 = f / (filas - 1);
+      return Math.abs(t1 - t2) < 0.22 || Math.abs(t1 - (1 - t2)) < 0.22;
+    }
+    if (forma === 'panal') {                // celosia: huecos alternados
+      return (f + c) % 2 === 0;
+    }
+    return true;                            // bloque
+  }
+
   GestorEnemigos.prototype.preparar = function (nivel) {
     this.params = CONFIG.nivelParams(nivel);
     this.enemigos.length = 0;
@@ -46,9 +68,11 @@
     this.temporizadorPicada = CONFIG.ENEMIGOS.PICADA_CADA_BASE;
     this.nivelActual = nivel;
 
+    var forma = CONFIG.FORMAS[(nivel - 1) % CONFIG.FORMAS.length];
     for (var f = 0; f < filas; f++) {
       var tipo = E.TIPOS[Math.min(f, E.TIPOS.length - 1)];
       for (var c = 0; c < columnas; c++) {
+        if (!enForma(forma, f, c, filas, columnas)) { continue; }
         this.enemigos.push({
           fila: f, columna: c,
           sprite: tipo.sprite,

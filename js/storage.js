@@ -57,7 +57,8 @@
 
     /* Disparo automatico: el jugador solo se preocupa de moverse. */
     leerAutoDisparo: function () {
-      return leerCrudo(CONFIG.ALMACENAMIENTO.CLAVE_AUTODISPARO) === '1';
+      // Encendido por defecto: solo se apaga si el jugador lo guardo en '0'.
+      return leerCrudo(CONFIG.ALMACENAMIENTO.CLAVE_AUTODISPARO) !== '0';
     },
     guardarAutoDisparo: function (activo) {
       escribirCrudo(CONFIG.ALMACENAMIENTO.CLAVE_AUTODISPARO, activo ? '1' : '0');

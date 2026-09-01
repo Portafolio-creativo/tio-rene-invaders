@@ -12,7 +12,7 @@
   var estado = { izquierda: false, derecha: false, disparo: false, absoluto: null };
   var suscriptores = [];
   var tactil = false;
-  var autoDisparo = false;   // dispara solo; el jugador solo se mueve
+  var autoDisparo = true;    // dispara solo por defecto; el jugador solo se mueve
 
   /* Proporcion del radio que hay que pasar para que la palanca cuente como
      movimiento. Sin esta zona muerta, el dedo quieto en el centro haria

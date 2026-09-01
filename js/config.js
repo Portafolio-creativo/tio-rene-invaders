@@ -213,6 +213,9 @@
       MIRADA_ANGULO: 0.22,      // cuanto gira la cabeza (radianes)
       MIRADA_DESVIO: 22,        // y cuanto se corre de lado (px)
       MIRADA_SOSTEN: 0.6,       // cuanto se queda mirando antes de volver
+      /* Balanceo continuo (Huevito): amplitud del vaiven de lado a lado. */
+      BALANCEO_ANGULO: 0.16,
+      BALANCEO_DESVIO: 16,
       PUNTOS: 750,
       /* Al caer revienta por partes: una tanda de estallidos encadenados
          mientras la pantalla tiembla. */
@@ -266,9 +269,13 @@
         },
         {
           sprite: 'boss-5', nombre: 'HUEVITO REY',
+          /* Como es un personaje boleto, en vez de estar chueco y quieto va
+             balanceando la cabeza de un lado al otro, sin parar. */
+          balanceo: true,
           voces: {
             aparece: 'huevitoAparece', muere: 'huevitoMuere',
-            golpe: ['huevitoGolpe1', 'huevitoGolpe2', 'huevitoGolpe3', 'huevitoGolpe4']
+            golpe: ['huevitoGolpe1', 'huevitoGolpe2', 'huevitoGolpe3', 'huevitoGolpe4',
+                    'huevitoGolpe5', 'huevitoGolpe6', 'huevitoGolpe7', 'huevitoGolpe8']
           }
         }
       ]
@@ -401,6 +408,10 @@
         huevitoGolpe2: 'huevito-golpe2.mp3',
         huevitoGolpe3: 'huevito-golpe3.mp3',
         huevitoGolpe4: 'huevito-golpe4.mp3',
+        huevitoGolpe5: 'huevito-golpe5.mp3',
+        huevitoGolpe6: 'huevito-golpe6.mp3',
+        huevitoGolpe7: 'huevito-golpe7.mp3',
+        huevitoGolpe8: 'huevito-golpe8.mp3',
         huevitoMuere: 'huevito-muere.mp3',
         racha1: 'racha-queri-too.mp3',     // "queri too"
         racha2: 'racha-tio-rene.mp3',
@@ -447,18 +458,25 @@
       NIVEL_CLIPS: ['nivelCompleto1', 'nivelCompleto2']
     },
 
-    /* Cada nivel pinta un cielo distinto, para que no se vean todos iguales.
-       Se van turnando; los niveles de jefe usan el suyo, mas amenazante. */
+    /* El fondo es SIEMPRE negro (asi le gusta). Lo que cambia por nivel es el
+       TINTE de las naves y el color de las estrellas, para que cada nivel se
+       vea distinto sin ensuciar el cielo. tinte:null = colores originales. */
     TEMAS: [
-      { a: '#070a14', b: '#0d1b3a', estrella: '#b9c6e8', suelo: '#46d16a' },
-      { a: '#0a0618', b: '#2a1140', estrella: '#e6c9ff', suelo: '#b06bff' },
-      { a: '#04121a', b: '#0b3b3f', estrella: '#a9f0e4', suelo: '#2fd6c0' },
-      { a: '#160814', b: '#3a1030', estrella: '#ffc9e6', suelo: '#ff6bb0' },
-      { a: '#0c1204', b: '#22400f', estrella: '#d8ffb0', suelo: '#8fe04a' },
-      { a: '#180c04', b: '#402410', estrella: '#ffd9a0', suelo: '#ff9f5a' }
+      { estrella: '#b9c6e8', tinte: null },
+      { estrella: '#e6c9ff', tinte: '#8a3cff' },
+      { estrella: '#a9f0e4', tinte: '#12d6c0' },
+      { estrella: '#ffc9e6', tinte: '#ff3c9d' },
+      { estrella: '#d8ffb0', tinte: '#7ee03a' },
+      { estrella: '#ffd9a0', tinte: '#ff8a2a' }
     ],
-    /* Cielo de los niveles de jefe: rojizo, ominoso. */
-    TEMA_JEFE: { a: '#1a0406', b: '#420a10', estrella: '#ffb0a0', suelo: '#ff6b6b' },
+    /* En los niveles de jefe no hay formacion que tintar; las estrellas van
+       en un tono tenso. El fondo sigue negro. */
+    TEMA_JEFE: { estrella: '#ffb0a0', tinte: null },
+
+    /* Formaciones distintas por nivel: cada patron decide que huecos deja la
+       rejilla, para que la silueta del enjambre no sea siempre un bloque.
+       Se eligen por (fila, columna, filas, columnas); true = hay nave. */
+    FORMAS: ['bloque', 'rombo', 'flancos', 'aspa', 'panal'],
 
     COLORES: {
       FONDO: '#070a14',

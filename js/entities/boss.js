@@ -39,7 +39,9 @@
     this.sprite = this.datos.sprite;
     this.nombre = this.datos.nombre;
     this.voces = this.datos.voces || {};
-    this.mira = !!this.datos.mira;   // el tic de mirar al costado
+    this.mira = !!this.datos.mira;        // el tic de mirar al costado
+    this.balanceo = !!this.datos.balanceo; // vaiven continuo de la cabeza
+    this.balanceoT = 0;
     this.miradaT = J.MIRADA_CADA_MIN;
     this.miradaFase = 'centro';      // centro | girando | volviendo
     this.inclina = 0;                // rotacion actual (radianes)
@@ -210,6 +212,13 @@
      un golpe rapido, se queda un momento y vuelve al centro. Solo lo hacen los
      jefes con mira:true. */
   Jefe.prototype.actualizarMirada = function (dt) {
+    // Balanceo continuo (Huevito): la cabeza va de un lado al otro sin parar.
+    if (this.balanceo) {
+      this.balanceoT += dt;
+      this.inclina = Math.sin(this.balanceoT * 1.7) * J.BALANCEO_ANGULO;
+      this.desvX = Math.sin(this.balanceoT * 1.7) * J.BALANCEO_DESVIO;
+      return;
+    }
     if (!this.mira) { return; }
     this.miradaT -= dt;
     if (this.miradaFase === 'centro') {

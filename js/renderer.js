@@ -30,7 +30,33 @@
   }
 
   Renderer.prototype.fijarTema = function (tema) {
-    if (tema) { this.tema = tema; }
+    if (!tema) { return; }
+    this.tema = tema;
+    // Cache de sprites tintados: se vacia al cambiar de tinte para no acumular.
+    this.tinteActual = tema.tinte || null;
+    this.cacheTinte = {};
+  };
+
+  /* Devuelve el sprite del enemigo tintado con el color del nivel, cacheado.
+     Sin tinte, devuelve el original. El tinte se hace con source-atop sobre un
+     lienzo aparte, asi respeta la silueta y no pinta un cuadrado. */
+  Renderer.prototype.spriteTintado = function (nombre) {
+    var original = Assets.obtener(nombre);
+    if (!this.tinteActual || !original) { return original; }
+    if (this.cacheTinte[nombre]) { return this.cacheTinte[nombre]; }
+    var w = original.width || original.naturalWidth;
+    var h = original.height || original.naturalHeight;
+    if (!w || !h) { return original; }
+    var c = document.createElement('canvas');
+    c.width = w; c.height = h;
+    var cx = c.getContext('2d');
+    cx.drawImage(original, 0, 0);
+    cx.globalCompositeOperation = 'source-atop';
+    cx.globalAlpha = 0.55;
+    cx.fillStyle = this.tinteActual;
+    cx.fillRect(0, 0, w, h);
+    this.cacheTinte[nombre] = c;
+    return c;
   };
 
   Renderer.prototype.crearEstrellas = function (n) {
@@ -88,14 +114,12 @@
       var f = this.sacudidaFuerza * q * q;
       ctx.translate((Math.random() - 0.5) * f, (Math.random() - 0.5) * f);
     }
-    var tema = this.tema;
-    var cielo = ctx.createLinearGradient(0, 0, 0, CONFIG.ALTO);
-    cielo.addColorStop(0, tema.a);
-    cielo.addColorStop(1, tema.b);
-    ctx.fillStyle = cielo;
+    // Fondo NEGRO siempre. Lo que da variedad por nivel es el tinte de las
+    // naves y el color de las estrellas, no el cielo.
+    ctx.fillStyle = C.FONDO;
     ctx.fillRect(0, 0, CONFIG.ANCHO, CONFIG.ALTO);
 
-    ctx.fillStyle = tema.estrella;
+    ctx.fillStyle = (this.tema && this.tema.estrella) || C.ESTRELLA;
     for (var i = 0; i < this.estrellas.length; i++) {
       var e = this.estrellas[i];
       // Parpadeo: el brillo late entre casi apagado y pleno, cada estrella a
@@ -165,7 +189,8 @@
     for (var i = 0; i < lista.length; i++) {
       var e = lista[i];
       if (!e.vivo) { continue; }
-      dibujarSprite(ctx, e.sprite + alterno, e.x, e.y, e.w, e.h);
+      var img = this.spriteTintado(e.sprite + alterno);
+      if (img) { ctx.drawImage(img, e.x, e.y, e.w, e.h); }
     }
   };
 
