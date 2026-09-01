@@ -485,6 +485,18 @@
        Se eligen por (fila, columna, filas, columnas); true = hay nave. */
     FORMAS: ['bloque', 'rombo', 'flancos', 'aspa', 'panal'],
 
+    /* Comportamiento de marcha por nivel: como se mueve el enjambre. Se turnan
+       y suben la dificultad. vaivenY = cuanto sube y baja mientras avanza;
+       pasoMult = ritmo (menor = mas rapido); descensoMult = cuanto baja al
+       tocar el borde. */
+    COMPORTAMIENTOS: [
+      { nombre: 'marcha',   vaivenY: 0,  vaivenVel: 0,   pasoMult: 1.00, descensoMult: 1.0 },
+      { nombre: 'ola',      vaivenY: 11, vaivenVel: 2.2, pasoMult: 1.00, descensoMult: 1.0 },
+      { nombre: 'veloz',    vaivenY: 0,  vaivenVel: 0,   pasoMult: 0.80, descensoMult: 0.85 },
+      { nombre: 'agresivo', vaivenY: 6,  vaivenVel: 1.8, pasoMult: 0.95, descensoMult: 1.4 },
+      { nombre: 'nervioso', vaivenY: 15, vaivenVel: 3.6, pasoMult: 0.85, descensoMult: 1.1 }
+    ],
+
     /* Familia de nave por nivel: cambia la SILUETA (no solo el color). Se
        turnan, asi cada nivel tiene bichos de otra forma. */
     FAMILIAS_NAVE: ['clasico', 'platillo', 'insecto', 'robot', 'medusa'],
@@ -506,6 +518,7 @@
       CLAVE_AUDIO: 'tioRene.audio',
       CLAVE_VOLUMEN: 'tioRene.volumen',
       CLAVE_AUTODISPARO: 'tioRene.autoDisparo',
+      CLAVE_DIFICULTAD: 'tri_dificultad',
       CLAVE_PALANCA: 'tioRene.palanca',
       RECORD_MAX: 99999999
     }
@@ -513,16 +526,30 @@
 
   /* Parametros que cambian con el nivel. Centralizado a proposito:
      tocar esta funcion es tocar toda la curva de dificultad. */
+  /* Dificultad elegible. Multiplica el ritmo de la marcha y del disparo: en
+     FACIL los intervalos son mas largos (todo mas lento), en DIFICIL mas
+     cortos. Normal deja el juego como estaba. */
+  CONFIG.DIFICULTADES = {
+    facil:   { etiqueta: 'FÁCIL',   paso: 1.30, disparo: 1.45, balaMult: 0.85 },
+    normal:  { etiqueta: 'NORMAL',  paso: 1.00, disparo: 1.00, balaMult: 1.00 },
+    dificil: { etiqueta: 'DIFÍCIL', paso: 0.80, disparo: 0.72, balaMult: 1.18 }
+  };
+  CONFIG.dificultad = 'normal';
+  CONFIG.fijarDificultad = function (clave) {
+    if (CONFIG.DIFICULTADES[clave]) { CONFIG.dificultad = clave; }
+  };
+
   CONFIG.nivelParams = function (nivel) {
     var e = CONFIG.ENEMIGOS;
     var n = Math.max(1, nivel);
+    var dif = CONFIG.DIFICULTADES[CONFIG.dificultad] || CONFIG.DIFICULTADES.normal;
     var extraY = Math.min(n - 1, e.Y_INICIAL_MAX_NIVELES) * e.Y_INICIAL_POR_NIVEL;
     return {
-      intervaloPaso: Math.max(e.INTERVALO_PASO_MIN, e.INTERVALO_PASO_BASE * Math.pow(0.93, n - 1)),
+      intervaloPaso: Math.max(e.INTERVALO_PASO_MIN, e.INTERVALO_PASO_BASE * Math.pow(0.93, n - 1) * dif.paso),
       descenso: Math.min(e.DESCENSO_MAX, e.DESCENSO_BASE + 2 * (n - 1)),
       yInicial: e.Y_INICIAL + extraY,
-      intervaloDisparo: Math.max(e.INTERVALO_DISPARO_MIN, e.INTERVALO_DISPARO_BASE * Math.pow(0.93, n - 1)),
-      velocidadDisparo: Math.min(430, CONFIG.PROYECTIL_ENEMIGO.VELOCIDAD_BASE + 11 * (n - 1)),
+      intervaloDisparo: Math.max(e.INTERVALO_DISPARO_MIN, e.INTERVALO_DISPARO_BASE * Math.pow(0.93, n - 1) * dif.disparo),
+      velocidadDisparo: Math.min(460, (CONFIG.PROYECTIL_ENEMIGO.VELOCIDAD_BASE + 11 * (n - 1)) * dif.balaMult),
       maxProyectiles: Math.min(e.MAX_PROYECTILES_TOPE, e.MAX_PROYECTILES_BASE + Math.floor((n - 1) / 2)),
       /* La formacion tambien crece: con solo acelerar, todos los niveles se
          sentian iguales. Ahora ademas hay mas naves y ocupan mas ancho. */

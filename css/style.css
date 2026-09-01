@@ -714,6 +714,36 @@ body.tactil .controles { display: none; }
 
 body.portada-lista #invitacion { opacity: 1; }
 
+/* Selector de dificultad en la portada. Aparece con la invitacion. */
+#dificultad {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  opacity: 0;
+  transition: opacity 0.45s ease;
+}
+body.portada-lista #dificultad { opacity: 1; }
+
+.dif-rotulo { font-size: 10px; letter-spacing: 3px; color: #d8ffe6; }
+.dif-opciones { display: inline-flex; border: 1px solid rgba(255,244,214,0.4); border-radius: 999px; overflow: hidden; }
+
+.dif {
+  font-family: var(--fuente);
+  font-size: 12px;
+  letter-spacing: 1px;
+  padding: 8px 14px;
+  min-height: 40px;
+  color: #eafff1;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+}
+.dif + .dif { border-left: 1px solid rgba(255,244,214,0.25); }
+.dif:hover { background: rgba(255,244,214,0.12); }
+.dif[aria-pressed="true"] { color: #06210f; background: #fff4d6; font-weight: bold; }
+.dif:focus-visible { outline: 2px solid var(--acento); outline-offset: -2px; }
+
 /* Las dos maneras de jugar, en la portada. Aparecen con la invitacion. */
 #opciones-inicio {
   display: flex;

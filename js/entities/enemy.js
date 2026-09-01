@@ -71,6 +71,9 @@
     this.nivelActual = nivel;
 
     var forma = CONFIG.FORMAS[(nivel - 1) % CONFIG.FORMAS.length];
+    this.comp = CONFIG.COMPORTAMIENTOS[(nivel - 1) % CONFIG.COMPORTAMIENTOS.length];
+    this.vaivenT = 0;
+    this.balanceoY = 0;
     for (var f = 0; f < filas; f++) {
       var tipo = E.TIPOS[Math.min(f, E.TIPOS.length - 1)];
       for (var c = 0; c < columnas; c++) {
@@ -200,7 +203,7 @@
       var e = this.enemigos[i];
       if (e.estado === 'picando' || e.estado === 'kamikaze') { continue; }   // los que atacan van por libre
       e.x = this.offsetX + e.columna * E.SEPARACION_X;
-      e.y = this.offsetY + e.fila * E.SEPARACION_Y;
+      e.y = this.offsetY + e.fila * E.SEPARACION_Y + this.balanceoY;
     }
   };
 
@@ -221,7 +224,7 @@
     if (this.total === 0) { return this.params.intervaloPaso; }
     var proporcion = Math.max(this.vivos, 1) / this.total;
     var factor = Math.pow(proporcion, E.FACTOR_ACELERACION);
-    return Math.max(E.INTERVALO_PASO_MIN, this.params.intervaloPaso * factor);
+    return Math.max(E.INTERVALO_PASO_MIN, this.params.intervaloPaso * factor * this.comp.pasoMult);
   };
 
   /* Devuelve un evento describiendo lo que paso en este ciclo. */
@@ -231,6 +234,13 @@
 
     this.actualizarPicadas(dt, objetivoX, evento);
 
+    // Vaiven vertical del enjambre (segun el comportamiento del nivel).
+    if (this.comp.vaivenY > 0) {
+      this.vaivenT += dt;
+      this.balanceoY = Math.sin(this.vaivenT * this.comp.vaivenVel) * this.comp.vaivenY;
+      this.recolocar();
+    }
+
     this.temporizadorPaso += dt;
     if (this.temporizadorPaso >= this.intervaloPaso()) {
       this.temporizadorPaso = 0;
@@ -239,7 +249,7 @@
       var lim = this.limites(siguiente);
       if (lim.min < E.MARGEN_LATERAL || lim.max > CONFIG.ANCHO - E.MARGEN_LATERAL) {
         this.direccion *= -1;
-        this.offsetY += this.params.descenso;
+        this.offsetY += this.params.descenso * this.comp.descensoMult;
         evento.descendio = true;
       } else {
         this.offsetX = siguiente;

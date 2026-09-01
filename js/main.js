@@ -92,6 +92,31 @@
   /* ---- Entrada ---- */
   TRI.Instalar.iniciar();
 
+  /* Selector de dificultad de la portada. Se lee lo guardado, se marca el
+     boton activo y cada eleccion se aplica y se guarda. Afecta desde la
+     siguiente partida. */
+  (function () {
+    var guardada = Storage.leerDificultad();
+    CONFIG.fijarDificultad(guardada);
+    var botones = document.querySelectorAll('#dificultad .dif');
+    function marcar(clave) {
+      for (var i = 0; i < botones.length; i++) {
+        var b = botones[i];
+        b.setAttribute('aria-pressed', b.getAttribute('data-dif') === clave ? 'true' : 'false');
+      }
+    }
+    marcar(guardada);
+    for (var i = 0; i < botones.length; i++) {
+      botones[i].addEventListener('click', function (ev) {
+        ev.stopPropagation();   // que no dispare el arranque de la portada
+        var clave = this.getAttribute('data-dif');
+        CONFIG.fijarDificultad(clave);
+        Storage.guardarDificultad(clave);
+        marcar(clave);
+      });
+    }
+  })();
+
   var esTactil = Input.iniciar(botonera);
   var conTacto = esTactil || (global.matchMedia && global.matchMedia('(pointer: coarse)').matches);
   if (conTacto) { document.body.classList.add('tactil'); }

@@ -72,6 +72,14 @@
       escribirCrudo(CONFIG.ALMACENAMIENTO.CLAVE_PALANCA, activa ? '1' : '0');
     },
 
+    leerDificultad: function () {
+      var v = leerCrudo(CONFIG.ALMACENAMIENTO.CLAVE_DIFICULTAD);
+      return (v === 'facil' || v === 'dificil') ? v : 'normal';
+    },
+    guardarDificultad: function (clave) {
+      escribirCrudo(CONFIG.ALMACENAMIENTO.CLAVE_DIFICULTAD, clave);
+    },
+
     leerVolumen: function () {
       var v = parseFloat(leerCrudo(CONFIG.ALMACENAMIENTO.CLAVE_VOLUMEN));
       if (!isFinite(v) || isNaN(v) || v < 0 || v > 1) { return CONFIG.AUDIO.VOLUMEN_INICIAL; }
