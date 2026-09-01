@@ -241,7 +241,10 @@
         },
         {
           sprite: 'boss-2', nombre: 'JB THE VOICE',
-          voces: { aparece: 'jbAparece', golpe: 'jbGolpe', muere: 'jbMuere' }
+          voces: {
+            aparece: 'jbAparece', muere: 'jbMuere',
+            golpe: ['jbGolpe1', 'jbGolpe2', 'jbGolpe3', 'jbGolpe4', 'jbGolpe5']
+          }
         },
         {
           sprite: 'boss-3', nombre: 'CARLITOS RUN',
@@ -261,7 +264,13 @@
             golpe: ['wasonGolpe1', 'wasonGolpe2', 'wasonGolpe3', 'wasonGolpe4', 'wasonGolpe5']
           }
         },
-        { sprite: 'boss-5', nombre: 'HUEVITO REY' }
+        {
+          sprite: 'boss-5', nombre: 'HUEVITO REY',
+          voces: {
+            aparece: 'huevitoAparece', muere: 'huevitoMuere',
+            golpe: ['huevitoGolpe1', 'huevitoGolpe2', 'huevitoGolpe3', 'huevitoGolpe4']
+          }
+        }
       ]
     },
 
@@ -365,7 +374,11 @@
         mickyMuere: 'micky-muere.mp3',
         /* JB The Voice: un unico clip suyo de myinstants, partido en tres. */
         jbAparece: 'jb-aparece.mp3',
-        jbGolpe: 'jb-golpe.mp3',
+        jbGolpe1: 'jb-golpe1.mp3',
+        jbGolpe2: 'jb-golpe2.mp3',
+        jbGolpe3: 'jb-golpe3.mp3',
+        jbGolpe4: 'jb-golpe4.mp3',
+        jbGolpe5: 'jb-golpe5.mp3',
         jbMuere: 'jb-muere.mp3',
         /* Wason King: un unico clip suyo de myinstants, partido en tres. */
         wasonAparece: 'wason-aparece.mp3',
@@ -382,6 +395,13 @@
         carlitosGolpe3: 'carlitos-golpe3.mp3',
         carlitosGolpe4: 'carlitos-golpe4.mp3',
         carlitosMuere: 'carlitos-muere.mp3',
+        /* Huevito Rey: varios clips suyos de myinstants. */
+        huevitoAparece: 'huevito-aparece.mp3',
+        huevitoGolpe1: 'huevito-golpe1.mp3',
+        huevitoGolpe2: 'huevito-golpe2.mp3',
+        huevitoGolpe3: 'huevito-golpe3.mp3',
+        huevitoGolpe4: 'huevito-golpe4.mp3',
+        huevitoMuere: 'huevito-muere.mp3',
         racha1: 'racha-queri-too.mp3',     // "queri too"
         racha2: 'racha-tio-rene.mp3',
         racha3: 'racha-miau.mp3',          // el "nau" cortito
