@@ -217,7 +217,7 @@
       INTERVALO_DISPARO_BASE: 0.95,
       INTERVALO_DISPARO_MIN: 0.34,
       /* Cada cuantos impactos suelta una frase, para que no sea un loro. */
-      VOZ_CADA: 9,
+      VOZ_CADA: 6,
       /* En el orden que pidio Eduardo. Cada uno puede traer sus propias voces
          (de myinstants, igual que las del Tio Rene). Los que aun no tienen
          sonidos propios se quedan sin voz: mejor callado que con la voz de
@@ -238,7 +238,10 @@
              entrevistan. Lo hace la cabeza entera (se va de lado y vuelve),
              porque la foto es fija y no se le pueden mover solo los ojos. */
           mira: true,
-          voces: { aparece: 'wasonAparece', golpe: 'wasonGolpe', muere: 'wasonMuere' }
+          voces: {
+            aparece: 'wasonAparece', muere: 'wasonMuere',
+            golpe: ['wasonGolpe1', 'wasonGolpe2', 'wasonGolpe3', 'wasonGolpe4', 'wasonGolpe5']
+          }
         },
         { sprite: 'boss-5', nombre: 'HUEVITO REY' }
       ]
@@ -348,7 +351,11 @@
         jbMuere: 'jb-muere.mp3',
         /* Wason King: un unico clip suyo de myinstants, partido en tres. */
         wasonAparece: 'wason-aparece.mp3',
-        wasonGolpe: 'wason-golpe.mp3',
+        wasonGolpe1: 'wason-golpe1.mp3',
+        wasonGolpe2: 'wason-golpe2.mp3',
+        wasonGolpe3: 'wason-golpe3.mp3',
+        wasonGolpe4: 'wason-golpe4.mp3',
+        wasonGolpe5: 'wason-golpe5.mp3',
         wasonMuere: 'wason-muere.mp3',
         racha1: 'racha-queri-too.mp3',     // "queri too"
         racha2: 'racha-tio-rene.mp3',

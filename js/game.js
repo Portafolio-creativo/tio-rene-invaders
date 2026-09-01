@@ -415,8 +415,21 @@
         if (!jefe.tocado(px, py)) { return; }
         jefe.impactar(px, py);
         // Suelta una frase cada tantos golpes: en cada impacto seria un loro.
+        // La voz de golpe puede ser una sola o una LISTA que se va turnando,
+        // para que no repita siempre lo mismo.
         if (jefe.voces.golpe && jefe.impactos % CONFIG.JEFES.VOZ_CADA === 0) {
-          Audio.reproducir(jefe.voces.golpe);
+          var g = jefe.voces.golpe;
+          if (Array.isArray(g)) {
+            // Al azar pero sin repetir el ultimo, para que no salga el mismo
+            // dos veces seguidas.
+            var op = g;
+            if (g.length > 1 && jefe.ultimoGolpe) {
+              op = g.filter(function (x) { return x !== jefe.ultimoGolpe; });
+            }
+            g = op[Math.floor(Math.random() * op.length)];
+            jefe.ultimoGolpe = g;
+          }
+          Audio.reproducir(g);
         }
         p.vivo = false;
         self.efectos.chispas(px, py, 7, '#ffd0a0');
