@@ -193,12 +193,29 @@
       return;                                      // sin barra de vida: ya murio
     }
 
-    ctx.drawImage(jefe.lienzo, x, y, w, h);
+    // Si mira de reojo, la cara se pinta girada y corrida sobre su centro.
+    var gira = jefe.inclina || 0, desv = (jefe.desvX || 0) * (w / CONFIG.JEFES.ANCHO);
+    var conGiro = Math.abs(gira) > 0.001 || Math.abs(desv) > 0.5;
+    if (conGiro) {
+      ctx.save();
+      ctx.translate(x + w / 2 + desv, y + h / 2);
+      ctx.rotate(gira);
+      ctx.drawImage(jefe.lienzo, -w / 2, -h / 2, w, h);
+      ctx.restore();
+    } else {
+      ctx.drawImage(jefe.lienzo, x, y, w, h);
+    }
     if (jefe.destello > 0) {
       ctx.save();
       ctx.globalAlpha = Math.min(0.5, jefe.destello * 4);
       ctx.globalCompositeOperation = 'lighter';
-      ctx.drawImage(jefe.lienzo, x, y, w, h);
+      if (conGiro) {
+        ctx.translate(x + w / 2 + desv, y + h / 2);
+        ctx.rotate(gira);
+        ctx.drawImage(jefe.lienzo, -w / 2, -h / 2, w, h);
+      } else {
+        ctx.drawImage(jefe.lienzo, x, y, w, h);
+      }
       ctx.restore();
     }
     // Barra de vida, siempre del mismo ancho y arriba del todo: si siguiera al

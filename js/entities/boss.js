@@ -39,6 +39,12 @@
     this.sprite = this.datos.sprite;
     this.nombre = this.datos.nombre;
     this.voces = this.datos.voces || {};
+    this.mira = !!this.datos.mira;   // el tic de mirar al costado
+    this.miradaT = J.MIRADA_CADA_MIN;
+    this.miradaFase = 'centro';      // centro | girando | volviendo
+    this.inclina = 0;                // rotacion actual (radianes)
+    this.desvX = 0;                  // corrimiento lateral actual (px)
+    this.miradaObj = 0;
     this.activo = true;
 
     this.cx = CONFIG.ANCHO / 2;
@@ -143,9 +149,13 @@
     if (!this.activo) { return false; }
     if (this.destello > 0) { this.destello -= dt; }
 
-    // Agonizando: no se mueve ni dispara, solo cuenta hasta reventar.
+    // Agonizando: no se mueve ni dispara, pero la mirada vuelve al centro para
+    // no quedar torcida mientras arde.
     if (this.muriendo > 0) {
       this.muriendo -= dt;
+      this.miradaObj = 0;
+      this.inclina += (0 - this.inclina) * Math.min(1, dt * 8);
+      this.desvX += (0 - this.desvX) * Math.min(1, dt * 8);
       return false;
     }
 
@@ -173,6 +183,8 @@
     }
     this.escala += (this.escalaObjetivo - this.escala) * Math.min(1, dt * 1.6);
 
+    this.actualizarMirada(dt);
+
     // Que el zoom no lo deje medio fuera de la pantalla.
     var l = this.limites();
     this.cx = Util.limitar(this.cx, l.minX, l.maxX);
@@ -192,6 +204,36 @@
       return true;
     }
     return false;
+  };
+
+  /* El tic de mirar al costado: cada cierto rato la cabeza se va de lado con
+     un golpe rapido, se queda un momento y vuelve al centro. Solo lo hacen los
+     jefes con mira:true. */
+  Jefe.prototype.actualizarMirada = function (dt) {
+    if (!this.mira) { return; }
+    this.miradaT -= dt;
+    if (this.miradaFase === 'centro') {
+      if (this.miradaT <= 0) {
+        this.miradaFase = 'girando';
+        // hacia un lado al azar, y un poco mas arriba/abajo para que quede bobo
+        var lado = Math.random() < 0.5 ? -1 : 1;
+        this.miradaObj = lado;
+        this.miradaT = J.MIRADA_SOSTEN;
+      }
+    } else if (this.miradaFase === 'girando') {
+      if (this.miradaT <= 0) { this.miradaFase = 'volviendo'; }
+    } else if (this.miradaFase === 'volviendo') {
+      this.miradaObj = 0;
+      if (Math.abs(this.inclina) < 0.01) {
+        this.miradaFase = 'centro';
+        this.miradaT = J.MIRADA_CADA_MIN + Math.random() * (J.MIRADA_CADA_MAX - J.MIRADA_CADA_MIN);
+      }
+    }
+    // Suavizado hacia el objetivo: rapido al irse, un poco mas lento al volver.
+    var vel = this.miradaFase === 'volviendo' ? 8 : 14;
+    var k = Math.min(1, dt * vel);
+    this.inclina += (this.miradaObj * J.MIRADA_ANGULO - this.inclina) * k;
+    this.desvX += (this.miradaObj * J.MIRADA_DESVIO - this.desvX) * k;
   };
 
   /* ---- Geometria ---- */

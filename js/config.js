@@ -195,6 +195,12 @@
          va deteriorando, y al llegar a esta cuenta estalla. */
       IMPACTOS_OBJETIVO: 34,
       MAX_PROYECTILES: 6,       // cuantos disparos suyos caben a la vez
+      /* Tic de "mirar al costado" (solo los jefes con mira:true). */
+      MIRADA_CADA_MIN: 1.4,     // cada cuanto se distrae
+      MIRADA_CADA_MAX: 3.2,
+      MIRADA_ANGULO: 0.22,      // cuanto gira la cabeza (radianes)
+      MIRADA_DESVIO: 22,        // y cuanto se corre de lado (px)
+      MIRADA_SOSTEN: 0.6,       // cuanto se queda mirando antes de volver
       PUNTOS: 750,
       /* Al caer revienta por partes: una tanda de estallidos encadenados
          mientras la pantalla tiembla. */
@@ -226,7 +232,14 @@
           voces: { aparece: 'jbAparece', golpe: 'jbGolpe', muere: 'jbMuere' }
         },
         { sprite: 'boss-3', nombre: 'PÁJARO VERDE' },
-        { sprite: 'boss-4', nombre: 'WASON KING' },
+        {
+          sprite: 'boss-4', nombre: 'WASON KING',
+          /* Su sello: se distrae y mira para el lado cada tanto, como cuando lo
+             entrevistan. Lo hace la cabeza entera (se va de lado y vuelve),
+             porque la foto es fija y no se le pueden mover solo los ojos. */
+          mira: true,
+          voces: { aparece: 'wasonAparece', golpe: 'wasonGolpe', muere: 'wasonMuere' }
+        },
         { sprite: 'boss-5', nombre: 'HUEVITO REY' }
       ]
     },
@@ -333,6 +346,10 @@
         jbAparece: 'jb-aparece.mp3',
         jbGolpe: 'jb-golpe.mp3',
         jbMuere: 'jb-muere.mp3',
+        /* Wason King: un unico clip suyo de myinstants, partido en tres. */
+        wasonAparece: 'wason-aparece.mp3',
+        wasonGolpe: 'wason-golpe.mp3',
+        wasonMuere: 'wason-muere.mp3',
         racha1: 'racha-queri-too.mp3',     // "queri too"
         racha2: 'racha-tio-rene.mp3',
         racha3: 'racha-miau.mp3',          // el "nau" cortito
