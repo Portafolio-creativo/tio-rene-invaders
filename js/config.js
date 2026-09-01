@@ -231,7 +231,13 @@
           sprite: 'boss-2', nombre: 'JB THE VOICE',
           voces: { aparece: 'jbAparece', golpe: 'jbGolpe', muere: 'jbMuere' }
         },
-        { sprite: 'boss-3', nombre: 'PÁJARO VERDE' },
+        {
+          sprite: 'boss-3', nombre: 'CARLITOS RUN',
+          voces: {
+            aparece: 'carlitosAparece', muere: 'carlitosMuere',
+            golpe: ['carlitosGolpe1', 'carlitosGolpe2', 'carlitosGolpe3', 'carlitosGolpe4']
+          }
+        },
         {
           sprite: 'boss-4', nombre: 'WASON KING',
           /* Su sello: se distrae y mira para el lado cada tanto, como cuando lo
@@ -357,6 +363,13 @@
         wasonGolpe4: 'wason-golpe4.mp3',
         wasonGolpe5: 'wason-golpe5.mp3',
         wasonMuere: 'wason-muere.mp3',
+        /* Carlitos Run: varios clips suyos de myinstants. */
+        carlitosAparece: 'carlitos-aparece.mp3',
+        carlitosGolpe1: 'carlitos-golpe1.mp3',
+        carlitosGolpe2: 'carlitos-golpe2.mp3',
+        carlitosGolpe3: 'carlitos-golpe3.mp3',
+        carlitosGolpe4: 'carlitos-golpe4.mp3',
+        carlitosMuere: 'carlitos-muere.mp3',
         racha1: 'racha-queri-too.mp3',     // "queri too"
         racha2: 'racha-tio-rene.mp3',
         racha3: 'racha-miau.mp3',          // el "nau" cortito
