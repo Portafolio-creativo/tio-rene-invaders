@@ -17,6 +17,8 @@
     this.direccion = 1;
     this.espera = Util.azar(O.ESPERA_MIN, O.ESPERA_MAX);
     this.bamboleo = 0;
+    this.contador = 0;     // cuantos han aparecido (para el de vida extra)
+    this.daVida = false;
   }
 
   Ovni.prototype.reiniciar = function () {
@@ -26,6 +28,9 @@
   };
 
   Ovni.prototype.aparecer = function () {
+    this.contador++;
+    // Cada N ovnis, este trae vida extra: se ve distinto y al derribarlo suma.
+    this.daVida = (this.contador % O.VIDA_CADA === 0);
     this.direccion = Math.random() < 0.5 ? 1 : -1;
     this.x = this.direccion === 1 ? -this.w : CONFIG.ANCHO;
     this.y = O.Y;

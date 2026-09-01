@@ -287,6 +287,9 @@
       this.puntuacion.vidas = 0;
       this.golpearJugador();
     }
+    // Zumbido constante mientras hay una kamikaze en pantalla.
+    if (this.enemigos.hayKamikaze) { Audio.iniciarZumbido(); }
+    else { Audio.detenerZumbido(); }
   };
 
   Juego.prototype.actualizarOvni = function (dt) {
@@ -473,6 +476,12 @@
       self.efectos.chispas(cx, cy, 18, '#ffd0a0');
       self.efectos.texto(cx, cy, String(puntos), '#7cf29a');
       if (self.puntuacion.sumar(puntos)) { Audio.reproducir('vidaExtra'); }
+      // Ovni de vida extra: al derribarlo suma una vida (si no esta en el tope).
+      if (ovni.daVida && self.puntuacion.ganarVida()) {
+        self.efectos.texto(cx, cy - 26, '+1 VIDA', '#ff6bd0');
+        self.efectos.destello(cx, cy, 110);
+        Audio.reproducir('vidaExtra');
+      }
     });
 
     Colisiones.proyectilesContraBarreras(this.proyectiles, this.barreras, function (barrera, p, px, py) {
@@ -521,6 +530,7 @@
     this.efectos.destello(this.jugador.x, p.cabeza.y + 30, 90);
     this.efectos.chispas(this.jugador.x, p.cabeza.y + 30, 16, '#ff9b6e');
     Audio.detenerSirena();
+    Audio.detenerZumbido();
     // En CADA vida perdida suena una frase de "se murio", turnandose. Si es la
     // ultima, ademas se le suma la frase de final de partida.
     var frases = CONFIG.AUDIO.MUERTE_CLIPS;

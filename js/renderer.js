@@ -221,13 +221,48 @@
       if (!e.vivo) { continue; }
       var clave = e.sprite + alterno;
       var img = (this.cacheNaves && this.cacheNaves[clave]) || this.spriteTintado(clave);
+      // La kamikaze va marcada con un aura roja palpitante, para que se vea que
+      // esa se salio a matarte.
+      if (e.estado === 'kamikaze') {
+        var kx = e.x + e.w / 2, ky = e.y + e.h / 2;
+        var pk = 0.5 + 0.5 * Math.sin(this.brilloEstrellas * 12);
+        ctx.save();
+        ctx.globalCompositeOperation = 'lighter';
+        ctx.globalAlpha = 0.4 + 0.4 * pk;
+        var au = ctx.createRadialGradient(kx, ky, 2, kx, ky, e.w);
+        au.addColorStop(0, 'rgba(255,60,40,0.9)');
+        au.addColorStop(1, 'rgba(255,60,40,0)');
+        ctx.fillStyle = au;
+        ctx.beginPath(); ctx.arc(kx, ky, e.w, 0, Math.PI * 2); ctx.fill();
+        ctx.restore();
+      }
       if (img) { ctx.drawImage(img, e.x, e.y, e.w, e.h); }
     }
   };
 
   Renderer.prototype.dibujarOvni = function (ovni) {
     if (!ovni.activo) { return; }
-    dibujarSprite(this.ctx, 'enemy-special', ovni.x, ovni.y, ovni.w, ovni.h);
+    var ctx = this.ctx;
+    dibujarSprite(ctx, 'enemy-special', ovni.x, ovni.y, ovni.w, ovni.h);
+    // El de vida extra late con un aura rosada y un corazon encima, para que se
+    // note que ese hay que cazarlo.
+    if (ovni.daVida) {
+      var cx = ovni.x + ovni.w / 2, cy = ovni.y + ovni.h / 2;
+      var pulso = 0.5 + 0.5 * Math.sin((ovni.bamboleo || 0) * 8);
+      ctx.save();
+      ctx.globalCompositeOperation = 'lighter';
+      ctx.globalAlpha = 0.35 + 0.35 * pulso;
+      var aura = ctx.createRadialGradient(cx, cy, 4, cx, cy, ovni.w * 0.8);
+      aura.addColorStop(0, 'rgba(255,107,208,0.8)');
+      aura.addColorStop(1, 'rgba(255,107,208,0)');
+      ctx.fillStyle = aura;
+      ctx.beginPath(); ctx.arc(cx, cy, ovni.w * 0.8, 0, Math.PI * 2); ctx.fill();
+      ctx.restore();
+      ctx.fillStyle = '#ff6bd0';
+      ctx.font = 'bold 16px ' + '"Trebuchet MS", Verdana, sans-serif';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText('♥', cx, ovni.y - 6);
+    }
   };
 
   /* El jefe se pinta desde su propio lienzo, que ya trae el deterioro. Se

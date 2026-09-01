@@ -31,7 +31,8 @@
   var buffers = {};          // sonidos cargados desde archivo (opcionales)
   var vocesActivas = 0;
   var MAX_VOCES = 14;
-  var sirena = null;         // referencia al zumbido del ovni
+  var sirena = null;
+  var zumbido = null;         // referencia al zumbido del ovni
   var vozActual = null;      // frase del Tio Rene sonando ahora mismo
   var pendiente = null;      // frase en espera de que se desbloquee el audio
   var ambienteGain = null;   // salida propia del ambiente, mas bajita
@@ -405,6 +406,32 @@
     },
 
     /* Zumbido continuo del ovni mientras cruza la pantalla. */
+    /* Zumbido raro y constante de la nave kamikaze: dos osciladores desafinados
+       con vibrato, para que suene amenazante y distinto de todo lo demas. */
+    iniciarZumbido: function () {
+      if (!activo || !soportado || zumbido) { return; }
+      crearContexto();
+      if (!ctx) { return; }
+      var o1 = ctx.createOscillator(), o2 = ctx.createOscillator();
+      var lfo = ctx.createOscillator(), lfoG = ctx.createGain();
+      var g = ctx.createGain();
+      o1.type = 'square'; o1.frequency.value = 138;
+      o2.type = 'sawtooth'; o2.frequency.value = 146;   // desafinado a proposito
+      lfo.frequency.value = 14; lfoG.gain.value = 26;
+      lfo.connect(lfoG); lfoG.connect(o1.frequency); lfoG.connect(o2.frequency);
+      g.gain.value = 0.075;
+      o1.connect(g); o2.connect(g); g.connect(masterGain);
+      o1.start(); o2.start(); lfo.start();
+      zumbido = { o1: o1, o2: o2, lfo: lfo, g: g };
+    },
+
+    detenerZumbido: function () {
+      if (!zumbido) { return; }
+      try { zumbido.o1.stop(); zumbido.o2.stop(); zumbido.lfo.stop(); zumbido.g.disconnect(); }
+      catch (e) { /* ya estaba */ }
+      zumbido = null;
+    },
+
     iniciarSirena: function () {
       if (!activo || !soportado || sirena) { return; }
       crearContexto();
@@ -473,6 +500,7 @@
     /* Al pausar o perder el foco se corta cualquier sonido sostenido. */
     silenciarSostenidos: function () {
       Audio.detenerSirena();
+      Audio.detenerZumbido();
       Audio.detenerAmbiente();
     }
   };

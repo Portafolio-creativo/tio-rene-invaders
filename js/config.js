@@ -143,7 +143,15 @@
       PICADA_VELOCIDAD: 190,    // px/s de caida
       PICADA_PERSECUCION: 1.6,  // cuanto persigue al jugador (0 = recto)
       PICADA_BAMBOLEO: 90,      // amplitud del zigzag al caer
-      PICADA_DISPARA: 0.9       // prob. de que dispare durante la picada
+      PICADA_DISPARA: 0.9,      // prob. de que dispare durante la picada
+      /* La KAMIKAZE: mas rara, se sale muy notoria y va DIRECTO al jugador con
+         un zumbido raro constante. Empieza mas adelante y castiga quedarse
+         quieto. */
+      KAMIKAZE_DESDE_NIVEL: 3,
+      KAMIKAZE_CADA_BASE: 11,   // segundos entre kamikazes (nivel 3)
+      KAMIKAZE_CADA_MIN: 4.5,
+      KAMIKAZE_VELOCIDAD: 240,  // px/s de caida (mas rapida que la picada normal)
+      KAMIKAZE_PERSECUCION: 3.4 // persigue fuerte al jugador en horizontal
     },
 
     OVNI: {
@@ -156,6 +164,7 @@
       /* No cruza y se va: hace varias PASADAS de ida y vuelta antes de irse,
          asi da tiempo de derribarlo en vez de perderse de una. */
       PASADAS: 3,
+      VIDA_CADA: 6,             // cada N ovnis, uno da VIDA EXTRA al derribarlo
       PUNTOS: [50, 100, 150, 200, 300]
     },
 

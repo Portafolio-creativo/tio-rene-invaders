@@ -66,6 +66,8 @@
     this.indicePaso = 0;
     this.temporizadorDisparo = this.params.intervaloDisparo * 0.6;
     this.temporizadorPicada = CONFIG.ENEMIGOS.PICADA_CADA_BASE;
+    this.temporizadorKamikaze = CONFIG.ENEMIGOS.KAMIKAZE_CADA_BASE;
+    this.hayKamikaze = false;
     this.nivelActual = nivel;
 
     var forma = CONFIG.FORMAS[(nivel - 1) % CONFIG.FORMAS.length];
@@ -96,8 +98,26 @@
     var E = CONFIG.ENEMIGOS;
     var destino = (typeof objetivoX === 'number') ? objetivoX : CONFIG.ANCHO / 2;
 
+    this.hayKamikaze = false;
     for (var i = 0; i < this.enemigos.length; i++) {
       var e = this.enemigos[i];
+      // Kamikaze: cae rapido, va DIRECTO al jugador (persigue fuerte, sin
+      // zigzag) y cuenta como tal para el zumbido.
+      if (e.vivo && e.estado === 'kamikaze') {
+        this.hayKamikaze = true;
+        var haciaK = destino - (e.x + e.w / 2);
+        e.x += Math.sign(haciaK) * Math.min(Math.abs(haciaK), E.KAMIKAZE_PERSECUCION * 60 * dt);
+        e.y += E.KAMIKAZE_VELOCIDAD * dt;
+        e.x = Util.limitar(e.x, 0, CONFIG.ANCHO - e.w);
+        e.disparoPicadaT -= dt;
+        if (e.disparoPicadaT <= 0) { e.disparoPicadaT = Util.azar(0.4, 0.8); evento.picadas.push({ x: e.x + e.w / 2, y: e.y + e.h }); }
+        if (e.y > CONFIG.ALTO) {
+          e.estado = 'formacion';
+          e.x = this.offsetX + e.columna * E.SEPARACION_X;
+          e.y = this.offsetY + e.fila * E.SEPARACION_Y;
+        }
+        continue;
+      }
       if (!e.vivo || e.estado !== 'picando') { continue; }
       e.picadaT += dt;
       // Cae persiguiendo al jugador, con un zigzag para que no sea un misil.
@@ -131,6 +151,30 @@
       this.temporizadorPicada = cada * Util.azar(0.7, 1.3);
       this.lanzarPicada();
     }
+
+    // Kamikaze, mas espaciada y desde un nivel mas alto.
+    if (this.nivelActual < E.KAMIKAZE_DESDE_NIVEL) { return; }
+    this.temporizadorKamikaze -= dt;
+    if (this.temporizadorKamikaze <= 0) {
+      var cadaK = Math.max(E.KAMIKAZE_CADA_MIN,
+        E.KAMIKAZE_CADA_BASE - (this.nivelActual - E.KAMIKAZE_DESDE_NIVEL) * 0.7);
+      this.temporizadorKamikaze = cadaK * Util.azar(0.8, 1.2);
+      this.lanzarKamikaze();
+    }
+  };
+
+  /* Manda una kamikaze: un enemigo cualquiera se sale y va directo al jugador. */
+  GestorEnemigos.prototype.lanzarKamikaze = function () {
+    var candidatos = [];
+    for (var i = 0; i < this.enemigos.length; i++) {
+      var e = this.enemigos[i];
+      if (e.vivo && e.estado === 'formacion') { candidatos.push(e); }
+    }
+    if (!candidatos.length) { return; }
+    var el = Util.elegir(candidatos);
+    el.estado = 'kamikaze';
+    el.picadaT = 0;
+    el.disparoPicadaT = Util.azar(0.3, 0.6);
   };
 
   /* Saca de la formacion a un enemigo (de los de abajo, que estan mas sueltos)
@@ -154,7 +198,7 @@
   GestorEnemigos.prototype.recolocar = function () {
     for (var i = 0; i < this.enemigos.length; i++) {
       var e = this.enemigos[i];
-      if (e.estado === 'picando') { continue; }   // el que ataca va por libre
+      if (e.estado === 'picando' || e.estado === 'kamikaze') { continue; }   // los que atacan van por libre
       e.x = this.offsetX + e.columna * E.SEPARACION_X;
       e.y = this.offsetY + e.fila * E.SEPARACION_Y;
     }
@@ -248,7 +292,7 @@
     var max = 0;
     for (var i = 0; i < this.enemigos.length; i++) {
       var e = this.enemigos[i];
-      if (e.vivo && e.estado !== 'picando' && e.y + e.h > max) { max = e.y + e.h; }
+      if (e.vivo && e.estado !== 'picando' && e.estado !== 'kamikaze' && e.y + e.h > max) { max = e.y + e.h; }
     }
     return max;
   };

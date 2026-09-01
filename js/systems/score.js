@@ -17,6 +17,13 @@
   };
 
   /* Devuelve true si esta suma dio una vida extra. */
+  /* Suma una vida si no esta en el tope. Devuelve true si la sumo. */
+  SistemaPuntuacion.prototype.ganarVida = function () {
+    if (this.vidas >= CONFIG.PUNTUACION.MAX_VIDAS) { return false; }
+    this.vidas++;
+    return true;
+  };
+
   SistemaPuntuacion.prototype.sumar = function (n) {
     this.puntos += Math.max(0, Math.floor(n));
     if (this.puntos > this.record) {
