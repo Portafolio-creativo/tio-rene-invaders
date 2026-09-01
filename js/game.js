@@ -114,6 +114,8 @@
     // Cielo del nivel: uno distinto por nivel, el rojizo para los jefes.
     this.renderer.fijarTema(this.esNivelDeJefe ? CONFIG.TEMA_JEFE
       : CONFIG.TEMAS[(this.niveles.nivel - 1) % CONFIG.TEMAS.length]);
+    // Forma de las naves de este nivel (despues del tema, que fija el tinte).
+    this.renderer.fijarNaves(CONFIG.FAMILIAS_NAVE[(this.niveles.nivel - 1) % CONFIG.FAMILIAS_NAVE.length]);
     if (this.esNivelDeJefe) {
       this.jefe.preparar(this.niveles.nivel);
       this.enemigos.vaciar();

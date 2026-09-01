@@ -476,6 +476,10 @@
        Se eligen por (fila, columna, filas, columnas); true = hay nave. */
     FORMAS: ['bloque', 'rombo', 'flancos', 'aspa', 'panal'],
 
+    /* Familia de nave por nivel: cambia la SILUETA (no solo el color). Se
+       turnan, asi cada nivel tiene bichos de otra forma. */
+    FAMILIAS_NAVE: ['clasico', 'platillo', 'insecto', 'robot', 'medusa'],
+
     COLORES: {
       FONDO: '#070a14',
       SUELO: '#46d16a',

@@ -37,6 +37,36 @@
     this.cacheTinte = {};
   };
 
+  /* Prepara las naves del nivel: dibuja la familia elegida (3 tipos x 2
+     fotogramas) y le aplica el tinte del nivel, todo cacheado. dibujarEnemigos
+     saca de aqui, asi la forma Y el color cambian por nivel. */
+  Renderer.prototype.fijarNaves = function (familia) {
+    this.cacheNaves = {};
+    if (!familia || !TRI.FallbackArt) { return; }
+    var tipos = ['enemy-01', 'enemy-02', 'enemy-03'];
+    for (var i = 0; i < tipos.length; i++) {
+      for (var alt = 0; alt < 2; alt++) {
+        var base = TRI.FallbackArt.nave(familia, tipos[i], alt === 1);
+        this.cacheNaves[tipos[i] + (alt === 1 ? '-b' : '-a')] = this.tintarLienzo(base);
+      }
+    }
+  };
+
+  /* Tinta un lienzo con el color del nivel, respetando su silueta. Sin tinte,
+     lo devuelve tal cual. */
+  Renderer.prototype.tintarLienzo = function (base) {
+    if (!this.tinteActual) { return base; }
+    var c = document.createElement('canvas');
+    c.width = base.width; c.height = base.height;
+    var cx = c.getContext('2d');
+    cx.drawImage(base, 0, 0);
+    cx.globalCompositeOperation = 'source-atop';
+    cx.globalAlpha = 0.5;
+    cx.fillStyle = this.tinteActual;
+    cx.fillRect(0, 0, base.width, base.height);
+    return c;
+  };
+
   /* Devuelve el sprite del enemigo tintado con el color del nivel, cacheado.
      Sin tinte, devuelve el original. El tinte se hace con source-atop sobre un
      lienzo aparte, asi respeta la silueta y no pinta un cuadrado. */
@@ -189,7 +219,8 @@
     for (var i = 0; i < lista.length; i++) {
       var e = lista[i];
       if (!e.vivo) { continue; }
-      var img = this.spriteTintado(e.sprite + alterno);
+      var clave = e.sprite + alterno;
+      var img = (this.cacheNaves && this.cacheNaves[clave]) || this.spriteTintado(clave);
       if (img) { ctx.drawImage(img, e.x, e.y, e.w, e.h); }
     }
   };

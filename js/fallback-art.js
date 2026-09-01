@@ -281,6 +281,81 @@
     return c;
   }
 
+  /* Familias de nave: mismas 3 filas (color por tipo) pero SILUETA distinta,
+     para que cada nivel se vea diferente y no solo cambie de color. El color
+     del nivel se aplica encima (lo hace el renderer). alterno = 2do fotograma
+     de la marcha (mueve patas/antenas). */
+  function construirNave(familia, tipo, alterno) {
+    var p = PALETA_ENEMIGOS[tipo] || PALETA_ENEMIGOS['enemy-01'];
+    var c = lienzo(36, 30), ctx = c.getContext('2d');
+    var d = alterno ? 2 : -2;
+    ctx.lineWidth = 2; ctx.strokeStyle = p.borde; ctx.fillStyle = p.cuerpo;
+    ctx.lineJoin = 'round';
+
+    function ojos(cxs, ry) {
+      cxs.forEach(function (cx) {
+        ctx.fillStyle = p.ojo; ctx.beginPath();
+        ctx.ellipse(cx, ry, 4, 4, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+        ctx.fillStyle = p.pupila; ctx.beginPath();
+        ctx.arc(cx + d * 0.5, ry, 1.9, 0, Math.PI * 2); ctx.fill();
+      });
+      ctx.fillStyle = p.cuerpo;
+    }
+
+    if (familia === 'platillo') {
+      // Disco con cupula y luces abajo.
+      ctx.beginPath(); ctx.ellipse(18, 17, 15, 6, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+      ctx.beginPath(); ctx.arc(18, 13, 8, Math.PI, 0); ctx.fill(); ctx.stroke();
+      ojos([13, 23], 11);
+      ctx.fillStyle = p.pupila;
+      [8, 14, 22, 28].forEach(function (lx, i) {
+        var on = (i % 2 === 0) === !!alterno;
+        ctx.globalAlpha = on ? 1 : 0.35;
+        ctx.beginPath(); ctx.arc(lx, 21, 1.6, 0, Math.PI * 2); ctx.fill();
+      });
+      ctx.globalAlpha = 1;
+    } else if (familia === 'insecto') {
+      // Rombo con antenas y pinzas.
+      ctx.beginPath();
+      ctx.moveTo(18, 3); ctx.lineTo(31, 15); ctx.lineTo(18, 27); ctx.lineTo(5, 15);
+      ctx.closePath(); ctx.fill(); ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(12, 6); ctx.lineTo(7 - d, 0);
+      ctx.moveTo(24, 6); ctx.lineTo(29 + d, 0);
+      ctx.moveTo(6, 15); ctx.lineTo(1, 15 + d);
+      ctx.moveTo(30, 15); ctx.lineTo(35, 15 - d);
+      ctx.stroke();
+      ojos([14, 22], 14);
+    } else if (familia === 'robot') {
+      // Cuerpo cuadrado con antena y ojos rectangulares.
+      redondeado(ctx, 6, 7, 24, 18, 3); ctx.fill(); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(18, 7); ctx.lineTo(18, 1); ctx.stroke();
+      ctx.beginPath(); ctx.arc(18, 1, 1.6, 0, Math.PI * 2); ctx.fillStyle = p.ojo; ctx.fill();
+      ctx.fillStyle = p.ojo;
+      [11, 25].forEach(function (cx) {
+        ctx.fillRect(cx - 3, 12, 6, 5); ctx.strokeRect(cx - 3, 12, 6, 5);
+        ctx.fillStyle = p.pupila; ctx.fillRect(cx - 1 + d * 0.5, 13, 2, 3); ctx.fillStyle = p.ojo;
+      });
+      ctx.fillStyle = p.pupila;
+      [10, 18, 26].forEach(function (lx) { ctx.fillRect(lx - 1, 25, 2, 3 + (alterno ? 1 : 0)); });
+    } else if (familia === 'medusa') {
+      // Campana con tentaculos colgando.
+      ctx.beginPath(); ctx.arc(18, 15, 12, Math.PI, 0); ctx.lineTo(30, 16); ctx.lineTo(6, 16);
+      ctx.closePath(); ctx.fill(); ctx.stroke();
+      ctx.beginPath();
+      [9, 15, 21, 27].forEach(function (tx, i) {
+        var largo = (i % 2 === 0) === !!alterno ? 28 : 24;
+        ctx.moveTo(tx, 16); ctx.quadraticCurveTo(tx + d, 22, tx, largo);
+      });
+      ctx.stroke();
+      ojos([14, 22], 12);
+    } else {
+      // 'clasico': el cangrejo de siempre.
+      return enemigo(tipo, alterno);
+    }
+    return c;
+  }
+
   var GENERADORES = {
     'player-head': cabeza,
     'player-jaw': mandibula,
@@ -310,6 +385,10 @@
     generar: function (nombre) {
       var gen = GENERADORES[nombre];
       return gen ? gen() : lienzo(8, 8);
+    },
+    /* Nave de una familia concreta (para variar la forma por nivel). */
+    nave: function (familia, tipo, alterno) {
+      return construirNave(familia, tipo, alterno);
     }
   };
 })(window);
