@@ -216,6 +216,84 @@ body.tactil #btn-pausa-barra { display: inline-block; }
 .titulo-capa.peligro { color: var(--peligro); }
 .titulo-capa.exito { color: var(--verde); }
 
+/* ---------- Pantalla de fin (game over / victoria): una tarjeta ---------- */
+.capa-fin { background: rgba(4, 6, 12, 0.82); backdrop-filter: blur(2px); }
+
+.tarjeta-fin {
+  width: min(92%, 340px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 26px 22px 20px;
+  background: linear-gradient(180deg, #101a30 0%, #0a1120 100%);
+  border: 1px solid #2b3a63;
+  border-radius: 16px;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.55),
+              inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.tarjeta-fin .titulo-capa { margin: 0; }
+.tarjeta-fin.exito { border-color: #2f6b45; box-shadow: 0 18px 50px rgba(0,0,0,.55), 0 0 40px rgba(70,209,106,.18); }
+#capa-game-over .tarjeta-fin { box-shadow: 0 18px 50px rgba(0,0,0,.55), 0 0 40px rgba(255,107,107,.14); }
+
+/* Bloque del puntaje: el numero grande manda. */
+.puntaje-bloque {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  width: 100%;
+  padding: 14px 10px;
+  background: rgba(0, 0, 0, 0.28);
+  border-radius: 12px;
+}
+
+.puntaje-rotulo { font-size: 11px; letter-spacing: 3px; color: var(--tinta-tenue); }
+
+.puntaje-num {
+  font-family: var(--fuente);
+  font-size: clamp(44px, 13vw, 60px);
+  font-weight: bold;
+  line-height: 1;
+  letter-spacing: 2px;
+  color: var(--verde);
+  text-shadow: 0 0 18px rgba(70, 209, 106, 0.35);
+}
+
+.record-linea { margin-top: 6px; font-size: 12px; letter-spacing: 2px; color: var(--tinta-tenue); }
+.record-linea strong { color: var(--acento); }
+
+/* Acciones principales, a lo ancho de la tarjeta. */
+.acciones-fin { display: flex; flex-direction: column; gap: 9px; width: 100%; }
+.acciones-fin .boton { width: 100%; min-width: 0; }
+
+/* Pie: acciones secundarias como enlaces discretos, no botones que compiten. */
+.acciones-pie {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  gap: 12px;
+  margin-top: 2px;
+}
+
+.enlace-fin {
+  font-family: var(--fuente);
+  font-size: 12px;
+  letter-spacing: 1px;
+  color: var(--tinta-tenue);
+  background: none;
+  border: 0;
+  padding: 8px 4px;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.enlace-fin:hover { color: var(--tinta); }
+.enlace-fin.apoyo { color: var(--acento); }
+.enlace-fin:focus-visible { outline: 2px solid var(--acento); outline-offset: 2px; border-radius: 4px; }
+
 .lema {
   margin: 0;
   font-size: 13px;

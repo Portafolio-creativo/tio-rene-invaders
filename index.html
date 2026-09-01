@@ -40,7 +40,7 @@
 <meta name="twitter:description" content="El Tío René defiende el barrio disparando desde la boca. Arcade chileno para tu navegador.">
 <meta name="twitter:image" content="https://portafolio-creativo.github.io/tio-rene-invaders/assets/ui/og-cover.jpg">
 <meta name="theme-color" content="#070a14">
-<link rel="stylesheet" href="css/style.css?v=202609011229">
+<link rel="stylesheet" href="css/style.css?v=202609011259">
 </head>
 <body>
 
@@ -110,28 +110,46 @@
       </section>
 
       <!-- GAME OVER -->
-      <section class="capa" id="capa-game-over" hidden>
-        <h2 class="titulo-capa peligro">GAME OVER</h2>
-        <p id="mensaje-final" class="lema"></p>
-        <p class="marcador-menu">PUNTOS <strong id="puntos-final">00000</strong></p>
-        <p class="marcador-menu">RÉCORD <strong id="record-final">00000</strong></p>
-        <button type="button" id="btn-reintentar" class="boton principal">OTRA VEZ</button>
-        <button type="button" id="btn-compartir" class="boton compartir">📤 COMPARTIR MI PUNTAJE</button>
-        <button type="button" id="btn-menu-final" class="boton">MENÚ</button>
-        <a class="boton apoyo" href="https://maladifusion.github.io/apoyo/"
-           target="_blank" rel="noopener noreferrer">💛 Apoya al creador</a>
+      <section class="capa capa-fin" id="capa-game-over" hidden>
+        <div class="tarjeta-fin">
+          <h2 class="titulo-capa peligro">GAME OVER</h2>
+          <p id="mensaje-final" class="lema"></p>
+          <div class="puntaje-bloque">
+            <span class="puntaje-rotulo">TU PUNTAJE</span>
+            <span class="puntaje-num" id="puntos-final">00000</span>
+            <span class="record-linea">RÉCORD <strong id="record-final">00000</strong></span>
+          </div>
+          <div class="acciones-fin">
+            <button type="button" id="btn-reintentar" class="boton principal">OTRA VEZ</button>
+            <button type="button" id="btn-compartir" class="boton compartir">📤 COMPARTIR PUNTAJE</button>
+          </div>
+          <div class="acciones-pie">
+            <button type="button" id="btn-menu-final" class="enlace-fin">⌂ Inicio</button>
+            <a class="enlace-fin apoyo" href="https://maladifusion.github.io/apoyo/"
+               target="_blank" rel="noopener noreferrer">💛 Apoya al creador</a>
+          </div>
+        </div>
       </section>
 
       <!-- VICTORIA -->
-      <section class="capa" id="capa-victoria" hidden>
-        <h2 class="titulo-capa exito">¡VICTORIA!</h2>
-        <p class="lema">El barrio quedó a salvo. Por ahora.</p>
-        <p class="marcador-menu">PUNTOS <strong id="puntos-victoria">00000</strong></p>
-        <button type="button" id="btn-seguir" class="boton principal">SEGUIR JUGANDO</button>
-        <button type="button" id="btn-compartir-victoria" class="boton compartir">📤 COMPARTIR MI PUNTAJE</button>
-        <button type="button" id="btn-menu-victoria" class="boton">MENÚ</button>
-        <a class="boton apoyo" href="https://maladifusion.github.io/apoyo/"
-           target="_blank" rel="noopener noreferrer">💛 Apoya al creador</a>
+      <section class="capa capa-fin" id="capa-victoria" hidden>
+        <div class="tarjeta-fin exito">
+          <h2 class="titulo-capa exito">¡VICTORIA!</h2>
+          <p class="lema">El barrio quedó a salvo. Por ahora.</p>
+          <div class="puntaje-bloque">
+            <span class="puntaje-rotulo">TU PUNTAJE</span>
+            <span class="puntaje-num" id="puntos-victoria">00000</span>
+          </div>
+          <div class="acciones-fin">
+            <button type="button" id="btn-seguir" class="boton principal">SEGUIR JUGANDO</button>
+            <button type="button" id="btn-compartir-victoria" class="boton compartir">📤 COMPARTIR PUNTAJE</button>
+          </div>
+          <div class="acciones-pie">
+            <button type="button" id="btn-menu-victoria" class="enlace-fin">⌂ Inicio</button>
+            <a class="enlace-fin apoyo" href="https://maladifusion.github.io/apoyo/"
+               target="_blank" rel="noopener noreferrer">💛 Apoya al creador</a>
+          </div>
+        </div>
       </section>
     </div>
   </main>
@@ -186,28 +204,28 @@
 
 <p id="estado-accesible" class="oculto-visual" aria-live="polite"></p>
 
-<script src="js/config.js?v=202609011229"></script>
-<script src="js/util.js?v=202609011229"></script>
-<script src="js/storage.js?v=202609011229"></script>
-<script src="js/fallback-art.js?v=202609011229"></script>
-<script src="js/assets.js?v=202609011229"></script>
-<script src="js/audio.js?v=202609011229"></script>
-<script src="js/input.js?v=202609011229"></script>
-<script src="js/instalar.js?v=202609011229"></script>
-<script src="js/compartir.js?v=202609011229"></script>
-<script src="js/entities/player.js?v=202609011229"></script>
-<script src="js/entities/enemy.js?v=202609011229"></script>
-<script src="js/entities/projectile.js?v=202609011229"></script>
-<script src="js/entities/barrier.js?v=202609011229"></script>
-<script src="js/entities/ufo.js?v=202609011229"></script>
-<script src="js/entities/boss.js?v=202609011229"></script>
-<script src="js/entities/particles.js?v=202609011229"></script>
-<script src="js/systems/collisions.js?v=202609011229"></script>
-<script src="js/systems/score.js?v=202609011229"></script>
-<script src="js/systems/levels.js?v=202609011229"></script>
-<script src="js/renderer.js?v=202609011229"></script>
-<script src="js/game.js?v=202609011229"></script>
-<script src="js/ui.js?v=202609011229"></script>
-<script src="js/main.js?v=202609011229"></script>
+<script src="js/config.js?v=202609011259"></script>
+<script src="js/util.js?v=202609011259"></script>
+<script src="js/storage.js?v=202609011259"></script>
+<script src="js/fallback-art.js?v=202609011259"></script>
+<script src="js/assets.js?v=202609011259"></script>
+<script src="js/audio.js?v=202609011259"></script>
+<script src="js/input.js?v=202609011259"></script>
+<script src="js/instalar.js?v=202609011259"></script>
+<script src="js/compartir.js?v=202609011259"></script>
+<script src="js/entities/player.js?v=202609011259"></script>
+<script src="js/entities/enemy.js?v=202609011259"></script>
+<script src="js/entities/projectile.js?v=202609011259"></script>
+<script src="js/entities/barrier.js?v=202609011259"></script>
+<script src="js/entities/ufo.js?v=202609011259"></script>
+<script src="js/entities/boss.js?v=202609011259"></script>
+<script src="js/entities/particles.js?v=202609011259"></script>
+<script src="js/systems/collisions.js?v=202609011259"></script>
+<script src="js/systems/score.js?v=202609011259"></script>
+<script src="js/systems/levels.js?v=202609011259"></script>
+<script src="js/renderer.js?v=202609011259"></script>
+<script src="js/game.js?v=202609011259"></script>
+<script src="js/ui.js?v=202609011259"></script>
+<script src="js/main.js?v=202609011259"></script>
 </body>
 </html>
